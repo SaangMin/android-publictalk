@@ -2,4 +2,5 @@
     <string name="app_name">PublicTalk</string>
     <string name="navigation_login">로그인 화면</string>
     <string name="logo_icon_description">로고 이미지</string>
+    <string name="loading_text">잠시만 기다려주세요.</string>
 </resources>
