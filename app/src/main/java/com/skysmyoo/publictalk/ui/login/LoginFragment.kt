@@ -80,6 +80,7 @@ class LoginFragment : BaseFragment() {
                     }
                 } else {
                     Log.e(TAG, "one tap login failed: $result")
+                    Snackbar.make(binding.root,getString(R.string.login_error_msg_retry), Snackbar.LENGTH_SHORT).show()
                 }
             }
         legacyLauncher =
@@ -94,6 +95,7 @@ class LoginFragment : BaseFragment() {
                     }
                 } else {
                     Log.e(TAG, "legacy login failed: ${result.resultCode}")
+                    Snackbar.make(binding.root,getString(R.string.login_error_msg_retry), Snackbar.LENGTH_SHORT).show()
                 }
             }
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)

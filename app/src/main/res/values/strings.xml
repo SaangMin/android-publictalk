@@ -4,4 +4,5 @@
     <string name="logo_icon_description">로고 이미지</string>
     <string name="loading_text">잠시만 기다려주세요.</string>
     <string name="login_success_msg">로그인 되었습니다.</string>
+    <string name="login_error_msg_retry">알 수 없는 원인으로 로그인 실패하였습니다. 다시 시도해주세요.</string>
 </resources>
