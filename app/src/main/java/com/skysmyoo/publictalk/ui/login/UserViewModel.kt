@@ -69,7 +69,6 @@ class UserViewModel(
                                 repository.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
                                         _isLoading.value = false
-                                        Log.d(TAG, "$user")
                                     } else {
                                         Log.e(TAG, "put user error!: ${errorBody()}")
                                     }

@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.ui.login
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -18,7 +19,9 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.data.source.remote.LoginRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
+import com.skysmyoo.publictalk.ui.MainActivity
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
+import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
 
 class SettingInfoFragment : BaseFragment() {
 
@@ -85,7 +88,20 @@ class SettingInfoFragment : BaseFragment() {
     private fun submitUserObserver() {
         viewModel.submitEvent.observe(viewLifecycleOwner) {
             viewModel.submitUser(imageUri, userLanguage?.code ?: "ko")
+            setProjectLanguage()
         }
+    }
+
+    private fun setProjectLanguage() {
+        val settingLanguage =
+            when (userLanguage?.code) {
+                "ko" -> "ko"
+                else -> "en"
+            }
+        LanguageSharedPreferences.setLocale(requireContext(), settingLanguage)
+
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        startActivity(intent)
     }
 
     private fun setPickImage() {

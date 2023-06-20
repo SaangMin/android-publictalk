@@ -28,6 +28,6 @@ class PublicTalkApplication : Application() {
     }
 
     companion object {
-        const val CHANNEL_ID = "public talk notification channel"
+        private const val CHANNEL_ID = "public talk notification channel"
     }
 }

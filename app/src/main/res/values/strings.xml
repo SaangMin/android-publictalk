@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">PublicTalk</string>
-    <string name="navigation_login_label">로그인 화면</string>
-    <string name="logo_icon_description">로고 이미지</string>
-    <string name="loading_text">잠시만 기다려주세요.</string>
-    <string name="login_success_msg">로그인 되었습니다.</string>
-    <string name="login_error_msg_retry">알 수 없는 원인으로 로그인 실패하였습니다. 다시 시도해주세요.</string>
-    <string name="edit_profile_image">이미지 설정</string>
-    <string name="setting_profile_image_label">프로필 이미지 설정</string>
+    <string name="navigation_login_label">login screen</string>
+    <string name="logo_icon_description">logo image</string>
+    <string name="loading_text">Loading...</string>
+    <string name="login_success_msg">login success!</string>
+    <string name="login_error_msg_retry">login error! Please retry!</string>
+    <string name="edit_profile_image">image setting</string>
+    <string name="setting_profile_image_label">프로필 이미지 설정\nProfile Image Setting</string>
     <string name="email_label">이메일\n(Email)</string>
     <string name="email_sample">abcde@gmail.com</string>
     <string name="name_label">이름\n(Name)</string>
@@ -15,9 +15,9 @@
     <string name="phone_number_label">핸드폰 번호\n(Phone)</string>
     <string name="input_phone_number">핸드폰 번호(phone)</string>
     <string name="entrance">입장\n(Entrance)</string>
-    <string name="navigation_setting_info_label">정보 입력 화면</string>
-    <string name="nothing_select_language_msg">언어를 선택해주세요.</string>
-    <string name="not_required_error_msg">빈 칸 없이 입력해주세요.</string>
+    <string name="navigation_setting_info_label">setting information screen</string>
+    <string name="nothing_select_language_msg">Please select language.</string>
+    <string name="not_required_error_msg">Please enter without spaces.</string>
     <string name="channel_name">public talk notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
