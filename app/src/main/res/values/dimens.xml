@@ -2,6 +2,6 @@
 <resources>
     <dimen name="margin_login">20dp</dimen>
     <dimen name="margin_loading">16dp</dimen>
-    <dimen name="margin_setting_info">16dp</dimen>
+    <dimen name="margin_setting_info">24dp</dimen>
     <dimen name="padding_setting_info_entrance">24dp</dimen>
 </resources>
