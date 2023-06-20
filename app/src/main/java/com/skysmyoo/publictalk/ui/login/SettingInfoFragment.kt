@@ -1,9 +1,14 @@
 package com.skysmyoo.publictalk.ui.login
 
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
@@ -15,13 +20,38 @@ class SettingInfoFragment : BaseFragment() {
 
     override val binding get() = _binding as FragmentSettingInfoBinding
     override val layoutId: Int get() = R.layout.fragment_setting_info
+
+    private lateinit var pickImage: ActivityResultLauncher<String>
     private var userLanguage: Language? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setPickImage()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvSettingInfoEmail.text = FirebaseData.user?.email
+        binding.ivSettingInfoProfile.setOnClickListener {
+            pickImage.launch("image/*")
+        }
         setSpinner()
+    }
+
+    private fun setPickImage() {
+        pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                requireActivity().contentResolver.query(it, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    cursor.moveToFirst()
+                    val imageName = cursor.getString(nameIndex)
+                    binding.ivSettingInfoProfile.setImageURI(it)
+                }
+            } ?: run {
+                Log.d(TAG, "No media selected")
+            }
+        }
     }
 
     private fun setSpinner() {

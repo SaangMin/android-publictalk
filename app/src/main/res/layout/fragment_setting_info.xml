@@ -17,9 +17,10 @@
 
         <ImageView
             android:id="@+id/iv_setting_info_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:contentDescription="@string/edit_profile_image"
+            android:padding="10dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_edit_profile_image"
             app:layout_constraintBottom_toTopOf="@id/tv_setting_info_profile_label"
