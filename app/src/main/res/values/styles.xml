@@ -8,7 +8,7 @@
 
     <style name="MySettingInfoEditStyle">
         <item name="android:lines">1</item>
-        <item name="android:layout_margin">28dp</item>
+        <item name="android:layout_margin">@dimen/margin_setting_info_edit_text</item>
         <item name="android:textSize">20sp</item>
         <item name="android:padding">4dp</item>
         <item name="android:background">@android:color/transparent</item>
