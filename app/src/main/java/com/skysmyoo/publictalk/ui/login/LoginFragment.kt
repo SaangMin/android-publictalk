@@ -25,6 +25,7 @@ import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setDeviceToken
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
 
@@ -137,6 +138,7 @@ class LoginFragment : BaseFragment() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                     setUserInfo()
+                    setDeviceToken()
                     setNavigation()
                 } else {
                     Log.w(TAG, "signInWithCredential failed : ${task.exception}")

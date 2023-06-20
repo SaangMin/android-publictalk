@@ -24,7 +24,6 @@ interface ApiClient {
         private const val baseUrl = BuildConfig.BASE_URL
 
         fun create(): ApiClient {
-
             val logger = HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BASIC
             }
