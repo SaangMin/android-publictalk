@@ -8,6 +8,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 
 class SettingInfoFragment : BaseFragment() {
@@ -19,6 +20,7 @@ class SettingInfoFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.tvSettingInfoEmail.text = FirebaseData.user?.email
         setSpinner()
     }
 
@@ -50,5 +52,9 @@ class SettingInfoFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "SettingInfoFragment"
     }
 }
