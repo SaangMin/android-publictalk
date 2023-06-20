@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PublicTalk</string>
-    <string name="navigation_login">로그인 화면</string>
+    <string name="navigation_login_label">로그인 화면</string>
     <string name="logo_icon_description">로고 이미지</string>
     <string name="loading_text">잠시만 기다려주세요.</string>
     <string name="login_success_msg">로그인 되었습니다.</string>
@@ -15,4 +15,6 @@
     <string name="phone_number_label">핸드폰 번호\n(Phone)</string>
     <string name="input_phone_number">핸드폰 번호(phone)</string>
     <string name="entrance">입장\n(Entrance)</string>
+    <string name="navigation_setting_info_label">정보 입력 화면</string>
+    <string name="nothing_select_language_msg">언어를 선택해주세요.</string>
 </resources>

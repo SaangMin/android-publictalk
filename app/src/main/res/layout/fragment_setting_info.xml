@@ -128,7 +128,9 @@
             android:id="@+id/sp_setting_info_language"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="24dp"
+            android:layout_margin="@dimen/margin_setting_info"
+            android:padding="8dp"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_setting_info_language_label"
             app:layout_constraintTop_toBottomOf="@id/et_setting_info_phone" />
