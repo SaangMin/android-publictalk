@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -136,10 +137,16 @@ class LoginFragment : BaseFragment() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                     setUserInfo()
+                    setNavigation()
                 } else {
                     Log.w(TAG, "signInWithCredential failed : ${task.exception}")
                 }
             }
+    }
+
+    private fun setNavigation() {
+        val action = LoginFragmentDirections.actionLoginToSettingInfo()
+        findNavController().navigate(action)
     }
 
     companion object {
