@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.login.SettingInfoFragment">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <ImageView
+            android:id="@+id/iv_setting_info_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/edit_profile_image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_edit_profile_image"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_info_profile_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_top" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_profile_label"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting_info"
+            android:text="@string/setting_profile_image_label"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_setting_info_profile" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_email_label"
+            style="@style/MySettingInfoLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_label"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_info_name_label"
+            app:layout_constraintStart_toEndOf="@id/gl_start"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_profile_label" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting_info"
+            android:padding="4dp"
+            android:textAlignment="textEnd"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/et_setting_info_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_setting_info_email_label"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_profile_label"
+            tools:text="@string/email_sample" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_name_label"
+            style="@style/MySettingInfoLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/name_label"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_info_phone_label"
+            app:layout_constraintStart_toEndOf="@id/gl_start"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_email_label" />
+
+        <EditText
+            android:id="@+id/et_setting_info_name"
+            style="@style/MySettingInfoEditStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="no"
+            android:hint="@string/input_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_setting_info_name_label"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_email" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_phone_label"
+            style="@style/MySettingInfoLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/phone_number_label"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_info_language_label"
+            app:layout_constraintStart_toEndOf="@id/gl_start"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_name_label" />
+
+        <EditText
+            android:id="@+id/et_setting_info_phone"
+            style="@style/MySettingInfoEditStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="no"
+            android:hint="@string/input_phone_number"
+            android:inputType="phone"
+            app:layout_constraintBottom_toTopOf="@id/sp_setting_info_language"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_setting_info_phone_label"
+            app:layout_constraintTop_toBottomOf="@id/et_setting_info_name" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_language_label"
+            style="@style/MySettingInfoLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/language_label"
+            app:layout_constraintStart_toEndOf="@id/gl_start"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_info_phone_label" />
+
+        <Spinner
+            android:id="@+id/sp_setting_info_language"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_setting_info_language_label"
+            app:layout_constraintTop_toBottomOf="@id/et_setting_info_phone" />
+
+        <TextView
+            android:id="@+id/tv_setting_info_submit"
+            style="@style/MySettingInfoEntranceStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_setting_info_entrance"
+            android:text="@string/entrance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

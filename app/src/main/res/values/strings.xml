@@ -5,4 +5,14 @@
     <string name="loading_text">잠시만 기다려주세요.</string>
     <string name="login_success_msg">로그인 되었습니다.</string>
     <string name="login_error_msg_retry">알 수 없는 원인으로 로그인 실패하였습니다. 다시 시도해주세요.</string>
+    <string name="edit_profile_image">이미지 설정</string>
+    <string name="setting_profile_image_label">프로필 이미지 설정</string>
+    <string name="email_label">이메일\n(Email)</string>
+    <string name="email_sample">abcde@gmail.com</string>
+    <string name="name_label">이름\n(Name)</string>
+    <string name="input_name">이름(name)</string>
+    <string name="language_label">언어\n(Language)</string>
+    <string name="phone_number_label">핸드폰 번호\n(Phone)</string>
+    <string name="input_phone_number">핸드폰 번호(phone)</string>
+    <string name="entrance">입장\n(Entrance)</string>
 </resources>
