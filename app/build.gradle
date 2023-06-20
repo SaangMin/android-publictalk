@@ -26,6 +26,7 @@ android {
 
         buildConfigField "String", "GOOGLE_CLIENT_ID", properties["google_client_id"]
         buildConfigField "String", "BASE_URL", properties["base_url"]
+        buildConfigField "String", "FCM_BASE_URL", properties["fcm_base_url"]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
