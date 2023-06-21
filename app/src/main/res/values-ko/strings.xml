@@ -21,4 +21,8 @@
     <string name="channel_name">public talk notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
+    <string name="add_friend">친구 추가</string>
+    <string name="friend_list">친구 목록</string>
+    <string name="chat_list">채팅 목록</string>
+    <string name="setting">설정</string>
 </resources>

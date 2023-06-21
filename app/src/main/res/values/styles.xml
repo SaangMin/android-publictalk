@@ -24,4 +24,8 @@
         <item name="android:textSize">16sp</item>
         <item name="android:background">@color/color_entrance</item>
     </style>
+
+    <style name="MyHomeBottomNavigation">
+        <item name="menu">@menu/home_bn_menu</item>
+    </style>
 </resources>
