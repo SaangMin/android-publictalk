@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/start_navigation"
+    app:startDestination="@id/navigation_login">
+
+    <fragment
+        android:id="@+id/navigation_login"
+        android:name="com.skysmyoo.publictalk.ui.login.LoginFragment"
+        android:label="@string/navigation_login_label"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_to_setting_info"
+            app:destination="@id/navigation_setting_info" />
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/navigation_home_activity" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_setting_info"
+        android:name="com.skysmyoo.publictalk.ui.login.SettingInfoFragment"
+        android:label="@string/navigation_setting_info_label"
+        tools:layout="@layout/fragment_setting_info">
+        <action
+            android:id="@+id/action_setting_info_to_home"
+            app:destination="@id/navigation_home_activity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/navigation_home_activity"
+        android:name="com.skysmyoo.publictalk.ui.HomeActivity"
+        android:label="@string/navigation_home_activity_label"
+        tools:layout="@layout/fragment_home" />
+
+</navigation>
