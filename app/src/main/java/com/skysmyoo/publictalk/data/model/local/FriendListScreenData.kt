@@ -9,7 +9,7 @@ sealed class FriendListScreenData {
             get() = header
     }
 
-    data class FriendListItem(val friend: User) : FriendListScreenData() {
+    data class Friend(val friend: User) : FriendListScreenData() {
         override val id: String
             get() = friend.toString()
     }

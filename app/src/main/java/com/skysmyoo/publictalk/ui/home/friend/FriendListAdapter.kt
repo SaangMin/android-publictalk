@@ -19,14 +19,14 @@ class FriendListAdapter :
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is FriendListScreenData.Header -> TYPE_HEADER
-            is FriendListScreenData.FriendListItem -> TYPE_FRIEND
+            is FriendListScreenData.Friend -> TYPE_FRIEND
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_HEADER -> HeaderViewHolder.from(parent)
-            TYPE_FRIEND -> FriendListViewHolder.from(parent)
+            TYPE_FRIEND -> FriendViewHolder.from(parent)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -38,8 +38,8 @@ class FriendListAdapter :
                 holder.bind(header)
             }
 
-            is FriendListViewHolder -> {
-                val friend = getItemId(position) as FriendListScreenData.FriendListItem
+            is FriendViewHolder -> {
+                val friend = getItem(position) as FriendListScreenData.Friend
                 holder.bind(friend)
             }
         }
@@ -67,20 +67,20 @@ class FriendListAdapter :
         }
     }
 
-    class FriendListViewHolder(
+    class FriendViewHolder(
         private val binding: ItemFriendListBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: FriendListScreenData.FriendListItem) {
+        fun bind(item: FriendListScreenData.Friend) {
             val friend = item.friend
             binding.ivItemFriendProfile.load(friend.userProfileImage)
             binding.tvItemFriendName.text = friend.userName
         }
 
         companion object {
-            fun from(parent: ViewGroup): FriendListViewHolder {
+            fun from(parent: ViewGroup): FriendViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return FriendListViewHolder(ItemFriendListBinding.inflate(inflater, parent, false))
+                return FriendViewHolder(ItemFriendListBinding.inflate(inflater, parent, false))
             }
         }
     }
