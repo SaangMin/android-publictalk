@@ -8,7 +8,7 @@ object LanguageSharedPreferences {
 
     fun setLocale(context: Context, locale: String) {
         val editor = context.getSharedPreferences(LANGUAGE_PREFERENCES, Context.MODE_PRIVATE).edit()
-        editor.putString(LANGUAGE_KEY, locale)
+        editor.putString(LANGUAGE_KEY, setLanguage(locale))
         editor.apply()
     }
 
@@ -16,5 +16,12 @@ object LanguageSharedPreferences {
         val sharedPreferences =
             context.getSharedPreferences(LANGUAGE_PREFERENCES, Context.MODE_PRIVATE)
         return sharedPreferences.getString(LANGUAGE_KEY, "default") ?: "default"
+    }
+
+    private fun setLanguage(language: String): String {
+        return when (language) {
+            "ko" -> "ko"
+            else -> "en"
+        }
     }
 }

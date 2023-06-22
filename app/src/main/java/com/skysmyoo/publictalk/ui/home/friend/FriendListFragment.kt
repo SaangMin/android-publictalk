@@ -5,6 +5,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
+import com.skysmyoo.publictalk.PublicTalkApplication
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Friend
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Header
@@ -19,7 +20,10 @@ class FriendListFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentFriendListBinding
     override val layoutId: Int get() = R.layout.fragment_friend_list
+
     private lateinit var friendListAdapter: FriendListAdapter
+    private val email = FirebaseData.user?.email
+    private val preferencesManager = PublicTalkApplication.preferencesManager
     private val repository = UserRepository(
         UserLocalDataSource(ServiceLocator.userDao)
     )
@@ -34,21 +38,24 @@ class FriendListFragment : BaseFragment() {
     }
 
     private fun setDefaultAdapterItem(adapter: FriendListAdapter) {
-        lifecycleScope.launch {
-            val myInfo = repository.getMyInfo(FirebaseData.user?.email!!)
-            if (myInfo != null) {
-                val defaultList = listOf(
-                    Header(getString(R.string.mine)),
-                    Friend(myInfo),
-                    Header(getString(R.string.friend_label))
-                )
-                adapter.submitList(defaultList)
-            } else {
-                Snackbar.make(
-                    binding.root,
-                    getString(R.string.load_my_info_error),
-                    Snackbar.LENGTH_SHORT
-                ).show()
+        if (email != null) {
+            preferencesManager.saveMyEmail(email)
+            lifecycleScope.launch {
+                val myInfo = repository.getMyInfo(email)
+                if (myInfo != null) {
+                    val defaultList = listOf(
+                        Header(getString(R.string.mine)),
+                        Friend(myInfo),
+                        Header(getString(R.string.friend_label))
+                    )
+                    adapter.submitList(defaultList)
+                } else {
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.load_my_info_error),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

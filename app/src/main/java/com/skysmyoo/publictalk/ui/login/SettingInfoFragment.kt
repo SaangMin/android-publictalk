@@ -93,12 +93,7 @@ class SettingInfoFragment : BaseFragment() {
     }
 
     private fun startHomeActivity() {
-        val settingLanguage =
-            when (userLanguage?.code) {
-                "ko" -> "ko"
-                else -> "en"
-            }
-        LanguageSharedPreferences.setLocale(requireContext(), settingLanguage)
+        LanguageSharedPreferences.setLocale(requireContext(), userLanguage?.code ?: "ko")
 
         val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
         findNavController().navigate(action)

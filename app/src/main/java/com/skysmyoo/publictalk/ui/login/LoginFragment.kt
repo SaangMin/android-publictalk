@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -24,10 +25,16 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.BuildConfig
+import com.skysmyoo.publictalk.PublicTalkApplication
 import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setDeviceToken
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
+import com.skysmyoo.publictalk.di.ServiceLocator
+import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
+import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment() {
 
@@ -40,6 +47,8 @@ class LoginFragment : BaseFragment() {
     private lateinit var signInRequest: BeginSignInRequest
     private lateinit var oneTapLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var legacyLauncher: ActivityResultLauncher<Intent>
+    private val preferencesManager = PublicTalkApplication.preferencesManager
+    private val repository = UserRepository(UserLocalDataSource(ServiceLocator.userDao))
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
@@ -53,6 +62,9 @@ class LoginFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        validateAlreadyLogin()
+
         binding.btnLogin.setOnClickListener {
             beginLogin(oneTapLauncher, legacyLauncher)
         }
@@ -82,7 +94,11 @@ class LoginFragment : BaseFragment() {
                     }
                 } else {
                     Log.e(TAG, "one tap login failed: $result")
-                    Snackbar.make(binding.root,getString(R.string.login_error_msg_retry), Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.login_error_msg_retry),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             }
         legacyLauncher =
@@ -97,7 +113,11 @@ class LoginFragment : BaseFragment() {
                     }
                 } else {
                     Log.e(TAG, "legacy login failed: ${result.resultCode}")
-                    Snackbar.make(binding.root,getString(R.string.login_error_msg_retry), Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.login_error_msg_retry),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             }
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
@@ -144,6 +164,26 @@ class LoginFragment : BaseFragment() {
                     Log.w(TAG, "signInWithCredential failed : ${task.exception}")
                 }
             }
+    }
+
+    private fun validateAlreadyLogin() {
+        val email = preferencesManager.getMyEmail()
+        if (email == null) {
+            return
+        } else {
+            lifecycleScope.launch {
+                val myInfo = repository.getMyInfo(email)
+                if (myInfo == null) {
+                    return@launch
+                } else {
+                    LanguageSharedPreferences.setLocale(requireContext(), myInfo.userLanguage)
+
+                    val action = LoginFragmentDirections.actionLoginToHome()
+                    findNavController().navigate(action)
+                    requireActivity().finish()
+                }
+            }
+        }
     }
 
     private fun setNavigation() {
