@@ -31,4 +31,7 @@
     <string name="navigation_setting_label">Setting Screen</string>
     <string name="navigation_home_activity_label">Main Screen</string>
     <string name="friends_sample">Friends</string>
+    <string name="me_sample">me</string>
+    <string name="friend_profile_image">Profile Image</string>
+    <string name="friend_name_sample">Steve</string>
 </resources>
