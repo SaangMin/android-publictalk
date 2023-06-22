@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.databinding.ItemFriendListBinding
 import com.skysmyoo.publictalk.databinding.ItemFriendListHeaderBinding
@@ -73,7 +74,10 @@ class FriendListAdapter :
 
         fun bind(item: FriendListScreenData.Friend) {
             val friend = item.friend
-            binding.ivItemFriendProfile.load(friend.userProfileImage)
+            binding.ivItemFriendProfile.load(friend.userProfileImage) {
+                error(R.drawable.icon_profile_image)
+                fallback(R.drawable.icon_profile_image)
+            }
             binding.tvItemFriendName.text = friend.userName
         }
 

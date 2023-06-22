@@ -34,4 +34,7 @@
     <string name="me_sample">me</string>
     <string name="friend_profile_image">Profile Image</string>
     <string name="friend_name_sample">Steve</string>
+    <string name="mine">Me</string>
+    <string name="friend_label">Friends</string>
+    <string name="load_my_info_error">An unknown error has occurred. Please restart the app after closing it.</string>
 </resources>
