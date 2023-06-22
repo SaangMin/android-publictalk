@@ -1,6 +1,6 @@
 package com.skysmyoo.publictalk.data.model.local
 
-import com.skysmyoo.publictalk.data.model.remote.request.User
+import com.skysmyoo.publictalk.data.model.remote.User
 
 sealed class FriendListScreenData {
 

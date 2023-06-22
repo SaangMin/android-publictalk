@@ -3,7 +3,7 @@ package com.skysmyoo.publictalk.data.source.local
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.skysmyoo.publictalk.data.model.remote.request.User
+import com.skysmyoo.publictalk.data.model.remote.User
 
 @Dao
 interface UserModelDao {

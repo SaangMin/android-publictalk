@@ -1,7 +1,7 @@
 package com.skysmyoo.publictalk.data.source.remote
 
 import android.net.Uri
-import com.skysmyoo.publictalk.data.model.remote.request.User
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.tasks.await
 import retrofit2.Response

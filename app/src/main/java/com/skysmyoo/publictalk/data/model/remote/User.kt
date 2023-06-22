@@ -1,4 +1,4 @@
-package com.skysmyoo.publictalk.data.model.remote.request
+package com.skysmyoo.publictalk.data.model.remote
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

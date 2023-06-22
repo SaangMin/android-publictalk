@@ -1,6 +1,6 @@
 package com.skysmyoo.publictalk.data.source
 
-import com.skysmyoo.publictalk.data.model.remote.request.User
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 
 class UserRepository(
