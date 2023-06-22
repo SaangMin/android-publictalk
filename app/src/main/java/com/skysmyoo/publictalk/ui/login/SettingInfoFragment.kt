@@ -15,8 +15,9 @@ import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
-import com.skysmyoo.publictalk.data.source.remote.LoginRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
@@ -33,9 +34,8 @@ class SettingInfoFragment : BaseFragment() {
     private val loadingDialog by lazy { LoadingDialogFragment() }
     private val viewModel by viewModels<UserViewModel> {
         UserViewModel.provideFactory(
-            UserRepository(
-                LoginRemoteDataSource(ServiceLocator.apiClient)
-            )
+            UserRepository(UserLocalDataSource(ServiceLocator.userDao)),
+            SignInRemoteDataSource(ServiceLocator.apiClient),
         )
     }
 
@@ -86,12 +86,13 @@ class SettingInfoFragment : BaseFragment() {
 
     private fun submitUserObserver() {
         viewModel.submitEvent.observe(viewLifecycleOwner) {
-            viewModel.submitUser(imageUri, userLanguage?.code ?: "ko")
-            setProjectLanguage()
+            viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
+                startHomeActivity()
+            }
         }
     }
 
-    private fun setProjectLanguage() {
+    private fun startHomeActivity() {
         val settingLanguage =
             when (userLanguage?.code) {
                 "ko" -> "ko"
@@ -101,6 +102,7 @@ class SettingInfoFragment : BaseFragment() {
 
         val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
         findNavController().navigate(action)
+        requireActivity().finish()
     }
 
     private fun setPickImage() {

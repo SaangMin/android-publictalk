@@ -12,11 +12,13 @@ import com.skysmyoo.publictalk.data.model.remote.request.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
+import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.launch
 
 class UserViewModel(
     private val repository: UserRepository,
+    private val remoteDataSource: SignInRemoteDataSource,
 ) : ViewModel() {
 
     private val _addImageEvent = MutableLiveData<Unit>()
@@ -46,6 +48,7 @@ class UserViewModel(
     fun submitUser(
         imageUri: Uri?,
         userLanguage: String,
+        startHomeActivity: () -> Unit,
     ) {
         user?.let {
             it.getIdToken(true)
@@ -55,7 +58,7 @@ class UserViewModel(
                         if (idToken != null) {
                             viewModelScope.launch {
                                 _isLoading.value = true
-                                val profileImage = repository.uploadImage(imageUri)
+                                val profileImage = remoteDataSource.uploadImage(imageUri)
                                 val user = User(
                                     userEmail = it.email ?: "",
                                     userName = name.value ?: "",
@@ -66,9 +69,11 @@ class UserViewModel(
                                     userFriendIdList = null,
                                     userCreatedAt = TimeUtil.getCurrentDateString()
                                 )
-                                repository.putUser(idToken, user).run {
+                                remoteDataSource.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
+                                        repository.insertUser(user)
                                         _isLoading.value = false
+                                        startHomeActivity()
                                     } else {
                                         Log.e(TAG, "put user error!: ${errorBody()}")
                                     }
@@ -91,10 +96,11 @@ class UserViewModel(
     companion object {
         private const val TAG = "UserViewModel"
 
-        fun provideFactory(repository: UserRepository) = viewModelFactory {
-            initializer {
-                UserViewModel(repository)
+        fun provideFactory(repository: UserRepository, remoteDataSource: SignInRemoteDataSource) =
+            viewModelFactory {
+                initializer {
+                    UserViewModel(repository, remoteDataSource)
+                }
             }
-        }
     }
 }
