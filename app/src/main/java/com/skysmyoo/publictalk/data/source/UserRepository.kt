@@ -27,4 +27,8 @@ class UserRepository(
     suspend fun uploadImage(image: Uri?): String? {
         return remoteDataSource.uploadImage(image)
     }
+
+    suspend fun clearUser() {
+        localDataSource.clearUser()
+    }
 }
