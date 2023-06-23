@@ -3,6 +3,8 @@ package com.skysmyoo.publictalk.data.source.local
 import android.content.Context
 import android.content.SharedPreferences
 import com.skysmyoo.publictalk.data.model.local.Constants
+import com.skysmyoo.publictalk.data.model.local.Constants.KEY_LANGUAGE_PREFERENCES
+import com.skysmyoo.publictalk.data.model.local.Constants.KEY_USER_LANGUAGE
 
 class SharedPreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -16,10 +18,25 @@ class SharedPreferencesManager(context: Context) {
         return sharedPreferences.getString(Constants.KEY_MY_EMAIL, null)
     }
 
+    fun setLocale(locale: String) {
+        sharedPreferences.edit().putString(KEY_LANGUAGE_PREFERENCES, setLanguage(locale)).apply()
+    }
+
+    fun getLocale(): String {
+        return sharedPreferences.getString(KEY_USER_LANGUAGE, "ko") ?: "ko"
+    }
+
     fun clearUserData() {
         sharedPreferences.edit().run {
             remove(Constants.KEY_MY_EMAIL)
             apply()
+        }
+    }
+
+    private fun setLanguage(language: String): String {
+        return when (language) {
+            "ko" -> "ko"
+            else -> "en"
         }
     }
 }

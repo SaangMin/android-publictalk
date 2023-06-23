@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.UserRepository
@@ -21,7 +22,6 @@ import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
-import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
 
 class SettingInfoFragment : BaseFragment() {
 
@@ -93,7 +93,7 @@ class SettingInfoFragment : BaseFragment() {
     }
 
     private fun startHomeActivity() {
-        LanguageSharedPreferences.setLocale(requireContext(), userLanguage?.code ?: "ko")
+        preferencesManager.setLocale(userLanguage?.code ?: "ko")
 
         val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
         findNavController().navigate(action)

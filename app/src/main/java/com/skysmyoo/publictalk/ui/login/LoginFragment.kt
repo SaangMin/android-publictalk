@@ -33,7 +33,6 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setDeviceToken
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
-import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
 import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment() {
@@ -176,7 +175,7 @@ class LoginFragment : BaseFragment() {
                 if (myInfo == null) {
                     return@launch
                 } else {
-                    LanguageSharedPreferences.setLocale(requireContext(), myInfo.userLanguage)
+                    preferencesManager.setLocale(myInfo.userLanguage)
 
                     val action = LoginFragmentDirections.actionLoginToHome()
                     findNavController().navigate(action)
