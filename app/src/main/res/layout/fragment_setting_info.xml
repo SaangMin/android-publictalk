@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="email"
+            type="String" />
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.login.UserViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,6 +31,7 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:contentDescription="@string/edit_profile_image"
+            android:onClick="@{()->viewModel.addImageClick()}"
             android:padding="10dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_edit_profile_image"
@@ -63,6 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="32dp"
             android:padding="4dp"
+            android:text="@{email}"
             android:textAlignment="textEnd"
             android:textColor="@color/color_text"
             android:textSize="16sp"
@@ -89,6 +102,7 @@
             android:layout_height="wrap_content"
             android:autofillHints="no"
             android:hint="@string/input_name"
+            android:text="@={viewModel.name}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_setting_info_name_label"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_info_email" />
@@ -111,6 +125,7 @@
             android:autofillHints="no"
             android:hint="@string/input_phone_number"
             android:inputType="phone"
+            android:text="@={viewModel.phoneNumber}"
             app:layout_constraintBottom_toTopOf="@id/sp_setting_info_language"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_setting_info_phone_label"
@@ -141,6 +156,7 @@
             style="@style/MySettingInfoEntranceStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:onClick="@{()->viewModel.onSubmitClick()}"
             android:padding="@dimen/padding_setting_info_entrance"
             android:text="@string/entrance"
             app:layout_constraintBottom_toBottomOf="parent"
