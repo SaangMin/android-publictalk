@@ -71,6 +71,7 @@ class UserViewModel(
                                 repository.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
                                         preferencesManager.saveMyEmail(it.email ?: "")
+                                        repository.clearUser()
                                         repository.insertUser(user)
                                         _isLoading.value = false
                                         startHomeActivity()
