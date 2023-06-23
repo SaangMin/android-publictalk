@@ -73,6 +73,7 @@ class UserViewModel(
                                         preferencesManager.saveMyEmail(it.email ?: "")
                                         repository.clearUser()
                                         repository.insertUser(user)
+                                        preferencesManager.saveMyEmail(user.userEmail)
                                         _isLoading.value = false
                                         startHomeActivity()
                                     } else {

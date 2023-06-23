@@ -209,7 +209,6 @@ class LoginFragment : BaseFragment() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
-                        result = true
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.exist_user_info_msg),
@@ -222,8 +221,10 @@ class LoginFragment : BaseFragment() {
                                 clearUser()
                                 insertUser(user)
                             }
+                            setUserInfo()
                             preferencesManager.saveMyEmail(user.userEmail)
                             preferencesManager.setLocale(user.userLanguage)
+                            result = true
                             val action = LoginFragmentDirections.actionLoginToHome()
                             findNavController().navigate(action)
                             requireActivity().finish()
