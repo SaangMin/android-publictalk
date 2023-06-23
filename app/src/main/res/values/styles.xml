@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MySettingInfoLabel" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:layout_marginTop">@dimen/margin_setting_info</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MySettingInfoEditStyle">
+        <item name="android:lines">1</item>
+        <item name="android:layout_margin">@dimen/margin_setting_info_edit_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textAlignment">textEnd</item>
+        <item name="android:textColor">@color/color_text</item>
+        <item name="android:inputType">text</item>
+    </style>
+
+    <style name="MySettingInfoEntranceStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@color/color_entrance</item>
+    </style>
+</resources>
