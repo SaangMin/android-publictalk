@@ -16,7 +16,7 @@ data class User(
     @PropertyName("userPhoneNumber") val userPhoneNumber: String = "",
     @PropertyName("userProfileImage") val userProfileImage: String? = null,
     @PropertyName("userLanguage") val userLanguage: String = "",
-    @PropertyName("userDeviceToken") val userDeviceToken: String = "",
+    @PropertyName("userDeviceToken") var userDeviceToken: String = "",
     @PropertyName("userFriendIdList") val userFriendIdList: List<String>? = null,
     @PropertyName("userCreatedAt") val userCreatedAt: String = "",
 ) : Serializable

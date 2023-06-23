@@ -68,6 +68,7 @@ class LoginFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setGoogleLoginService()
+        setDeviceToken()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -169,7 +170,6 @@ class LoginFragment : BaseFragment() {
                             getString(R.string.login_success_msg),
                             Toast.LENGTH_SHORT
                         ).show()
-                        setDeviceToken()
                         setNavigation()
                     } else {
                         Log.w(TAG, "signInWithCredential failed : ${task.exception}")
@@ -217,6 +217,7 @@ class LoginFragment : BaseFragment() {
                         lifecycleScope.launch {
                             val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
                                 ?: return@launch
+                            user.userDeviceToken = FirebaseData.token ?: return@launch
                             with(repository) {
                                 clearUser()
                                 insertUser(user)
