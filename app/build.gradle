@@ -67,6 +67,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-database-ktx'
 
     //Jetpack navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'

@@ -6,6 +6,7 @@ import android.content.IntentSender
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,15 +23,22 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.PublicTalkApplication
 import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setDeviceToken
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
+import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import kotlinx.coroutines.launch
@@ -47,7 +55,10 @@ class LoginFragment : BaseFragment() {
     private lateinit var oneTapLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var legacyLauncher: ActivityResultLauncher<Intent>
     private val preferencesManager = PublicTalkApplication.preferencesManager
-    private val repository = UserRepository(UserLocalDataSource(ServiceLocator.userDao))
+    private val repository = UserRepository(
+        UserLocalDataSource(ServiceLocator.userDao),
+        UserRemoteDataSource(ServiceLocator.apiClient)
+    )
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
@@ -57,6 +68,7 @@ class LoginFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setGoogleLoginService()
+        setDeviceToken()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -147,22 +159,23 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun submitToken(idToken: String?) {
-        val authCredential = GoogleAuthProvider.getCredential(idToken, null)
-        firebaseAuth.signInWithCredential(authCredential)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    Snackbar.make(
-                        binding.root,
-                        getString(R.string.login_success_msg),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                    setUserInfo()
-                    setDeviceToken()
-                    setNavigation()
-                } else {
-                    Log.w(TAG, "signInWithCredential failed : ${task.exception}")
+        setUserInfo()
+        if (!isExistUser(FirebaseData.user?.email)) {
+            val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+            firebaseAuth.signInWithCredential(authCredential)
+                .addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.login_success_msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        setNavigation()
+                    } else {
+                        Log.w(TAG, "signInWithCredential failed : ${task.exception}")
+                    }
                 }
-            }
+        }
     }
 
     private fun validateAlreadyLogin() {
@@ -170,19 +183,64 @@ class LoginFragment : BaseFragment() {
         if (email == null) {
             return
         } else {
-            lifecycleScope.launch {
-                val myInfo = repository.getMyInfo(email)
-                if (myInfo == null) {
-                    return@launch
-                } else {
-                    preferencesManager.setLocale(myInfo.userLanguage)
+            if (isExistUser(email)) {
+                lifecycleScope.launch {
+                    val myInfo = repository.getMyInfo(email)
+                    if (myInfo == null) {
+                        return@launch
+                    } else {
+                        preferencesManager.setLocale(myInfo.userLanguage)
 
-                    val action = LoginFragmentDirections.actionLoginToHome()
-                    findNavController().navigate(action)
-                    requireActivity().finish()
+                        val action = LoginFragmentDirections.actionLoginToHome()
+                        findNavController().navigate(action)
+                        requireActivity().finish()
+                    }
                 }
+            } else {
+                return
             }
         }
+    }
+
+    private fun isExistUser(email: String?): Boolean {
+        var result = false
+        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
+        ref.orderByChild("userEmail").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.exist_user_info_msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        lifecycleScope.launch {
+                            val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
+                                ?: return@launch
+                            user.userDeviceToken = FirebaseData.token ?: return@launch
+                            with(repository) {
+                                clearUser()
+                                insertUser(user)
+                            }
+                            setUserInfo()
+                            preferencesManager.saveMyEmail(user.userEmail)
+                            preferencesManager.setLocale(user.userLanguage)
+                            result = true
+                            val action = LoginFragmentDirections.actionLoginToHome()
+                            findNavController().navigate(action)
+                            requireActivity().finish()
+                        }
+                    } else {
+                        result = false
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(TAG, "LoadUser:onCancelled: $error")
+                    result = false
+                }
+            })
+        return result
     }
 
     private fun setNavigation() {

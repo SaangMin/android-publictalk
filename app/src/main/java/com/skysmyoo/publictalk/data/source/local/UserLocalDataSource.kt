@@ -11,4 +11,8 @@ class UserLocalDataSource(private val userModelDao: UserModelDao) {
     suspend fun getMyInfo(email: String): User? {
         return userModelDao.getMyInfo(email)
     }
+
+    suspend fun clearUser() {
+        userModelDao.clearUser()
+    }
 }

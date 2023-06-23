@@ -11,6 +11,7 @@ import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Friend
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Header
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
+import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import kotlinx.coroutines.launch
@@ -23,7 +24,8 @@ class FriendListFragment : BaseFragment() {
     private lateinit var friendListAdapter: FriendListAdapter
     private val email = preferencesManager.getMyEmail()
     private val repository = UserRepository(
-        UserLocalDataSource(ServiceLocator.userDao)
+        UserLocalDataSource(ServiceLocator.userDao),
+        UserRemoteDataSource(ServiceLocator.apiClient)
     )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

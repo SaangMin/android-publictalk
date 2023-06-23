@@ -11,6 +11,9 @@ interface UserModelDao {
     @Insert
     suspend fun insertUser(user: User)
 
+    @Query("DELETE FROM saved_user_models")
+    suspend fun clearUser()
+
     @Query("SELECT * FROM saved_user_models WHERE userEmail = :email LIMIT 1")
     suspend fun getMyInfo(email: String): User?
 
