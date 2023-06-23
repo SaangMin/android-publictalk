@@ -21,4 +21,14 @@
     <string name="channel_name">public talk notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
+    <string name="add_friend">Search friend</string>
+    <string name="friend_list">Friends</string>
+    <string name="chat_list">Chats</string>
+    <string name="setting">Setting</string>
+    <string name="navigation_home_label">Home Screen</string>
+    <string name="navigation_friend_list_label">Friend List Screen</string>
+    <string name="navigation_chat_list_label">Chat List Screen</string>
+    <string name="navigation_setting_label">Setting Screen</string>
+    <string name="navigation_home_activity_label">Main Screen</string>
+    <string name="friends_sample">Friends</string>
 </resources>

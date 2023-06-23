@@ -5,4 +5,5 @@
     <color name="main_background_color">#FFDBD0</color>
     <color name="color_entrance">#FE7B4F</color>
     <color name="color_text">#5D4036</color>
+    <color name="color_bn_background">#FFB59D</color>
 </resources>

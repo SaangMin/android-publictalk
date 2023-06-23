@@ -1,6 +1,5 @@
 package com.skysmyoo.publictalk.ui.login
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +9,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
@@ -19,7 +19,6 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.data.source.remote.LoginRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
-import com.skysmyoo.publictalk.ui.MainActivity
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
 import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
 
@@ -100,8 +99,8 @@ class SettingInfoFragment : BaseFragment() {
             }
         LanguageSharedPreferences.setLocale(requireContext(), settingLanguage)
 
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        startActivity(intent)
+        val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
+        findNavController().navigate(action)
     }
 
     private fun setPickImage() {
