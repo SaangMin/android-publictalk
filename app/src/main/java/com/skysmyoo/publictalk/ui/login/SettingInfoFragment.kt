@@ -12,15 +12,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
-import com.skysmyoo.publictalk.data.source.remote.LoginRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
-import com.skysmyoo.publictalk.utils.LanguageSharedPreferences
 
 class SettingInfoFragment : BaseFragment() {
 
@@ -33,9 +34,8 @@ class SettingInfoFragment : BaseFragment() {
     private val loadingDialog by lazy { LoadingDialogFragment() }
     private val viewModel by viewModels<UserViewModel> {
         UserViewModel.provideFactory(
-            UserRepository(
-                LoginRemoteDataSource(ServiceLocator.apiClient)
-            )
+            UserRepository(UserLocalDataSource(ServiceLocator.userDao)),
+            SignInRemoteDataSource(ServiceLocator.apiClient),
         )
     }
 
@@ -86,21 +86,18 @@ class SettingInfoFragment : BaseFragment() {
 
     private fun submitUserObserver() {
         viewModel.submitEvent.observe(viewLifecycleOwner) {
-            viewModel.submitUser(imageUri, userLanguage?.code ?: "ko")
-            setProjectLanguage()
+            viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
+                startHomeActivity()
+            }
         }
     }
 
-    private fun setProjectLanguage() {
-        val settingLanguage =
-            when (userLanguage?.code) {
-                "ko" -> "ko"
-                else -> "en"
-            }
-        LanguageSharedPreferences.setLocale(requireContext(), settingLanguage)
+    private fun startHomeActivity() {
+        preferencesManager.setLocale(userLanguage?.code ?: "ko")
 
         val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
         findNavController().navigate(action)
+        requireActivity().finish()
     }
 
     private fun setPickImage() {

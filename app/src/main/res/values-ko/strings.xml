@@ -34,4 +34,7 @@
     <string name="me_sample">나</string>
     <string name="friend_profile_image">프로필 이미지</string>
     <string name="friend_name_sample">개똥이</string>
+    <string name="mine">나</string>
+    <string name="friend_label">친구</string>
+    <string name="load_my_info_error">알 수 없는 오류가 발생했습니다. 앱 종료 후 다시 실행해주세요.</string>
 </resources>

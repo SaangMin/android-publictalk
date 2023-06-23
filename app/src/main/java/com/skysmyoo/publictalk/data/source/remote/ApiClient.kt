@@ -1,7 +1,7 @@
 package com.skysmyoo.publictalk.data.source.remote
 
 import com.skysmyoo.publictalk.BuildConfig
-import com.skysmyoo.publictalk.data.model.remote.request.User
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.di.ServiceLocator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
