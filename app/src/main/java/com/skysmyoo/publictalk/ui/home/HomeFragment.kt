@@ -26,25 +26,28 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun setAppbar(navController: NavController) {
-        val appbar = binding.abHome
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.navigation_friend_list -> {
-                    appbar.title = getString(R.string.friend_list)
-                    appbar.menu.clear()
-                    appbar.inflateMenu(R.menu.home_ab_menu)
+                    setToolbar(getString(R.string.friend_list))
+                    binding.abHome.inflateMenu(R.menu.home_ab_menu)
                 }
 
                 R.id.navigation_chat_list -> {
-                    appbar.title = getString(R.string.chat_list)
-                    appbar.menu.clear()
+                    setToolbar(getString(R.string.chat_list))
                 }
 
                 R.id.navigation_setting -> {
-                    appbar.title = getString(R.string.setting)
-                    appbar.menu.clear()
+                    setToolbar(getString(R.string.setting))
                 }
             }
+        }
+    }
+
+    private fun setToolbar(title: String) {
+        with (binding.abHome) {
+            this.title = title
+            menu.clear()
         }
     }
 }
