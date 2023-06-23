@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
@@ -71,6 +72,7 @@ class UserViewModel(
                                 )
                                 remoteDataSource.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
+                                        preferencesManager.saveMyEmail(it.email ?: "")
                                         repository.insertUser(user)
                                         _isLoading.value = false
                                         startHomeActivity()

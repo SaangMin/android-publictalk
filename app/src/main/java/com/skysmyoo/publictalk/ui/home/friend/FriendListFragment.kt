@@ -5,13 +5,12 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
-import com.skysmyoo.publictalk.PublicTalkApplication
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Friend
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Header
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import kotlinx.coroutines.launch
@@ -22,8 +21,7 @@ class FriendListFragment : BaseFragment() {
     override val layoutId: Int get() = R.layout.fragment_friend_list
 
     private lateinit var friendListAdapter: FriendListAdapter
-    private val email = FirebaseData.user?.email
-    private val preferencesManager = PublicTalkApplication.preferencesManager
+    private val email = preferencesManager.getMyEmail()
     private val repository = UserRepository(
         UserLocalDataSource(ServiceLocator.userDao)
     )
@@ -39,7 +37,6 @@ class FriendListFragment : BaseFragment() {
 
     private fun setDefaultAdapterItem(adapter: FriendListAdapter) {
         if (email != null) {
-            preferencesManager.saveMyEmail(email)
             lifecycleScope.launch {
                 val myInfo = repository.getMyInfo(email)
                 if (myInfo != null) {
