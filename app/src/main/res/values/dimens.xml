@@ -5,4 +5,7 @@
     <dimen name="margin_setting_info">24dp</dimen>
     <dimen name="margin_setting_info_edit_text">30dp</dimen>
     <dimen name="padding_setting_info_entrance">24dp</dimen>
+    <dimen name="margin_friend_list_header_start">16dp</dimen>
+    <dimen name="margin_friend_list_header">8dp</dimen>
+    <dimen name="margin_friend_item">16dp</dimen>
 </resources>
