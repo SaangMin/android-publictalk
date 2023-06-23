@@ -31,6 +31,7 @@ import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setDeviceToken
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
+import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import kotlinx.coroutines.launch
@@ -47,7 +48,10 @@ class LoginFragment : BaseFragment() {
     private lateinit var oneTapLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var legacyLauncher: ActivityResultLauncher<Intent>
     private val preferencesManager = PublicTalkApplication.preferencesManager
-    private val repository = UserRepository(UserLocalDataSource(ServiceLocator.userDao))
+    private val repository = UserRepository(
+        UserLocalDataSource(ServiceLocator.userDao),
+        UserRemoteDataSource(ServiceLocator.apiClient)
+    )
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)

@@ -13,13 +13,11 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
-import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.launch
 
 class UserViewModel(
     private val repository: UserRepository,
-    private val remoteDataSource: SignInRemoteDataSource,
 ) : ViewModel() {
 
     private val _addImageEvent = MutableLiveData<Unit>()
@@ -59,7 +57,7 @@ class UserViewModel(
                         if (idToken != null) {
                             viewModelScope.launch {
                                 _isLoading.value = true
-                                val profileImage = remoteDataSource.uploadImage(imageUri)
+                                val profileImage = repository.uploadImage(imageUri)
                                 val user = User(
                                     userEmail = it.email ?: "",
                                     userName = name.value ?: "",
@@ -70,7 +68,7 @@ class UserViewModel(
                                     userFriendIdList = null,
                                     userCreatedAt = TimeUtil.getCurrentDateString()
                                 )
-                                remoteDataSource.putUser(idToken, user).run {
+                                repository.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
                                         preferencesManager.saveMyEmail(it.email ?: "")
                                         repository.insertUser(user)
@@ -98,10 +96,10 @@ class UserViewModel(
     companion object {
         private const val TAG = "UserViewModel"
 
-        fun provideFactory(repository: UserRepository, remoteDataSource: SignInRemoteDataSource) =
+        fun provideFactory(repository: UserRepository) =
             viewModelFactory {
                 initializer {
-                    UserViewModel(repository, remoteDataSource)
+                    UserViewModel(repository)
                 }
             }
     }

@@ -6,7 +6,7 @@ import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.tasks.await
 import retrofit2.Response
 
-class SignInRemoteDataSource(private val apiClient: ApiClient) {
+class UserRemoteDataSource(private val apiClient: ApiClient) {
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
         return apiClient.putUser(auth, user)
     }

@@ -18,7 +18,7 @@ import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
-import com.skysmyoo.publictalk.data.source.remote.SignInRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
@@ -34,8 +34,8 @@ class SettingInfoFragment : BaseFragment() {
     private val loadingDialog by lazy { LoadingDialogFragment() }
     private val viewModel by viewModels<UserViewModel> {
         UserViewModel.provideFactory(
-            UserRepository(UserLocalDataSource(ServiceLocator.userDao)),
-            SignInRemoteDataSource(ServiceLocator.apiClient),
+            UserRepository(UserLocalDataSource(ServiceLocator.userDao),
+                UserRemoteDataSource(ServiceLocator.apiClient))
         )
     }
 
