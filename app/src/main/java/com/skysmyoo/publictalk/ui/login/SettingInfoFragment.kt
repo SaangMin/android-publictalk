@@ -2,7 +2,6 @@ package com.skysmyoo.publictalk.ui.login
 
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -32,9 +31,11 @@ class SettingInfoFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvSettingInfoEmail.text = FirebaseData.user?.email
-        binding.ivSettingInfoProfile.setOnClickListener {
-            pickImage.launch("image/*")
+        with(binding) {
+            tvSettingInfoEmail.text = FirebaseData.user?.email
+            ivSettingInfoProfile.setOnClickListener {
+                pickImage.launch("image/*")
+            }
         }
         setSpinner()
     }
@@ -43,9 +44,7 @@ class SettingInfoFragment : BaseFragment() {
         pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 requireActivity().contentResolver.query(it, null, null, null, null)?.use { cursor ->
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     cursor.moveToFirst()
-                    val imageName = cursor.getString(nameIndex)
                     binding.ivSettingInfoProfile.setImageURI(it)
                 }
             } ?: run {
