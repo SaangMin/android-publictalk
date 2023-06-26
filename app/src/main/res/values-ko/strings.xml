@@ -42,4 +42,6 @@
     <string name="navigation_splash_label">시작 로딩 화면</string>
     <string name="navigation_start_activity_label">시작 로그인 화면</string>
     <string name="logout">로그 아웃</string>
+    <string name="chat_room_image">채팅방 이미지</string>
+    <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
 </resources>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="chatRoom"
+            type="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+
+        <variable
+            name="lastMessage"
+            type="com.skysmyoo.publictalk.data.model.remote.Message" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_item_chat_list_profile"
+            profileImage="@{chatRoom.other.userProfileImage}"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_margin="@dimen/margin_chat_list_image"
+            android:contentDescription="@string/chat_room_image"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/MyShapeImageStyle"
+            tools:src="@drawable/icon_profile_image" />
+
+        <TextView
+            android:id="@+id/tv_item_chat_list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_chat_list_text"
+            android:text="@{chatRoom.other.userName}"
+            android:textColor="@color/color_text"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_item_chat_list_body"
+            app:layout_constraintStart_toEndOf="@id/iv_item_chat_list_profile"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/friend_name_sample" />
+
+        <TextView
+            android:id="@+id/tv_item_chat_list_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_chat_list_text"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@{lastMessage.body}"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/gl_end"
+            app:layout_constraintStart_toEndOf="@id/iv_item_chat_list_profile"
+            app:layout_constraintTop_toBottomOf="@id/tv_item_chat_list_title"
+            tools:text="@string/chat_list_item_body_sample" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.85" />
+
+        <TextView
+            android:id="@+id/tv_item_chat_list_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_chat_list_text"
+            android:text="@{lastMessage.createdAt}"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_item_chat_list_unread_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="오후 14:28" />
+
+        <TextView
+            android:id="@+id/tv_item_chat_list_unread_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="@dimen/margin_unread_icon"
+            android:background="@drawable/circle_text_background"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/gl_end"
+            app:layout_constraintTop_toBottomOf="@id/tv_item_chat_list_time"
+            tools:text="1" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/dv_item_chat_list_bot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -42,4 +42,6 @@
     <string name="navigation_splash_label">start loading Screen</string>
     <string name="navigation_start_activity_label">Start Screen</string>
     <string name="logout">logout</string>
+    <string name="chat_room_image">Chat Room Image</string>
+    <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
 </resources>
