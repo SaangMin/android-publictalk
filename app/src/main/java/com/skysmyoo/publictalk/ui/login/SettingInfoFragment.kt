@@ -32,10 +32,12 @@ class SettingInfoFragment : BaseFragment() {
     private var imageUri: Uri? = null
     private var userLanguage: Language? = null
     private val loadingDialog by lazy { LoadingDialogFragment() }
-    private val viewModel by viewModels<UserViewModel> {
-        UserViewModel.provideFactory(
-            UserRepository(UserLocalDataSource(ServiceLocator.userDao),
-                UserRemoteDataSource(ServiceLocator.apiClient))
+    private val viewModel by viewModels<LoginViewModel> {
+        LoginViewModel.provideFactory(
+            UserRepository(
+                UserLocalDataSource(ServiceLocator.userDao),
+                UserRemoteDataSource(ServiceLocator.apiClient)
+            )
         )
     }
 
