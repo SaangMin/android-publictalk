@@ -20,4 +20,7 @@ interface UserModelDao {
     @Query("SELECT * FROM saved_user_models WHERE uid = :uid")
     suspend fun findUser(uid: Int): User?
 
+    @Query("SELECT * FROM saved_user_models")
+    suspend fun getUserList(): List<User>?
+
 }

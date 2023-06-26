@@ -31,4 +31,8 @@ class UserRepository(
     suspend fun clearUser() {
         localDataSource.clearUser()
     }
+
+    suspend fun getUser(): List<User>? {
+        return localDataSource.getUser()
+    }
 }
