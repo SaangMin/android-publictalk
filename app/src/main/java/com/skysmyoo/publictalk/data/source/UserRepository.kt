@@ -21,15 +21,12 @@ class UserRepository(
     }
 
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
+        localDataSource.insertUser(user)
         return remoteDataSource.putUser(auth, user)
     }
 
     suspend fun uploadImage(image: Uri?): String? {
         return remoteDataSource.uploadImage(image)
-    }
-
-    suspend fun clearUser() {
-        localDataSource.clearUser()
     }
 
     suspend fun getUser(): List<User>? {

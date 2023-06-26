@@ -14,7 +14,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
@@ -80,10 +79,6 @@ class LoginViewModel(
                                 )
                                 repository.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
-                                        preferencesManager.saveMyEmail(it.email ?: "")
-                                        repository.clearUser()
-                                        repository.insertUser(user)
-                                        preferencesManager.saveMyEmail(user.userEmail)
                                         _isLoading.value = false
                                         startHomeActivity()
                                     } else {
