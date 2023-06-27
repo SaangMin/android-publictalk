@@ -9,13 +9,13 @@ import com.skysmyoo.publictalk.data.model.local.TestSampleData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.databinding.FragmentChatListBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ChatListFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentChatListBinding
     override val layoutId: Int get() = R.layout.fragment_chat_list
-
     private val adapter = ChatRoomListAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

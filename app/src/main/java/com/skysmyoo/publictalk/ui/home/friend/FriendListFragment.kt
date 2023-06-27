@@ -13,9 +13,10 @@ import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
-import com.skysmyoo.publictalk.di.ServiceLocator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FriendListFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentFriendListBinding

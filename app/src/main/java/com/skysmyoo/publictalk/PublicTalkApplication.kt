@@ -8,7 +8,9 @@ import android.os.Build
 import androidx.room.Room
 import com.skysmyoo.publictalk.data.source.local.AppDatabase
 import com.skysmyoo.publictalk.data.source.local.SharedPreferencesManager
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class PublicTalkApplication : Application() {
 
     override fun onCreate() {

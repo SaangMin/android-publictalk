@@ -32,8 +32,9 @@ import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
-import com.skysmyoo.publictalk.di.ServiceLocator
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : BaseFragment() {
 
     override val binding get() = _binding as FragmentLoginBinding

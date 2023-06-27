@@ -7,7 +7,9 @@ import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentSettingBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentSettingBinding

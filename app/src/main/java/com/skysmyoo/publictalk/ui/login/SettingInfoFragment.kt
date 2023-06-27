@@ -21,7 +21,9 @@ import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingInfoFragment : BaseFragment() {
 
     override val binding get() = _binding as FragmentSettingInfoBinding

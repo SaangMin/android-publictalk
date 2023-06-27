@@ -16,7 +16,9 @@ import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSplashBinding
 import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.login.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SplashFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentSplashBinding
