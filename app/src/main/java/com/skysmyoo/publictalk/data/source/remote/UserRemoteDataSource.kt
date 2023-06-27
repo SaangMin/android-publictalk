@@ -5,8 +5,9 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.tasks.await
 import retrofit2.Response
+import javax.inject.Inject
 
-class UserRemoteDataSource(private val apiClient: ApiClient) {
+class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient) {
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
         return apiClient.putUser(auth, user)
     }
