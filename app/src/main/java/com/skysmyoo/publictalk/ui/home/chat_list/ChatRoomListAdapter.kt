@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 
@@ -26,6 +27,10 @@ class ChatRoomListAdapter :
             with(binding) {
                 chatRoom = item
                 lastMessage = item.messageList?.lastOrNull()
+                unreadMessage =
+                    item.messageList?.filter {
+                        !it.isReading && it.receiver == preferencesManager.getMyEmail()
+                    }?.size ?: 0
             }
         }
 

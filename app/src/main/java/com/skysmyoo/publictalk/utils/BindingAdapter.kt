@@ -1,6 +1,8 @@
 package com.skysmyoo.publictalk.utils
 
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import coil.load
 import com.skysmyoo.publictalk.R
@@ -10,5 +12,14 @@ fun loadUserImage(view: ImageView, image: String?) {
     view.load(image) {
         error(R.drawable.icon_profile_image)
         fallback(R.drawable.icon_profile_image)
+    }
+}
+
+@BindingAdapter("isVisible")
+fun isVisible(view: TextView, unreadMessage: Int) {
+    if (unreadMessage > 0) {
+        view.visibility = View.VISIBLE
+    } else {
+        view.visibility = View.INVISIBLE
     }
 }

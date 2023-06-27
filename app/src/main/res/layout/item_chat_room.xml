@@ -12,6 +12,10 @@
         <variable
             name="lastMessage"
             type="com.skysmyoo.publictalk.data.model.remote.Message" />
+
+        <variable
+            name="unreadMessage"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -56,7 +60,6 @@
             android:text="@{lastMessage.body}"
             android:textColor="@color/gray"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/gl_end"
             app:layout_constraintStart_toEndOf="@id/iv_item_chat_list_profile"
             app:layout_constraintTop_toBottomOf="@id/tv_item_chat_list_title"
@@ -83,11 +86,13 @@
 
         <TextView
             android:id="@+id/tv_item_chat_list_unread_icon"
+            isVisible="@{unreadMessage}"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/margin_unread_icon"
             android:background="@drawable/circle_text_background"
             android:gravity="center"
+            android:text="@{String.valueOf(unreadMessage)}"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:visibility="invisible"
