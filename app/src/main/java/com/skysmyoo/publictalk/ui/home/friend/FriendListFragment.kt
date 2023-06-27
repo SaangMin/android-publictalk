@@ -10,11 +10,10 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Friend
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Header
 import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
-import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FriendListFragment : BaseFragment() {
@@ -22,12 +21,11 @@ class FriendListFragment : BaseFragment() {
     override val binding get() = _binding!! as FragmentFriendListBinding
     override val layoutId: Int get() = R.layout.fragment_friend_list
 
+    @Inject
+    lateinit var repository: UserRepository
+
     private lateinit var friendListAdapter: FriendListAdapter
     private val email = preferencesManager.getMyEmail()
-    private val repository = UserRepository(
-        UserLocalDataSource(ServiceLocator.userDao),
-        UserRemoteDataSource(ServiceLocator.apiClient)
-    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
