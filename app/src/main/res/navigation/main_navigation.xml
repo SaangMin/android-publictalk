@@ -3,12 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/navigation_home">
+    app:startDestination="@id/navigation_friend_list">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.skysmyoo.publictalk.ui.home.HomeFragment"
-        android:label="@string/navigation_home_label"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_friend_list"
+        android:name="com.skysmyoo.publictalk.ui.home.friend.FriendListFragment"
+        android:label="@string/navigation_friend_list_label"
+        tools:layout="@layout/fragment_friend_list" />
+
+    <fragment
+        android:id="@+id/navigation_chat_list"
+        android:name="com.skysmyoo.publictalk.ui.home.chat_list.ChatListFragment"
+        android:label="@string/navigation_chat_list_label"
+        tools:layout="@layout/fragment_chat_list" />
+
+    <fragment
+        android:id="@+id/navigation_setting"
+        android:name="com.skysmyoo.publictalk.ui.home.setting.SettingFragment"
+        android:label="@string/navigation_setting_label"
+        tools:layout="@layout/fragment_setting">
+        <action
+            android:id="@+id/action_setting_to_start_activity"
+            app:destination="@id/navigation_start_activity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/navigation_start_activity"
+        android:name="com.skysmyoo.publictalk.ui.StartActivity"
+        android:label="@string/navigation_start_activity_label"
+        tools:layout="@layout/activity_start" />
 
 </navigation>
