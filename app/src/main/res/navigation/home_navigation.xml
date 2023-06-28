@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/navigation_chat_list"
-        android:name="com.skysmyoo.publictalk.ui.home.chatting.ChatListFragment"
+        android:name="com.skysmyoo.publictalk.ui.home.chat_list.ChatListFragment"
         android:label="@string/navigation_chat_list_label"
         tools:layout="@layout/fragment_chat_list" />
 
