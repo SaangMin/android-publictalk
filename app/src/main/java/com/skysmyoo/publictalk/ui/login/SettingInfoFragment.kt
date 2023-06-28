@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.UserRepository
@@ -32,10 +31,12 @@ class SettingInfoFragment : BaseFragment() {
     private var imageUri: Uri? = null
     private var userLanguage: Language? = null
     private val loadingDialog by lazy { LoadingDialogFragment() }
-    private val viewModel by viewModels<UserViewModel> {
-        UserViewModel.provideFactory(
-            UserRepository(UserLocalDataSource(ServiceLocator.userDao),
-                UserRemoteDataSource(ServiceLocator.apiClient))
+    private val viewModel by viewModels<LoginViewModel> {
+        LoginViewModel.provideFactory(
+            UserRepository(
+                UserLocalDataSource(ServiceLocator.userDao),
+                UserRemoteDataSource(ServiceLocator.apiClient)
+            )
         )
     }
 
@@ -93,8 +94,6 @@ class SettingInfoFragment : BaseFragment() {
     }
 
     private fun startHomeActivity() {
-        preferencesManager.setLocale(userLanguage?.code ?: "ko")
-
         val action = SettingInfoFragmentDirections.actionSettingInfoToHome()
         findNavController().navigate(action)
         requireActivity().finish()

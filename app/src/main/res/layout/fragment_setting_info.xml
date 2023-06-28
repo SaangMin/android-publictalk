@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.skysmyoo.publictalk.ui.login.UserViewModel" />
+            type="com.skysmyoo.publictalk.ui.login.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -21,6 +21,15 @@
         android:id="@+id/navigation_setting"
         android:name="com.skysmyoo.publictalk.ui.home.setting.SettingFragment"
         android:label="@string/navigation_setting_label"
-        tools:layout="@layout/fragment_setting" />
+        tools:layout="@layout/fragment_setting">
+        <action
+            android:id="@+id/action_setting_to_start_activity"
+            app:destination="@id/navigation_start_activity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/navigation_start_activity"
+        android:name="com.skysmyoo.publictalk.ui.StartActivity"
+        android:label="@string/navigation_start_activity_label" />
 
 </navigation>

@@ -8,7 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
@@ -16,7 +21,7 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.launch
 
-class UserViewModel(
+class LoginViewModel(
     private val repository: UserRepository,
 ) : ViewModel() {
 
@@ -28,6 +33,10 @@ class UserViewModel(
     val submitEvent: LiveData<Unit> = _submitEvent
     private val _notRequiredEvent = MutableLiveData<Unit>()
     val notRequiredEvent: LiveData<Unit> = _notRequiredEvent
+    private val _isExistUser = MutableLiveData(false)
+    val isExistUser: LiveData<Boolean> = _isExistUser
+    private val _googleLoginEvent = MutableLiveData(Unit)
+    val googleLoginEvent: LiveData<Unit> = _googleLoginEvent
 
     val name = MutableLiveData<String>()
     val phoneNumber = MutableLiveData<String>()
@@ -70,10 +79,6 @@ class UserViewModel(
                                 )
                                 repository.putUser(idToken, user).run {
                                     if (this.isSuccessful) {
-                                        preferencesManager.saveMyEmail(it.email ?: "")
-                                        repository.clearUser()
-                                        repository.insertUser(user)
-                                        preferencesManager.saveMyEmail(user.userEmail)
                                         _isLoading.value = false
                                         startHomeActivity()
                                     } else {
@@ -95,13 +100,39 @@ class UserViewModel(
         return name.value.isNullOrEmpty() || phoneNumber.value.isNullOrEmpty()
     }
 
+    fun validateExistUser(email: String?) {
+        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
+        ref.orderByChild("userEmail").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        viewModelScope.launch {
+                            val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
+                                ?: return@launch
+                            user.userDeviceToken = token ?: return@launch
+                            repository.insertUser(user)
+                            _isExistUser.value = true
+                        }
+                    } else {
+                        _isExistUser.value = false
+                        _googleLoginEvent.value = Unit
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(TAG, "LoadUser:onCancelled: $error")
+                    _googleLoginEvent.value = Unit
+                }
+            })
+    }
+
     companion object {
         private const val TAG = "UserViewModel"
 
         fun provideFactory(repository: UserRepository) =
             viewModelFactory {
                 initializer {
-                    UserViewModel(repository)
+                    LoginViewModel(repository)
                 }
             }
     }
