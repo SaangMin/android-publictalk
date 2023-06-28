@@ -49,4 +49,8 @@ class UserRepository @Inject constructor(
     suspend fun getExistUser(email: String?): DataSnapshot? {
         return remoteDataSource.getExistUser(email)
     }
+
+    suspend fun addFriend(myInfo: User, friendEmail: String) {
+        localDataSource.addFriendEmail(myInfo, friendEmail)
+    }
 }
