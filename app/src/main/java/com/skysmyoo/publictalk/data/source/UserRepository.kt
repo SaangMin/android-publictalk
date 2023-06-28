@@ -32,4 +32,16 @@ class UserRepository @Inject constructor(
     suspend fun getUser(): List<User>? {
         return localDataSource.getUser()
     }
+
+    fun getMyEmail(): String? {
+        return localDataSource.getMyEmail()
+    }
+
+    fun getMyLocale(): String {
+        return localDataSource.getMyLocale()
+    }
+
+    fun clearMyData() {
+        return localDataSource.clearMyData()
+    }
 }

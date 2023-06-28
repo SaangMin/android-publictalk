@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentSplashBinding
@@ -35,7 +34,7 @@ class SplashFragment : BaseFragment() {
     }
 
     private fun validateAlreadyLogin() {
-        val email = preferencesManager.getMyEmail()
+        val email = viewModel.getMyEmail()
         Log.d(TAG, "$email")
         if (email.isNullOrEmpty()) {
             val action = SplashFragmentDirections.actionSplashToLogin()

@@ -25,7 +25,6 @@ class FriendListFragment : BaseFragment() {
     lateinit var repository: UserRepository
 
     private lateinit var friendListAdapter: FriendListAdapter
-    private val email = preferencesManager.getMyEmail()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,6 +36,7 @@ class FriendListFragment : BaseFragment() {
     }
 
     private fun setDefaultAdapterItem(adapter: FriendListAdapter) {
+        val email = repository.getMyEmail()
         if (email != null) {
             lifecycleScope.launch {
                 val myInfo = repository.getMyInfo(email)
