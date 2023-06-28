@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.source
 
 import android.net.Uri
+import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
@@ -45,15 +46,15 @@ class UserRepository @Inject constructor(
         return remoteDataSource.getExistUser(email)
     }
 
-    suspend fun addFriend(myInfo: User, friendEmail: String) {
+    suspend fun addFriend(myInfo: User, friendEmail: Friend) {
         localDataSource.addFriendEmail(myInfo, friendEmail)
     }
 
-    suspend fun removeFriend(myInfo: User, friendEmail: String) {
+    suspend fun removeFriend(myInfo: User, friendEmail: Friend) {
         localDataSource.removeFriendEmail(myInfo, friendEmail)
     }
 
-    suspend fun getFriends(friendList: List<String>): List<User?> {
+    suspend fun getFriends(friendList: List<Friend>): List<User?> {
         return remoteDataSource.getFriends(friendList)
     }
 }

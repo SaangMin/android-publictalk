@@ -7,6 +7,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
+import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.coroutineScope
@@ -65,10 +66,10 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun getFriends(friendList: List<String>): List<User?> =
+    suspend fun getFriends(friendList: List<Friend>): List<User?> =
         coroutineScope {
             friendList.map {
-                getExistUser(it)
+                getExistUser(it.userEmail)
             }
         }
 }

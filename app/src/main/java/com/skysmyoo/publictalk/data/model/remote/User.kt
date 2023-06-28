@@ -17,6 +17,6 @@ data class User(
     @PropertyName("userProfileImage") val userProfileImage: String? = null,
     @PropertyName("userLanguage") val userLanguage: String = "",
     @PropertyName("userDeviceToken") var userDeviceToken: String = "",
-    @PropertyName("userFriendIdList") val userFriendIdList: List<String> = emptyList(),
+    @PropertyName("userFriendIdList") val userFriendIdList: List<Friend> = emptyList(),
     @PropertyName("userCreatedAt") val userCreatedAt: String = "",
 ) : Serializable

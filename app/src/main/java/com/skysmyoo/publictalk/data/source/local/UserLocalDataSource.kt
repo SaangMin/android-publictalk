@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.data.source.local
 
+import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import javax.inject.Inject
@@ -43,18 +44,18 @@ class UserLocalDataSource @Inject constructor(
         return preferencesManager.clearUserData()
     }
 
-    suspend fun addFriendEmail(myInfo: User, friendEmail: String) {
+    suspend fun addFriendEmail(myInfo: User, friendEmail: Friend) {
         val updateFriendList =
-            myInfo.userFriendIdList?.toMutableList() ?: emptyList<String>().toMutableList()
+            myInfo.userFriendIdList.toMutableList()
         updateFriendList.add(friendEmail)
 
         val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
         userModelDao.updateUser(updatedMyInfo)
     }
 
-    suspend fun removeFriendEmail(myInfo: User, friendEmail: String) {
+    suspend fun removeFriendEmail(myInfo: User, friendEmail: Friend) {
         val updateFriendList =
-            myInfo.userFriendIdList?.toMutableList() ?: emptyList<String>().toMutableList()
+            myInfo.userFriendIdList.toMutableList()
         updateFriendList.remove(friendEmail)
 
         val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
