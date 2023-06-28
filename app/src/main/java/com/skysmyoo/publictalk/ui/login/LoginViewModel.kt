@@ -97,15 +97,11 @@ class LoginViewModel @Inject constructor(
 
     fun validateExistUser(email: String?) {
         viewModelScope.launch {
-            val snapshot = repository.getExistUser(email)
-            if (snapshot?.value != null) {
-                viewModelScope.launch {
-                    val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
-                        ?: return@launch
-                    user.userDeviceToken = token ?: return@launch
-                    repository.insertUser(user)
-                    _isExistUser.value = true
-                }
+            val user = repository.getExistUser(email)
+            if (user != null) {
+                user.userDeviceToken = token ?: return@launch
+                repository.insertUser(user)
+                _isExistUser.value = true
             } else {
                 _isExistUser.value = false
                 _googleLoginEvent.value = Unit

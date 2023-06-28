@@ -41,13 +41,15 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun getExistUser(email: String?): DataSnapshot? {
+    suspend fun getExistUser(email: String?): User? {
         val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
         return suspendCoroutine { continuation ->
             ref.orderByChild("userEmail").equalTo(email)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        continuation.resume(snapshot)
+                        val user =
+                            snapshot.children.firstOrNull()?.getValue(User::class.java) ?: return
+                        continuation.resume(user)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
