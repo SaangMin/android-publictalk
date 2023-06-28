@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
@@ -69,7 +70,7 @@ class LoginViewModel @Inject constructor(
                                     userProfileImage = profileImage,
                                     userLanguage = userLanguage,
                                     userDeviceToken = token ?: "",
-                                    userFriendIdList = emptyList(),
+                                    userFriendIdList = listOf(Friend(userEmail = "iu@gmail.com")),
                                     userCreatedAt = TimeUtil.getCurrentDateString()
                                 )
                                 repository.putUser(idToken, user).run {
