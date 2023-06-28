@@ -53,4 +53,8 @@ class UserRepository @Inject constructor(
     suspend fun addFriend(myInfo: User, friendEmail: String) {
         localDataSource.addFriendEmail(myInfo, friendEmail)
     }
+
+    suspend fun removeFriend(myInfo: User, friendEmail: String) {
+        localDataSource.removeFriendEmail(myInfo, friendEmail)
+    }
 }

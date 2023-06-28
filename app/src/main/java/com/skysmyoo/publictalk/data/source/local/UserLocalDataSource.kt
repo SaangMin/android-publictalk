@@ -51,4 +51,13 @@ class UserLocalDataSource @Inject constructor(
         val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
         userModelDao.updateUser(updatedMyInfo)
     }
+
+    suspend fun removeFriendEmail(myInfo: User, friendEmail: String) {
+        val updateFriendList =
+            myInfo.userFriendIdList?.toMutableList() ?: emptyList<String>().toMutableList()
+        updateFriendList.remove(friendEmail)
+
+        val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
+        userModelDao.updateUser(updatedMyInfo)
+    }
 }
