@@ -37,8 +37,7 @@ class SplashFragment : BaseFragment() {
         val email = viewModel.getMyEmail()
         Log.d(TAG, "$email")
         if (email.isNullOrEmpty()) {
-            val action = SplashFragmentDirections.actionSplashToLogin()
-            findNavController().navigate(action)
+            navigateToLogin()
         } else {
             viewModel.validateExistUser(email)
         }
@@ -57,8 +56,15 @@ class SplashFragment : BaseFragment() {
                 val action = SplashFragmentDirections.actionSplashToHome()
                 findNavController().navigate(action)
                 requireActivity().finish()
+            } else {
+                navigateToLogin()
             }
         }
+    }
+
+    private fun navigateToLogin() {
+        val action = SplashFragmentDirections.actionSplashToLogin()
+        findNavController().navigate(action)
     }
 
     companion object {

@@ -34,7 +34,7 @@ class LoginViewModel @Inject constructor(
     val submitEvent: LiveData<Unit> = _submitEvent
     private val _notRequiredEvent = MutableLiveData<Unit>()
     val notRequiredEvent: LiveData<Unit> = _notRequiredEvent
-    private val _isExistUser = MutableLiveData(false)
+    private val _isExistUser = MutableLiveData<Boolean>()
     val isExistUser: LiveData<Boolean> = _isExistUser
     private val _googleLoginEvent = MutableLiveData(Unit)
     val googleLoginEvent: LiveData<Unit> = _googleLoginEvent
