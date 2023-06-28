@@ -19,7 +19,7 @@ class SharedPreferencesManager(context: Context) {
     }
 
     fun setLocale(locale: String) {
-        sharedPreferences.edit().putString(KEY_LANGUAGE_PREFERENCES, setLanguage(locale)).apply()
+        sharedPreferences.edit().putString(KEY_USER_LANGUAGE, setLanguage(locale)).apply()
     }
 
     fun getLocale(): String {
