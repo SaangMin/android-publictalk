@@ -9,17 +9,41 @@
         android:background="@color/main_background_color"
         tools:context=".ui.HomeActivity">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/ab_home"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_bn_background"
+            app:layout_constraintBottom_toTopOf="@id/fcv_home"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+            tools:menu="@menu/home_ab_menu"
+            tools:title="@string/friends_sample" />
+
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fcv_main"
+            android:id="@+id/fcv_home"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@id/bn_home"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ab_home"
+            app:navGraph="@navigation/main_navigation" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bn_home"
+            style="@style/MyHomeBottomNavigation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/color_bn_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:navGraph="@navigation/main_navigation" />
+            app:layout_constraintTop_toBottomOf="@id/fcv_home" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

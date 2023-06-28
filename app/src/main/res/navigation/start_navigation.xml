@@ -32,7 +32,7 @@
         android:id="@+id/navigation_home_activity"
         android:name="com.skysmyoo.publictalk.ui.HomeActivity"
         android:label="@string/navigation_home_activity_label"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/activity_home" />
 
     <fragment
         android:id="@+id/navigation_splash"
@@ -41,7 +41,9 @@
         tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splash_to_login"
-            app:destination="@id/navigation_login" />
+            app:destination="@id/navigation_login"
+            app:popUpTo="@id/navigation_splash"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_splash_to_home"
             app:destination="@id/navigation_home_activity" />
