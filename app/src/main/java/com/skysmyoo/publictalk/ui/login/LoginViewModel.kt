@@ -69,7 +69,7 @@ class LoginViewModel @Inject constructor(
                                     userProfileImage = profileImage,
                                     userLanguage = userLanguage,
                                     userDeviceToken = token ?: "",
-                                    userFriendIdList = null,
+                                    userFriendIdList = emptyList(),
                                     userCreatedAt = TimeUtil.getCurrentDateString()
                                 )
                                 repository.putUser(idToken, user).run {
