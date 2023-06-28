@@ -29,10 +29,6 @@ class UserRepository @Inject constructor(
         return remoteDataSource.uploadImage(image)
     }
 
-    suspend fun getUser(): List<User>? {
-        return localDataSource.getUser()
-    }
-
     fun getMyEmail(): String? {
         return localDataSource.getMyEmail()
     }
@@ -55,5 +51,9 @@ class UserRepository @Inject constructor(
 
     suspend fun removeFriend(myInfo: User, friendEmail: String) {
         localDataSource.removeFriendEmail(myInfo, friendEmail)
+    }
+
+    suspend fun getFriends(friendList: List<String>): List<User?> {
+        return remoteDataSource.getFriends(friendList)
     }
 }

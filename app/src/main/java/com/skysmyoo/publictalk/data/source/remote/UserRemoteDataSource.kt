@@ -9,6 +9,7 @@ import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.utils.TimeUtil
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import retrofit2.Response
 import javax.inject.Inject
@@ -47,9 +48,14 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
             ref.orderByChild("userEmail").equalTo(email)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val user =
-                            snapshot.children.firstOrNull()?.getValue(User::class.java) ?: return
-                        continuation.resume(user)
+                        if (snapshot.exists()) {
+                            val user =
+                                snapshot.children.firstOrNull()?.getValue(User::class.java)
+                                    ?: return
+                            continuation.resume(user)
+                        } else {
+                            continuation.resume(null)
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -58,4 +64,11 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                 })
         }
     }
+
+    suspend fun getFriends(friendList: List<String>): List<User?> =
+        coroutineScope {
+            friendList.map {
+                getExistUser(it)
+            }
+        }
 }
