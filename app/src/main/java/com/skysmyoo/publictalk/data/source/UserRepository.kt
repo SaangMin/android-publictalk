@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.source
 
 import android.net.Uri
+import com.google.firebase.database.DataSnapshot
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
@@ -43,5 +44,9 @@ class UserRepository @Inject constructor(
 
     fun clearMyData() {
         return localDataSource.clearMyData()
+    }
+
+    suspend fun isExistUser(email: String?): DataSnapshot? {
+        return remoteDataSource.isExistUser(email)
     }
 }

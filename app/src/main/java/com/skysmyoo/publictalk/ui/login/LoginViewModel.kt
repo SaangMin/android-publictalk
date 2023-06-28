@@ -6,12 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
@@ -102,29 +96,21 @@ class LoginViewModel @Inject constructor(
     }
 
     fun validateExistUser(email: String?) {
-        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
-        ref.orderByChild("userEmail").equalTo(email)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        viewModelScope.launch {
-                            val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
-                                ?: return@launch
-                            user.userDeviceToken = token ?: return@launch
-                            repository.insertUser(user)
-                            _isExistUser.value = true
-                        }
-                    } else {
-                        _isExistUser.value = false
-                        _googleLoginEvent.value = Unit
-                    }
+        viewModelScope.launch {
+            val snapshot = repository.isExistUser(email)
+            if (snapshot?.value != null) {
+                viewModelScope.launch {
+                    val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
+                        ?: return@launch
+                    user.userDeviceToken = token ?: return@launch
+                    repository.insertUser(user)
+                    _isExistUser.value = true
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w(TAG, "LoadUser:onCancelled: $error")
-                    _googleLoginEvent.value = Unit
-                }
-            })
+            } else {
+                _isExistUser.value = false
+                _googleLoginEvent.value = Unit
+            }
+        }
     }
 
     fun getMyEmail(): String? {
