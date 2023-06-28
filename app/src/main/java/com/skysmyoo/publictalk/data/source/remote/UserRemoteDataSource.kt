@@ -41,7 +41,7 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun isExistUser(email: String?): DataSnapshot? {
+    suspend fun getExistUser(email: String?): DataSnapshot? {
         val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
         return suspendCoroutine { continuation ->
             ref.orderByChild("userEmail").equalTo(email)

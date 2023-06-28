@@ -97,7 +97,7 @@ class LoginViewModel @Inject constructor(
 
     fun validateExistUser(email: String?) {
         viewModelScope.launch {
-            val snapshot = repository.isExistUser(email)
+            val snapshot = repository.getExistUser(email)
             if (snapshot?.value != null) {
                 viewModelScope.launch {
                     val user = snapshot.children.firstOrNull()?.getValue(User::class.java)

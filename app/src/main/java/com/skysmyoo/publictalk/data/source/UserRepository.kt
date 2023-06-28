@@ -46,7 +46,7 @@ class UserRepository @Inject constructor(
         return localDataSource.clearMyData()
     }
 
-    suspend fun isExistUser(email: String?): DataSnapshot? {
-        return remoteDataSource.isExistUser(email)
+    suspend fun getExistUser(email: String?): DataSnapshot? {
+        return remoteDataSource.getExistUser(email)
     }
 }
