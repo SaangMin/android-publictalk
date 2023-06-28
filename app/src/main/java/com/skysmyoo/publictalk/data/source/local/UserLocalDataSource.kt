@@ -1,13 +1,13 @@
 package com.skysmyoo.publictalk.data.source.local
 
-import com.skysmyoo.publictalk.PublicTalkApplication
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import javax.inject.Inject
 
-class UserLocalDataSource @Inject constructor(private val userModelDao: UserModelDao) {
-
-    private val preferencesManager = PublicTalkApplication.preferencesManager
+class UserLocalDataSource @Inject constructor(
+    private val userModelDao: UserModelDao,
+    private val preferencesManager: SharedPreferencesManager,
+) {
 
     suspend fun insertUser(user: User) {
         userModelDao.clearUser()

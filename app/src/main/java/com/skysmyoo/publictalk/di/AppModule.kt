@@ -3,6 +3,7 @@ package com.skysmyoo.publictalk.di
 import android.content.Context
 import androidx.room.Room
 import com.skysmyoo.publictalk.data.source.local.AppDatabase
+import com.skysmyoo.publictalk.data.source.local.SharedPreferencesManager
 import com.skysmyoo.publictalk.data.source.local.UserModelDao
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -31,5 +32,11 @@ object AppModule {
     @Provides
     fun provideUserDao(appDatabase: AppDatabase): UserModelDao {
         return appDatabase.userModelDao()
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferencesManager(@ApplicationContext context: Context): SharedPreferencesManager {
+        return SharedPreferencesManager(context)
     }
 }

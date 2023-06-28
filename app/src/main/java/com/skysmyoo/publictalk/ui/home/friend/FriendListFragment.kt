@@ -5,7 +5,6 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Friend
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData.Header

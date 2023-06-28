@@ -7,14 +7,18 @@ import android.content.Context
 import android.os.Build
 import com.skysmyoo.publictalk.data.source.local.SharedPreferencesManager
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
 class PublicTalkApplication : Application() {
 
+    @Inject
+    lateinit var sharedPreferencesManager: SharedPreferencesManager
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        preferencesManager = SharedPreferencesManager(this)
+        preferencesManager = sharedPreferencesManager
     }
 
     private fun createNotificationChannel() {
