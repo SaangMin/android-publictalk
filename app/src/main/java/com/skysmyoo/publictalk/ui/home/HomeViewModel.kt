@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val myEmail = repository.getMyEmail() ?: return@launch
             val myInfo = repository.getMyInfo(myEmail) ?: return@launch
-            val friendList = repository.getFriends(myInfo.userFriendIdList)
+            val friendList = repository.getFriends()
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),
@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
             )
 
             if (friendList.isNotEmpty()) {
-                val friendListScreenData = friendList.map { FriendListScreenData.Friend(it!!) }
+                val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
                 itemList.addAll(friendListScreenData)
                 _adapterItemList.value = itemList
             } else {
