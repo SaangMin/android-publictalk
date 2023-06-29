@@ -58,6 +58,11 @@ class UserRepository @Inject constructor(
         localDataSource.removeFriend(myInfo, friend)
     }
 
+    suspend fun updateUser(auth: String, user: User): Response<User>? {
+        localDataSource.insertUser(user)
+        return remoteDataSource.updateUser(auth, user)
+    }
+
     suspend fun updateFriends(myInfo: User, friendList: List<Friend>): List<User?> {
         val friendEmailList = friendList.map { it.userEmail }
         val updatedFriendList = remoteDataSource.updateFriendsData(friendEmailList)

@@ -63,9 +63,10 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun updateUser(auth: String, user: User): Response<Map<String, String>>? {
+    suspend fun updateUser(auth: String, user: User): Response<User>? {
         val userEmail = user.userEmail
         val userUid = getExistUser(userEmail)?.key ?: return null
+        user.userDeviceToken = FirebaseData.token ?: return null
         return apiClient.updateUser(userUid, auth, user)
     }
 

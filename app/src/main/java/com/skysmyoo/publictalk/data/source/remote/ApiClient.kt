@@ -21,5 +21,5 @@ interface ApiClient {
         @Path("uid") uid: String,
         @Query("auth") auth: String,
         @Body user: User
-    ): Response<Map<String, String>>
+    ): Response<User>
 }

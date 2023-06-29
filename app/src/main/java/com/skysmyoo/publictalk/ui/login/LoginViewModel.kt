@@ -92,7 +92,7 @@ class LoginViewModel @Inject constructor(
                 setUserInfo()
                 FirebaseData.getIdToken { idToken ->
                     viewModelScope.launch {
-                        repository.insertUser(user)
+                        repository.updateUser(idToken, user)
                         repository.updateFriends(user, user.userFriendIdList)
                         _isExistUser.value = true
                     }
