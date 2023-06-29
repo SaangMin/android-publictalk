@@ -42,19 +42,35 @@ class UserRepository @Inject constructor(
         return localDataSource.clearMyData()
     }
 
-    suspend fun getExistUser(email: String?): User? {
-        return remoteDataSource.getExistUser(email)
+    suspend fun getExistUser(email: String?): Map<String, User>? {
+        val userDataSnapshot = remoteDataSource.getExistUser(email)
+        val userUid = userDataSnapshot?.key ?: return null
+        val user = userDataSnapshot.getValue(User::class.java) ?: return null
+
+        return mapOf(userUid to user)
     }
 
-    suspend fun addFriend(myInfo: User, friendEmail: Friend) {
-        localDataSource.addFriendEmail(myInfo, friendEmail)
+    private suspend fun addFriend(myInfo: User, friend: User) {
+        localDataSource.addFriend(myInfo, friend)
     }
 
-    suspend fun removeFriend(myInfo: User, friendEmail: Friend) {
-        localDataSource.removeFriendEmail(myInfo, friendEmail)
+    suspend fun removeFriend(myInfo: User, friend: User) {
+        localDataSource.removeFriend(myInfo, friend)
     }
 
-    suspend fun getFriends(friendList: List<Friend>): List<User?> {
-        return remoteDataSource.getFriends(friendList)
+    suspend fun updateFriends(myInfo: User, friendList: List<Friend>): List<User?> {
+        val friendEmailList = friendList.map { it.userEmail }
+        val updatedFriendList = remoteDataSource.updateFriendsData(friendEmailList)
+        updatedFriendList.forEach {
+            if (it != null) {
+                localDataSource.clearFriendsData()
+                addFriend(myInfo, it)
+            }
+        }
+        return updatedFriendList
+    }
+
+    suspend fun getFriends(): List<User> {
+        return localDataSource.getFriendList()
     }
 }

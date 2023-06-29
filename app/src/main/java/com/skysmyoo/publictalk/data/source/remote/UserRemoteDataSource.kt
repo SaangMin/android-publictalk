@@ -7,7 +7,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
-import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.coroutineScope
@@ -43,17 +42,15 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun getExistUser(email: String?): User? {
+    suspend fun getExistUser(email: String?): DataSnapshot? {
         val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
         return suspendCoroutine { continuation ->
             ref.orderByChild("userEmail").equalTo(email)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
-                            val user =
-                                snapshot.children.firstOrNull()?.getValue(User::class.java)
-                                    ?: return
-                            continuation.resume(user)
+                            val userData = snapshot.children.firstOrNull() ?: return
+                            continuation.resume(userData)
                         } else {
                             continuation.resume(null)
                         }
@@ -66,10 +63,18 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
-    suspend fun getFriends(friendList: List<Friend>): List<User?> =
+    suspend fun updateUser(auth: String, user: User): Response<Map<String, String>>? {
+        val userEmail = user.userEmail
+        val userUid = getExistUser(userEmail)?.key ?: return null
+        return apiClient.updateUser(userUid, auth, user)
+    }
+
+    suspend fun updateFriendsData(friendList: List<String>): List<User?> =
         coroutineScope {
             friendList.map {
-                getExistUser(it.userEmail)
+                val dataSnapshot = getExistUser(it)
+                val updatedUser = dataSnapshot?.getValue(User::class.java)
+                updatedUser
             }
         }
 }

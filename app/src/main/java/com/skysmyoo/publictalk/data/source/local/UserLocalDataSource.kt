@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.data.source.local
 
+import com.skysmyoo.publictalk.data.model.local.SavedFriend
 import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
@@ -7,6 +8,7 @@ import javax.inject.Inject
 
 class UserLocalDataSource @Inject constructor(
     private val userModelDao: UserModelDao,
+    private val friendModelDao: FriendModelDao,
     private val preferencesManager: SharedPreferencesManager,
 ) {
 
@@ -44,21 +46,32 @@ class UserLocalDataSource @Inject constructor(
         return preferencesManager.clearUserData()
     }
 
-    suspend fun addFriendEmail(myInfo: User, friendEmail: Friend) {
+    suspend fun clearFriendsData() {
+        return friendModelDao.clearFriends()
+    }
+
+    suspend fun addFriend(myInfo: User, friend: User) {
+        val updateFriendList = myInfo.userFriendIdList.toMutableList()
+        updateFriendList.add(Friend(userEmail = friend.userEmail))
+        friendModelDao.insertFriend(SavedFriend(friendData = friend))
+
+        myInfo.userFriendIdList = updateFriendList
+        userModelDao.updateUser(myInfo)
+    }
+
+    suspend fun removeFriend(myInfo: User, friend: User) {
         val updateFriendList =
             myInfo.userFriendIdList.toMutableList()
-        updateFriendList.add(friendEmail)
+        val removeTarget = updateFriendList.find { it.userEmail == friend.userEmail }
+        updateFriendList.remove(removeTarget)
+        friendModelDao.removeFriend(friend)
 
         val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
         userModelDao.updateUser(updatedMyInfo)
     }
 
-    suspend fun removeFriendEmail(myInfo: User, friendEmail: Friend) {
-        val updateFriendList =
-            myInfo.userFriendIdList.toMutableList()
-        updateFriendList.remove(friendEmail)
-
-        val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
-        userModelDao.updateUser(updatedMyInfo)
+    suspend fun getFriendList(): List<User> {
+        val savedFriendList = friendModelDao.getFriendList()
+        return savedFriendList.map { it.friendData }
     }
 }

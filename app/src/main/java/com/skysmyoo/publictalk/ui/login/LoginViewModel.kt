@@ -9,8 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -54,41 +55,29 @@ class LoginViewModel @Inject constructor(
         userLanguage: String,
         startHomeActivity: () -> Unit,
     ) {
-        user?.let {
-            it.getIdToken(true)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val idToken = task.result.token
-                        if (idToken != null) {
-                            viewModelScope.launch {
-                                _isLoading.value = true
-                                val profileImage = repository.uploadImage(imageUri)
-                                val user = User(
-                                    userEmail = it.email ?: "",
-                                    userName = name.value ?: "",
-                                    userPhoneNumber = phoneNumber.value ?: "",
-                                    userProfileImage = profileImage,
-                                    userLanguage = userLanguage,
-                                    userDeviceToken = token ?: "",
-                                    userFriendIdList = listOf(Friend(userEmail = "iu@gmail.com")),
-                                    userCreatedAt = TimeUtil.getCurrentDateString()
-                                )
-                                repository.putUser(idToken, user).run {
-                                    if (this.isSuccessful) {
-                                        _isLoading.value = false
-                                        startHomeActivity()
-                                    } else {
-                                        Log.e(TAG, "put user error!: ${errorBody()}")
-                                    }
-                                }
-                            }
-                        } else {
-                            Log.e(TAG, "idToken is null")
-                        }
+        FirebaseData.getIdToken { idToken ->
+            viewModelScope.launch {
+                _isLoading.value = true
+                val profileImage = repository.uploadImage(imageUri)
+                val user = User(
+                    userEmail = FirebaseData.user?.email ?: "",
+                    userName = name.value ?: "",
+                    userPhoneNumber = phoneNumber.value ?: "",
+                    userProfileImage = profileImage,
+                    userLanguage = userLanguage,
+                    userDeviceToken = token ?: "",
+                    userFriendIdList = listOf(Friend(userEmail = "iu@gmail.com")),
+                    userCreatedAt = TimeUtil.getCurrentDateString()
+                )
+                repository.putUser(idToken, user).run {
+                    if (this.isSuccessful) {
+                        _isLoading.value = false
+                        startHomeActivity()
                     } else {
-                        Log.e(TAG, "put user error!")
+                        Log.e(TAG, "put user error!: ${errorBody()}")
                     }
                 }
+            }
         }
     }
 
@@ -98,11 +87,16 @@ class LoginViewModel @Inject constructor(
 
     fun validateExistUser(email: String?) {
         viewModelScope.launch {
-            val user = repository.getExistUser(email)
+            val user = repository.getExistUser(email)?.values?.firstOrNull()
             if (user != null) {
-                user.userDeviceToken = token ?: return@launch
-                repository.insertUser(user)
-                _isExistUser.value = true
+                setUserInfo()
+                FirebaseData.getIdToken { idToken ->
+                    viewModelScope.launch {
+                        repository.insertUser(user)
+                        repository.updateFriends(user, user.userFriendIdList)
+                        _isExistUser.value = true
+                    }
+                }
             } else {
                 _isExistUser.value = false
                 _googleLoginEvent.value = Unit
@@ -115,6 +109,6 @@ class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "UserViewModel"
+        private const val TAG = "LoginViewModel"
     }
 }
