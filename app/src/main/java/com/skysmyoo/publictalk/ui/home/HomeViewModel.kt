@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
+import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.source.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,6 +18,10 @@ class HomeViewModel @Inject constructor(
 
     private val _adapterItemList = MutableLiveData<List<FriendListScreenData>>()
     val adapterItemList: LiveData<List<FriendListScreenData>> = _adapterItemList
+    private val _chatRoomClickEvent = MutableLiveData<Unit>()
+    val chatRoomClickEvent: LiveData<Unit> = _chatRoomClickEvent
+
+    var clickedChatRoom: ChatRoom? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
@@ -35,9 +40,17 @@ class HomeViewModel @Inject constructor(
                 _adapterItemList.value = itemList
             } else {
                 _adapterItemList.value = itemList
-
             }
         }
+    }
+
+    fun getMyEmail(): String {
+        return repository.getMyEmail() ?: ""
+    }
+
+    fun onClickChatRoom(chatRoom: ChatRoom) {
+        clickedChatRoom = chatRoom
+        _chatRoomClickEvent.value = Unit
     }
 
     companion object {

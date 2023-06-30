@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
+import com.skysmyoo.publictalk.ui.home.HomeViewModel
 
-class ChatRoomListAdapter :
+class ChatRoomListAdapter (
+    private val viewModel: HomeViewModel
+) :
     ListAdapter<ChatRoom, ChatRoomListAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomViewHolder {
@@ -17,13 +20,13 @@ class ChatRoomListAdapter :
     }
 
     override fun onBindViewHolder(holder: ChatRoomViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), viewModel)
     }
 
     class ChatRoomViewHolder(private val binding: ItemChatRoomBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ChatRoom) {
+        fun bind(item: ChatRoom, viewModel: HomeViewModel) {
             with(binding) {
                 chatRoom = item
                 lastMessage = item.messageList?.lastOrNull()
@@ -31,6 +34,7 @@ class ChatRoomListAdapter :
                     item.messageList?.filter {
                         !it.isReading && it.receiver == preferencesManager.getMyEmail()
                     }?.size ?: 0
+                this.viewModel = viewModel
             }
         }
 

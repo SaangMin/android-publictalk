@@ -16,11 +16,16 @@
         <variable
             name="unreadMessage"
             type="Integer" />
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.home.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:onClick="@{()->viewModel.onClickChatRoom(chatRoom)}">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_item_chat_list_profile"

@@ -15,7 +15,11 @@
         android:id="@+id/navigation_chat_list"
         android:name="com.skysmyoo.publictalk.ui.home.chat_list.ChatListFragment"
         android:label="@string/navigation_chat_list_label"
-        tools:layout="@layout/fragment_chat_list" />
+        tools:layout="@layout/fragment_chat_list" >
+        <action
+            android:id="@+id/action_chat_list_to_chatRoom"
+            app:destination="@id/navigation_chat_room" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_setting"
@@ -32,5 +36,14 @@
         android:name="com.skysmyoo.publictalk.ui.StartActivity"
         android:label="@string/navigation_start_activity_label"
         tools:layout="@layout/activity_start" />
+
+    <fragment
+        android:id="@+id/navigation_chat_room"
+        android:name="com.skysmyoo.publictalk.ui.chat_room.ChatRoomFragment"
+        android:label="@string/navigation_chat_room_label" >
+        <argument
+            android:name="chatRoom"
+            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+    </fragment>
 
 </navigation>
