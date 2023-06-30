@@ -46,4 +46,9 @@
     <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
     <string name="send">전송</string>
     <string name="send_message_hint">메세지를 입력해주세요.</string>
+    <string name="hello">안녕하세요.</string>
+    <string name="time_sample">오후 1 : 40</string>
+    <string name="navigation_chat_room_label">채팅방</string>
+    <string name="delete_chat_room">대화방 삭제</string>
+    <string name="chat_room_title_sample">개똥이</string>
 </resources>
