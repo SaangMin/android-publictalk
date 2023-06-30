@@ -11,6 +11,7 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.databinding.FragmentChatListBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
+import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,12 +51,16 @@ class ChatListFragment : BaseFragment() {
     }
 
     private fun chatRoomClickObserver() {
-        viewModel.chatRoomClickEvent.observe(viewLifecycleOwner) {
+        viewModel.chatRoomClickEvent.observe(viewLifecycleOwner, EventObserver{
             val clickedChatRoom = viewModel.clickedChatRoom
             if(clickedChatRoom != null) {
                 val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
                 findNavController().navigate(action)
             }
-        }
+        })
+    }
+
+    companion object {
+        private const val TAG = "ChatListFragment"
     }
 }

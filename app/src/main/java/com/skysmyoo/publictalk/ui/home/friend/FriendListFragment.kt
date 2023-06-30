@@ -7,6 +7,7 @@ import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
+import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,9 +29,9 @@ class FriendListFragment : BaseFragment() {
     }
 
     private fun adapterItemListObserver() {
-        viewModel.adapterItemList.observe(viewLifecycleOwner) {
+        viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
             friendListAdapter.submitList(it)
-        }
+        })
     }
 
     companion object {
