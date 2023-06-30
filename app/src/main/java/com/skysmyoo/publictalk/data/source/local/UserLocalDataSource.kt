@@ -51,22 +51,22 @@ class UserLocalDataSource @Inject constructor(
     }
 
     suspend fun addFriend(myInfo: User, friend: User) {
-        val updateFriendList = myInfo.userFriendIdList.toMutableList()
-        updateFriendList.add(Friend(userEmail = friend.userEmail))
+        val updatedFriendList = myInfo.userFriendIdList.toMutableList()
+        updatedFriendList.add(Friend(userEmail = friend.userEmail))
         friendModelDao.insertFriend(SavedFriend(friendData = friend))
 
-        myInfo.userFriendIdList = updateFriendList
+        myInfo.userFriendIdList = updatedFriendList
         userModelDao.updateUser(myInfo)
     }
 
     suspend fun removeFriend(myInfo: User, friend: User) {
-        val updateFriendList =
+        val updatedFriendList =
             myInfo.userFriendIdList.toMutableList()
-        val removeTarget = updateFriendList.find { it.userEmail == friend.userEmail }
-        updateFriendList.remove(removeTarget)
+        val removeTarget = updatedFriendList.find { it.userEmail == friend.userEmail }
+        updatedFriendList.remove(removeTarget)
         friendModelDao.removeFriend(friend)
 
-        val updatedMyInfo = myInfo.copy(userFriendIdList = updateFriendList)
+        val updatedMyInfo = myInfo.copy(userFriendIdList = updatedFriendList)
         userModelDao.updateUser(updatedMyInfo)
     }
 
