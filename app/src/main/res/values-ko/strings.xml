@@ -51,4 +51,5 @@
     <string name="navigation_chat_room_label">채팅방</string>
     <string name="delete_chat_room">대화방 삭제</string>
     <string name="chat_room_title_sample">개똥이</string>
+    <string name="message_box_not_reading_count">1</string>
 </resources>

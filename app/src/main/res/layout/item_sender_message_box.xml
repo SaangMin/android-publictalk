@@ -8,6 +8,10 @@
         <variable
             name="message"
             type="com.skysmyoo.publictalk.data.model.remote.Message" />
+
+        <variable
+            name="time"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,20 +21,22 @@
 
         <TextView
             android:id="@+id/tv_item_sender_not_reading"
+            isReading="@{Boolean.valueOf(message.isReading)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
+            android:text="@string/message_box_not_reading_count"
             android:textColor="@color/color_text"
             android:textSize="11sp"
             app:layout_constraintBottom_toTopOf="@id/tv_item_sender_time"
-            app:layout_constraintEnd_toStartOf="@id/tv_item_sender_body"
-            tools:text="1" />
+            app:layout_constraintEnd_toStartOf="@id/tv_item_sender_body" />
 
         <TextView
             android:id="@+id/tv_item_sender_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{time}"
             android:textColor="@color/color_text"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"

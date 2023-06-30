@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.databinding.ItemReceiverMessageBoxBinding
 import com.skysmyoo.publictalk.databinding.ItemSenderMessageBoxBinding
+import com.skysmyoo.publictalk.utils.TimeUtil
 import javax.inject.Inject
 
 private const val TYPE_SENDER = 0
@@ -51,7 +52,10 @@ class ChatRoomAdapter @Inject constructor(
 
         fun bind(item: MessageBox.SenderMessageBox) {
             val message = item.message
-            binding.message = message
+            with(binding) {
+                this.message = message
+                time = TimeUtil.convertDateTime(message.createdAt)
+            }
         }
 
         companion object {
@@ -73,7 +77,10 @@ class ChatRoomAdapter @Inject constructor(
 
         fun bind(item: MessageBox.ReceiverMessageBox) {
             val message = item.message
-            binding.message = message
+            with(binding) {
+                this.message = message
+                time = TimeUtil.convertDateTime(message.createdAt)
+            }
         }
 
         companion object {

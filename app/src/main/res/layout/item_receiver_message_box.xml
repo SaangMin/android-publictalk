@@ -8,6 +8,10 @@
         <variable
             name="message"
             type="com.skysmyoo.publictalk.data.model.remote.Message" />
+
+        <variable
+            name="time"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,6 +38,7 @@
             android:id="@+id/tv_item_receiver_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{time}"
             android:textColor="@color/color_text"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"

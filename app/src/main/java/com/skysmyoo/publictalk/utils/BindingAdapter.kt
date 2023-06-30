@@ -23,3 +23,12 @@ fun isVisible(view: TextView, unreadMessage: Int) {
         view.visibility = View.INVISIBLE
     }
 }
+
+@BindingAdapter("isReading")
+fun isReading(view: TextView, isReading: Boolean) {
+    if (isReading) {
+        view.visibility = View.INVISIBLE
+    } else {
+        view.visibility = View.VISIBLE
+    }
+}

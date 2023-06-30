@@ -37,7 +37,7 @@ class ChatListFragment : BaseFragment() {
             viewModel.getMyEmail(),
             "안녕!",
             false,
-            "217381293791"
+            "2023-06-29 13:44:15"
         )
 
         val sampleMessage2 = Message(
@@ -45,7 +45,7 @@ class ChatListFragment : BaseFragment() {
             TestSampleData.sampleUser.userEmail,
             "응 안녕!",
             false,
-            "217381293791"
+            "2023-06-30 13:50:24"
         )
 
         val sampleChatRoom = ChatRoom(
