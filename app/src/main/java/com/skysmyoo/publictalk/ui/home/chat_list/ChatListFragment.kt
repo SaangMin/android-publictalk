@@ -39,11 +39,20 @@ class ChatListFragment : BaseFragment() {
             false,
             "217381293791"
         )
+
+        val sampleMessage2 = Message(
+            viewModel.getMyEmail(),
+            TestSampleData.sampleUser.userEmail,
+            "응 안녕!",
+            false,
+            "217381293791"
+        )
+
         val sampleChatRoom = ChatRoom(
             0,
             viewModel.getMyEmail(),
             TestSampleData.sampleUser,
-            listOf(sampleMessage, sampleMessage),
+            listOf(sampleMessage, sampleMessage, sampleMessage2),
             "148290321"
         )
 
@@ -51,9 +60,9 @@ class ChatListFragment : BaseFragment() {
     }
 
     private fun chatRoomClickObserver() {
-        viewModel.chatRoomClickEvent.observe(viewLifecycleOwner, EventObserver{
+        viewModel.chatRoomClickEvent.observe(viewLifecycleOwner, EventObserver {
             val clickedChatRoom = viewModel.clickedChatRoom
-            if(clickedChatRoom != null) {
+            if (clickedChatRoom != null) {
                 val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
                 findNavController().navigate(action)
             }

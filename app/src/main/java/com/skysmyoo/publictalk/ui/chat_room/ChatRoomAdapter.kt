@@ -8,14 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.databinding.ItemReceiverMessageBoxBinding
 import com.skysmyoo.publictalk.databinding.ItemSenderMessageBoxBinding
-import com.skysmyoo.publictalk.ui.home.HomeViewModel
 import javax.inject.Inject
 
 private const val TYPE_SENDER = 0
 private const val TYPE_RECEIVER = 1
 
 class ChatRoomAdapter @Inject constructor(
-    private val viewModel: HomeViewModel
+    private val viewModel: ChatRoomViewModel
 ) : ListAdapter<MessageBox, RecyclerView.ViewHolder>(MessageBoxDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
