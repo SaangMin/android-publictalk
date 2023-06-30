@@ -11,4 +11,6 @@
     <dimen name="margin_chat_list_image">16dp</dimen>
     <dimen name="margin_chat_list_text">10dp</dimen>
     <dimen name="margin_unread_icon">16dp</dimen>
+    <dimen name="margin_chat_room">16dp</dimen>
+    <dimen name="padding_chat_room">8dp</dimen>
 </resources>

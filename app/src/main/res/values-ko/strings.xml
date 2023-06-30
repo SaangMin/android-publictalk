@@ -44,4 +44,6 @@
     <string name="logout">로그 아웃</string>
     <string name="chat_room_image">채팅방 이미지</string>
     <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
+    <string name="send">전송</string>
+    <string name="send_message_hint">메세지를 입력해주세요.</string>
 </resources>
