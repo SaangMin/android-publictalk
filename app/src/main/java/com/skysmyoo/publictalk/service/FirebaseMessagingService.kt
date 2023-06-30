@@ -9,11 +9,13 @@ import com.google.firebase.messaging.RemoteMessage
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.Token
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class FirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
