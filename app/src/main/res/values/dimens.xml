@@ -13,4 +13,5 @@
     <dimen name="margin_unread_icon">16dp</dimen>
     <dimen name="margin_chat_room">16dp</dimen>
     <dimen name="padding_chat_room">8dp</dimen>
+    <dimen name="margin_msg_box">16dp</dimen>
 </resources>

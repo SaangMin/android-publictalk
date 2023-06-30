@@ -58,4 +58,9 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="MyChatRoomToolBarStyle">
+        <item name="navigationIcon">@drawable/icon_back</item>
+        <item name="menu">@menu/chat_room_ab_menu</item>
+    </style>
 </resources>
