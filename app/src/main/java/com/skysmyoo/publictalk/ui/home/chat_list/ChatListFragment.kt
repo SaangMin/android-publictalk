@@ -49,7 +49,6 @@ class ChatListFragment : BaseFragment() {
         )
 
         val sampleChatRoom = ChatRoom(
-            0,
             viewModel.getMyEmail(),
             TestSampleData.sampleUser,
             listOf(sampleMessage, sampleMessage, sampleMessage2),
