@@ -11,4 +11,5 @@ import com.skysmyoo.publictalk.data.model.remote.User
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userModelDao(): UserModelDao
     abstract fun friendModelDao(): FriendModelDao
+    abstract fun chatModelDao(): ChatModelDao
 }
