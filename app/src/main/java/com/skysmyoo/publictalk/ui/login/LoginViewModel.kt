@@ -6,16 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.skysmyoo.publictalk.BuildConfig
+import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -34,7 +30,7 @@ class LoginViewModel @Inject constructor(
     val submitEvent: LiveData<Unit> = _submitEvent
     private val _notRequiredEvent = MutableLiveData<Unit>()
     val notRequiredEvent: LiveData<Unit> = _notRequiredEvent
-    private val _isExistUser = MutableLiveData(false)
+    private val _isExistUser = MutableLiveData<Boolean>()
     val isExistUser: LiveData<Boolean> = _isExistUser
     private val _googleLoginEvent = MutableLiveData(Unit)
     val googleLoginEvent: LiveData<Unit> = _googleLoginEvent
@@ -59,41 +55,29 @@ class LoginViewModel @Inject constructor(
         userLanguage: String,
         startHomeActivity: () -> Unit,
     ) {
-        user?.let {
-            it.getIdToken(true)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val idToken = task.result.token
-                        if (idToken != null) {
-                            viewModelScope.launch {
-                                _isLoading.value = true
-                                val profileImage = repository.uploadImage(imageUri)
-                                val user = User(
-                                    userEmail = it.email ?: "",
-                                    userName = name.value ?: "",
-                                    userPhoneNumber = phoneNumber.value ?: "",
-                                    userProfileImage = profileImage,
-                                    userLanguage = userLanguage,
-                                    userDeviceToken = token ?: "",
-                                    userFriendIdList = null,
-                                    userCreatedAt = TimeUtil.getCurrentDateString()
-                                )
-                                repository.putUser(idToken, user).run {
-                                    if (this.isSuccessful) {
-                                        _isLoading.value = false
-                                        startHomeActivity()
-                                    } else {
-                                        Log.e(TAG, "put user error!: ${errorBody()}")
-                                    }
-                                }
-                            }
-                        } else {
-                            Log.e(TAG, "idToken is null")
-                        }
+        FirebaseData.getIdToken { idToken ->
+            viewModelScope.launch {
+                _isLoading.value = true
+                val profileImage = repository.uploadImage(imageUri)
+                val user = User(
+                    userEmail = FirebaseData.user?.email ?: "",
+                    userName = name.value ?: "",
+                    userPhoneNumber = phoneNumber.value ?: "",
+                    userProfileImage = profileImage,
+                    userLanguage = userLanguage,
+                    userDeviceToken = token ?: "",
+                    userFriendIdList = listOf(Friend(userEmail = "iu@gmail.com")),
+                    userCreatedAt = TimeUtil.getCurrentDateString()
+                )
+                repository.putUser(idToken, user).run {
+                    if (this.isSuccessful) {
+                        _isLoading.value = false
+                        startHomeActivity()
                     } else {
-                        Log.e(TAG, "put user error!")
+                        Log.e(TAG, "put user error!: ${errorBody()}")
                     }
                 }
+            }
         }
     }
 
@@ -102,29 +86,22 @@ class LoginViewModel @Inject constructor(
     }
 
     fun validateExistUser(email: String?) {
-        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
-        ref.orderByChild("userEmail").equalTo(email)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        viewModelScope.launch {
-                            val user = snapshot.children.firstOrNull()?.getValue(User::class.java)
-                                ?: return@launch
-                            user.userDeviceToken = token ?: return@launch
-                            repository.insertUser(user)
-                            _isExistUser.value = true
-                        }
-                    } else {
-                        _isExistUser.value = false
-                        _googleLoginEvent.value = Unit
+        viewModelScope.launch {
+            val user = repository.getExistUser(email)?.values?.firstOrNull()
+            if (user != null) {
+                setUserInfo()
+                FirebaseData.getIdToken { idToken ->
+                    viewModelScope.launch {
+                        repository.updateUser(idToken, user)
+                        repository.updateFriends(user, user.userFriendIdList)
+                        _isExistUser.value = true
                     }
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w(TAG, "LoadUser:onCancelled: $error")
-                    _googleLoginEvent.value = Unit
-                }
-            })
+            } else {
+                _isExistUser.value = false
+                _googleLoginEvent.value = Unit
+            }
+        }
     }
 
     fun getMyEmail(): String? {
@@ -132,6 +109,6 @@ class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "UserViewModel"
+        private const val TAG = "LoginViewModel"
     }
 }

@@ -3,6 +3,7 @@ package com.skysmyoo.publictalk.di
 import android.content.Context
 import androidx.room.Room
 import com.skysmyoo.publictalk.data.source.local.AppDatabase
+import com.skysmyoo.publictalk.data.source.local.FriendModelDao
 import com.skysmyoo.publictalk.data.source.local.SharedPreferencesManager
 import com.skysmyoo.publictalk.data.source.local.UserModelDao
 import com.squareup.moshi.Moshi
@@ -26,12 +27,18 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "user-database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     fun provideUserDao(appDatabase: AppDatabase): UserModelDao {
         return appDatabase.userModelDao()
+    }
+
+    @Provides
+    fun provideFriendDao(appDatabase: AppDatabase): FriendModelDao {
+        return appDatabase.friendModelDao()
     }
 
     @Provides

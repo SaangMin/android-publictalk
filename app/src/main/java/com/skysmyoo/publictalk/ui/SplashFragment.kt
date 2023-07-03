@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
@@ -35,10 +34,8 @@ class SplashFragment : BaseFragment() {
 
     private fun validateAlreadyLogin() {
         val email = viewModel.getMyEmail()
-        Log.d(TAG, "$email")
         if (email.isNullOrEmpty()) {
-            val action = SplashFragmentDirections.actionSplashToLogin()
-            findNavController().navigate(action)
+            navigateToLogin()
         } else {
             viewModel.validateExistUser(email)
         }
@@ -46,7 +43,6 @@ class SplashFragment : BaseFragment() {
 
     private fun existUserEmailObserver() {
         viewModel.isExistUser.observe(viewLifecycleOwner) {
-            Log.d(TAG, "$it")
             if (it) {
                 Toast.makeText(
                     requireContext(),
@@ -57,8 +53,15 @@ class SplashFragment : BaseFragment() {
                 val action = SplashFragmentDirections.actionSplashToHome()
                 findNavController().navigate(action)
                 requireActivity().finish()
+            } else {
+                navigateToLogin()
             }
         }
+    }
+
+    private fun navigateToLogin() {
+        val action = SplashFragmentDirections.actionSplashToLogin()
+        findNavController().navigate(action)
     }
 
     companion object {

@@ -11,7 +11,7 @@ object TestSampleData {
         userProfileImage = "https://i.namu.wiki/i/R0AhIJhNi8fkU2Al72pglkrT8QenAaCJd1as-d_iY6MC8nub1iI5VzIqzJlLa-1uzZm--TkB-KHFiT-P-t7bEg.webp",
         userLanguage = "ko",
         userDeviceToken = "",
-        userFriendIdList = null,
+        userFriendIdList = emptyList(),
         userCreatedAt = "2023-06-26 15:16:38"
     )
 }
