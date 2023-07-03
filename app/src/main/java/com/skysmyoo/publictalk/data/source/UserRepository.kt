@@ -5,8 +5,9 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import retrofit2.Response
+import javax.inject.Inject
 
-class UserRepository(
+class UserRepository @Inject constructor(
     private val localDataSource: UserLocalDataSource,
     private val remoteDataSource: UserRemoteDataSource,
 ) {
@@ -14,7 +15,6 @@ class UserRepository(
     suspend fun insertUser(user: User) {
         localDataSource.insertUser(user)
     }
-
 
     suspend fun getMyInfo(email: String): User? {
         return localDataSource.getMyInfo(email)
@@ -31,5 +31,17 @@ class UserRepository(
 
     suspend fun getUser(): List<User>? {
         return localDataSource.getUser()
+    }
+
+    fun getMyEmail(): String? {
+        return localDataSource.getMyEmail()
+    }
+
+    fun getMyLocale(): String {
+        return localDataSource.getMyLocale()
+    }
+
+    fun clearMyData() {
+        return localDataSource.clearMyData()
     }
 }

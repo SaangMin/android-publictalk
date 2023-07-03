@@ -6,8 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -19,9 +17,12 @@ import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.utils.TimeUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
 
@@ -126,14 +127,11 @@ class LoginViewModel(
             })
     }
 
+    fun getMyEmail(): String? {
+        return repository.getMyEmail()
+    }
+
     companion object {
         private const val TAG = "UserViewModel"
-
-        fun provideFactory(repository: UserRepository) =
-            viewModelFactory {
-                initializer {
-                    LoginViewModel(repository)
-                }
-            }
     }
 }

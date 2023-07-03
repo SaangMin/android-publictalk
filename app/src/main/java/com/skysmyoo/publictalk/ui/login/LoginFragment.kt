@@ -27,13 +27,11 @@ import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.R
-import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
-import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
-import com.skysmyoo.publictalk.di.ServiceLocator
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : BaseFragment() {
 
     override val binding get() = _binding as FragmentLoginBinding
@@ -46,14 +44,7 @@ class LoginFragment : BaseFragment() {
     private lateinit var oneTapLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var legacyLauncher: ActivityResultLauncher<Intent>
     private var idToken: String? = null
-    private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModel.provideFactory(
-            UserRepository(
-                UserLocalDataSource(ServiceLocator.userDao),
-                UserRemoteDataSource(ServiceLocator.apiClient)
-            )
-        )
-    }
+    private val viewModel: LoginViewModel by viewModels()
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
         .requestEmail()

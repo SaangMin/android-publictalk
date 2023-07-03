@@ -3,10 +3,10 @@ package com.skysmyoo.publictalk.data.source.local
 import android.content.Context
 import android.content.SharedPreferences
 import com.skysmyoo.publictalk.data.model.local.Constants
-import com.skysmyoo.publictalk.data.model.local.Constants.KEY_LANGUAGE_PREFERENCES
 import com.skysmyoo.publictalk.data.model.local.Constants.KEY_USER_LANGUAGE
+import javax.inject.Inject
 
-class SharedPreferencesManager(context: Context) {
+class SharedPreferencesManager @Inject constructor(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(Constants.KEY_MY_PREFERENCES, Context.MODE_PRIVATE)
 
@@ -19,7 +19,7 @@ class SharedPreferencesManager(context: Context) {
     }
 
     fun setLocale(locale: String) {
-        sharedPreferences.edit().putString(KEY_LANGUAGE_PREFERENCES, setLanguage(locale)).apply()
+        sharedPreferences.edit().putString(KEY_USER_LANGUAGE, setLanguage(locale)).apply()
     }
 
     fun getLocale(): String {

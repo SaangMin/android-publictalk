@@ -10,7 +10,9 @@ import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManage
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.ActivityHomeBinding
 import com.skysmyoo.publictalk.utils.LanguageContextWrapper
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding

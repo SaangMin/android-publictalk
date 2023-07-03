@@ -14,14 +14,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
-import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
-import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
-import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingInfoFragment : BaseFragment() {
 
     override val binding get() = _binding as FragmentSettingInfoBinding
@@ -31,14 +29,7 @@ class SettingInfoFragment : BaseFragment() {
     private var imageUri: Uri? = null
     private var userLanguage: Language? = null
     private val loadingDialog by lazy { LoadingDialogFragment() }
-    private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModel.provideFactory(
-            UserRepository(
-                UserLocalDataSource(ServiceLocator.userDao),
-                UserRemoteDataSource(ServiceLocator.apiClient)
-            )
-        )
-    }
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

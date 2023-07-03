@@ -7,29 +7,19 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
-import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
-import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.databinding.FragmentSplashBinding
-import com.skysmyoo.publictalk.di.ServiceLocator
 import com.skysmyoo.publictalk.ui.login.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SplashFragment : BaseFragment() {
 
     override val binding get() = _binding!! as FragmentSplashBinding
     override val layoutId: Int get() = R.layout.fragment_splash
 
-    private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModel.provideFactory(
-            UserRepository(
-                UserLocalDataSource(ServiceLocator.userDao),
-                UserRemoteDataSource(ServiceLocator.apiClient)
-            )
-        )
-    }
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +34,7 @@ class SplashFragment : BaseFragment() {
     }
 
     private fun validateAlreadyLogin() {
-        val email = preferencesManager.getMyEmail()
+        val email = viewModel.getMyEmail()
         Log.d(TAG, "$email")
         if (email.isNullOrEmpty()) {
             val action = SplashFragmentDirections.actionSplashToLogin()

@@ -8,12 +8,16 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.Token
-import com.skysmyoo.publictalk.di.ServiceLocator
+import com.skysmyoo.publictalk.data.source.remote.FcmClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class FirebaseMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var fcmClient: FcmClient
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -22,7 +26,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     private fun sendRegistrationToServer(token: String?) {
         CoroutineScope(Dispatchers.IO).launch {
-            val response = ServiceLocator.fcmClient.registerToken(Token(token))
+            val response = fcmClient.registerToken(Token(token))
             if (response.isSuccessful) {
                 Log.d(TAG, "Token registered successfully")
             } else {
