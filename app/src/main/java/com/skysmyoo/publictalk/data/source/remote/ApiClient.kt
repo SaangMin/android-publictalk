@@ -1,5 +1,7 @@
 package com.skysmyoo.publictalk.data.source.remote
 
+import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,4 +24,17 @@ interface ApiClient {
         @Query("auth") auth: String,
         @Body user: User
     ): Response<User>
+
+    @POST("chatRooms.json")
+    suspend fun createChatRoom(
+        @Query("auth") auth: String,
+        @Body chatRoom: ChatRoom
+    ): Response<Map<String, String>>
+
+    @POST("chatRooms/{chatRoomId}/messages.json")
+    suspend fun sendMessage(
+        @Path("chatRoomId") chatRoomId: String,
+        @Query("auth") auth: String,
+        @Body message: Message
+    ): Response<Map<String, String>>
 }

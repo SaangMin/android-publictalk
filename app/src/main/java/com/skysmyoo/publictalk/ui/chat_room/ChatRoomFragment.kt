@@ -27,15 +27,18 @@ class ChatRoomFragment : BaseFragment() {
 
         adapter = ChatRoomAdapter(viewModel)
         setLayout(chatRoomInfo)
-        viewModel.setAdapterItemList(chatRoomInfo.messageList ?: emptyList())
+        viewModel.setAdapterItemList(chatRoomInfo.messages)
         messageListObserver()
 
+        binding.btnChatRoomSend.setOnClickListener {
+            onSendMessage(chatRoomInfo)
+        }
     }
 
     private fun setLayout(chatRoomInfo: ChatRoom) {
         with(binding) {
             rvChatRoom.adapter = adapter
-            abChatRoom.title = chatRoomInfo.other.userName
+            abChatRoom.title = chatRoomInfo.other?.userName
             abChatRoom.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -46,7 +49,11 @@ class ChatRoomFragment : BaseFragment() {
         viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
             adapter.submitList(it)
         })
+    }
 
+    private fun onSendMessage(chatRoomInfo: ChatRoom) {
+        val messageText = binding.etChatRoomMessage.text.toString()
+        viewModel.sendMessage(chatRoomInfo, messageText)
     }
 
     companion object {
