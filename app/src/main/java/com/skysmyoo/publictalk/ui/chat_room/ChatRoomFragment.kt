@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.MessageBox
@@ -67,6 +68,11 @@ class ChatRoomFragment : BaseFragment() {
                 adapter.submitList(currentList)
             }
             binding.etChatRoomMessage.setText("")
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    binding.rvChatRoom.layoutManager?.scrollToPosition(currentList.size - 1)
+                }
+            })
         })
     }
 
