@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
 
     fun getChatRooms() {
         viewModelScope.launch {
-            val chatRoomList = repository.getChatRooms(getMyEmail())
+            val chatRoomList = repository.getChatRooms()
             if (chatRoomList != null){
                 _chatRoomList.value = Event(chatRoomList)
             }

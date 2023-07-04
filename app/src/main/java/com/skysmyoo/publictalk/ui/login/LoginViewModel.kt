@@ -94,6 +94,7 @@ class LoginViewModel @Inject constructor(
                     viewModelScope.launch {
                         repository.updateUser(idToken, user)
                         repository.updateFriends(user, user.userFriendIdList)
+                        repository.updateChatRoom(user.userEmail)
                         _isExistUser.value = true
                     }
                 }

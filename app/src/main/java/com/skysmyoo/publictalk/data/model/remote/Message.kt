@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.model.remote
 
 import com.squareup.moshi.JsonClass
+import java.io.Serializable
 
 @JsonClass(generateAdapter = true)
 data class Message(
@@ -9,4 +10,4 @@ data class Message(
     val body: String = "",
     val isReading: Boolean = false,
     val createdAt: String = "",
-)
+): Serializable
