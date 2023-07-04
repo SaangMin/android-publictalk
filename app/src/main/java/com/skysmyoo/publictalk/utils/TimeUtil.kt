@@ -44,10 +44,10 @@ object TimeUtil {
         val calendarTarget = Calendar.getInstance()
         calendarTarget.time = this
 
-        val calendar2 = Calendar.getInstance()
+        val calendar = Calendar.getInstance()
 
-        return (calendarTarget.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)
-                && calendarTarget.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)
-                && calendarTarget.get(Calendar.DAY_OF_MONTH) == calendar2.get(Calendar.DAY_OF_MONTH))
+        return (calendarTarget.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)
+                && calendarTarget.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)
+                && calendarTarget.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH))
     }
 }
