@@ -27,7 +27,7 @@ class ChatRoomFragment : BaseFragment() {
 
         adapter = ChatRoomAdapter(viewModel)
         setLayout(chatRoomInfo)
-        viewModel.setAdapterItemList(chatRoomInfo.messages)
+        viewModel.setAdapterItemList(chatRoomInfo.messages.map { it.values.first() })
         messageListObserver()
 
         binding.btnChatRoomSend.setOnClickListener {

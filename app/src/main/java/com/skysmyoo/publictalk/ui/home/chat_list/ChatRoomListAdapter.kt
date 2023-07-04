@@ -27,11 +27,12 @@ class ChatRoomListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatRoom, viewModel: HomeViewModel) {
+            val messageList = item.messages.map { it.values.first() }
             with(binding) {
                 chatRoom = item
-                lastMessage = item.messages.lastOrNull()
+                lastMessage = messageList.lastOrNull()
                 unreadMessage =
-                    item.messages.filter {
+                    messageList.filter {
                         !it.isReading && it.receiver == preferencesManager.getMyEmail()
                     }.size
                 this.viewModel = viewModel
