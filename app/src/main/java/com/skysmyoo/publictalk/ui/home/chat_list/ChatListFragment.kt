@@ -51,10 +51,10 @@ class ChatListFragment : BaseFragment() {
         val sampleChatRoom = ChatRoom(
             viewModel.getMyEmail(),
             TestSampleData.sampleUser,
-            listOf(
-                mapOf("dnsj" to sampleMessage),
-                mapOf("dnsj" to sampleMessage),
-                mapOf("dnsj" to sampleMessage2)
+            mapOf(
+                ("dnsj" to sampleMessage),
+                ("dnsj" to sampleMessage),
+                ("dnsj" to sampleMessage2)
             ),
             "148290321"
         )

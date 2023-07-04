@@ -2,6 +2,7 @@ package com.skysmyoo.publictalk.data.source.remote
 
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -21,22 +22,31 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
 
     suspend fun getChatRooms(email: String): List<DataSnapshot>? {
         val ref = Firebase.database(BuildConfig.BASE_URL).getReference("chatRooms")
-        return suspendCoroutine { continuation ->
-            ref.orderByChild("me").equalTo(email)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            val chatRoomData = snapshot.children.toList()
-                            continuation.resume(chatRoomData)
-                        } else {
-                            continuation.resume(null)
-                        }
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {
+        val query1 = ref.orderByChild("me").equalTo(email)
+        val query2 = ref.orderByChild("other").equalTo(email)
+
+        val results1 = performQuery(query1)
+        val results2 = performQuery(query2)
+
+        return results1?.plus(results2 ?: emptyList())
+    }
+
+    private suspend fun performQuery(query: Query): List<DataSnapshot>? {
+        return suspendCoroutine { continuation ->
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        continuation.resume(snapshot.children.toList())
+                    } else {
                         continuation.resume(null)
                     }
-                })
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resume(null)
+                }
+            })
         }
     }
 

@@ -27,7 +27,7 @@ class ChatRoomListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatRoom, viewModel: HomeViewModel) {
-            val messageList = item.messages.map { it.values.first() }
+            val messageList = item.messages.values.toList()
             with(binding) {
                 chatRoom = item
                 lastMessage = messageList.lastOrNull()

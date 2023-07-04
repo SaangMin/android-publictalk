@@ -7,6 +7,6 @@ import java.io.Serializable
 data class ChatRoom(
     val me: String = "",
     val other: User? = null,
-    val messages: List<Map<String, Message>> = emptyList(),
+    val messages: Map<String, Message> = emptyMap(),
     val chatCreatedAt: String = "",
 ) : Serializable
