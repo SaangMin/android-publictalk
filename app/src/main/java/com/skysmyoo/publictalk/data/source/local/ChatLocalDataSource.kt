@@ -15,4 +15,8 @@ class ChatLocalDataSource @Inject constructor(
     suspend fun insertChatRoom(chatRoom: ChatRoom) {
         chatModelDao.insertChatRoom(chatRoom)
     }
+
+    suspend fun clearChatRooms() {
+        chatModelDao.clearChatRooms()
+    }
 }

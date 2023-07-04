@@ -11,6 +11,9 @@ interface ChatModelDao {
     @Insert
     suspend fun insertChatRoom(chatRoom: ChatRoom)
 
+    @Query("DELETE FROM saved_chat_rooms")
+    suspend fun clearChatRooms()
+
     @Query("SELECT * FROM saved_chat_rooms")
     suspend fun getChatRoomList(): List<ChatRoom>?
 }
