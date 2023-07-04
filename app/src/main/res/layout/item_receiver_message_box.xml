@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="message"
+            type="com.skysmyoo.publictalk.data.model.remote.Message" />
+
+        <variable
+            name="time"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_item_receiver_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_receiver_message_box"
+            android:padding="@dimen/margin_msg_box"
+            android:text="@{message.body}"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_item_receiver_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/hello" />
+
+        <TextView
+            android:id="@+id/tv_item_receiver_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{time}"
+            android:textColor="@color/color_text"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_item_receiver_body"
+            tools:text="@string/time_sample" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

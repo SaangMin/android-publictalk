@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.chat_room.ChatRoomFragment">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/ab_chat_room"
+            style="@style/MyChatRoomToolBarStyle"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_bn_background"
+            app:layout_constraintBottom_toTopOf="@id/rv_chat_room"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium"
+            tools:title="@string/chat_room_title_sample" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_chat_room"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/cl_chat_room_send_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ab_chat_room"
+            tools:listitem="@layout/item_sender_message_box" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_chat_room_send_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/color_bn_background"
+            android:padding="@dimen/padding_chat_room"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_chat_room">
+
+            <EditText
+                android:id="@+id/et_chat_room_message"
+                style="@style/MyChatRoomEditTextStyle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:autofillHints="no"
+                android:hint="@string/send_message_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_chat_room_send"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/btn_chat_room_send"
+                style="@style/MyChatRoomButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/et_chat_room_message"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

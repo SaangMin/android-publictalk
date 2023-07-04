@@ -40,21 +40,28 @@ class HomeActivity : AppCompatActivity() {
         }
 
         navController?.addOnDestinationChangedListener { _, destination, _ ->
+            val bottomNavigation = binding.bnHome
+            val toolBar = binding.abHome
             when (destination.id) {
                 R.id.navigation_friend_list -> {
                     setToolbar(getString(R.string.friend_list))
-                    binding.abHome.inflateMenu(R.menu.home_ab_menu)
-                    binding.bnHome.isVisible = true
+                    toolBar.inflateMenu(R.menu.home_ab_menu)
+                    bottomNavigation.isVisible = true
                 }
 
                 R.id.navigation_chat_list -> {
                     setToolbar(getString(R.string.chat_list))
-                    binding.bnHome.isVisible = true
+                    bottomNavigation.isVisible = true
                 }
 
                 R.id.navigation_setting -> {
                     setToolbar(getString(R.string.setting))
-                    binding.bnHome.isVisible = true
+                    bottomNavigation.isVisible = true
+                }
+
+                R.id.navigation_chat_room -> {
+                    toolBar.isVisible = false
+                    bottomNavigation.isVisible = false
                 }
             }
         }
@@ -64,6 +71,7 @@ class HomeActivity : AppCompatActivity() {
         with(binding.abHome) {
             this.title = title
             menu.clear()
+            isVisible = true
         }
     }
 }

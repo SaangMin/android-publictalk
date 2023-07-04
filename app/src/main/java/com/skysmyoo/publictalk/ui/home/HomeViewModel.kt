@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
+import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,8 +17,12 @@ class HomeViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _adapterItemList = MutableLiveData<List<FriendListScreenData>>()
-    val adapterItemList: LiveData<List<FriendListScreenData>> = _adapterItemList
+    private val _adapterItemList = MutableLiveData<Event<List<FriendListScreenData>>>()
+    val adapterItemList: LiveData<Event<List<FriendListScreenData>>> = _adapterItemList
+    private val _chatRoomClickEvent = MutableLiveData<Event<Unit>>()
+    val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
+
+    var clickedChatRoom: ChatRoom? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
@@ -32,12 +38,20 @@ class HomeViewModel @Inject constructor(
             if (friendList.isNotEmpty()) {
                 val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
                 itemList.addAll(friendListScreenData)
-                _adapterItemList.value = itemList
+                _adapterItemList.value = Event(itemList)
             } else {
-                _adapterItemList.value = itemList
-
+                _adapterItemList.value = Event(itemList)
             }
         }
+    }
+
+    fun getMyEmail(): String {
+        return repository.getMyEmail() ?: ""
+    }
+
+    fun onClickChatRoom(chatRoom: ChatRoom) {
+        clickedChatRoom = chatRoom
+        _chatRoomClickEvent.value = Event(Unit)
     }
 
     companion object {
