@@ -21,6 +21,8 @@ class HomeViewModel @Inject constructor(
     val adapterItemList: LiveData<Event<List<FriendListScreenData>>> = _adapterItemList
     private val _chatRoomClickEvent = MutableLiveData<Event<Unit>>()
     val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
+    private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
+    val chatRoomList: LiveData<Event<List<ChatRoom>>> = _chatRoomList
 
     var clickedChatRoom: ChatRoom? = null
 
@@ -41,6 +43,15 @@ class HomeViewModel @Inject constructor(
                 _adapterItemList.value = Event(itemList)
             } else {
                 _adapterItemList.value = Event(itemList)
+            }
+        }
+    }
+
+    fun getChatRooms() {
+        viewModelScope.launch {
+            val chatRoomList = repository.getChatRooms(getMyEmail())
+            if (chatRoomList != null){
+                _chatRoomList.value = Event(chatRoomList)
             }
         }
     }

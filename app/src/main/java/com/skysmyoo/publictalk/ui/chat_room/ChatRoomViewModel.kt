@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.ui.chat_room
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -50,7 +51,9 @@ class ChatRoomViewModel @Inject constructor(
         val message = Message(chatRoom.me, chatRoom.other?.userEmail ?: "", messageBody, false, currentTime)
         FirebaseData.getIdToken {
             viewModelScope.launch {
-                val chatRoomId = chatRepository.sendMessage(it, chatRoom.me, chatRoom.other!!, message)
+                Log.d(TAG,"${chatRepository.getCurrentRoom(chatRoom.me, chatRoom.other?.userEmail!!)}")
+                val messageList = chatRepository.sendMessage(it, chatRoom.me, chatRoom.other!!, message)
+                Log.d(TAG,"$messageList")
             }
         }
     }

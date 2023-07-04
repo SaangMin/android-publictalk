@@ -13,9 +13,9 @@ class ChatRepository @Inject constructor(
     private val remoteDataSource: ChatRemoteDataSource,
 ) {
 
-    suspend fun getChatRooms(myEmail: String): List<ChatRoom?>? {
+    suspend fun getChatRooms(myEmail: String): List<ChatRoom>? {
         val chatRoomDataList = remoteDataSource.getChatRooms(myEmail)
-        return chatRoomDataList?.map { it.getValue(ChatRoom::class.java) }
+        return chatRoomDataList?.map { it.getValue(ChatRoom::class.java) ?: return null}
     }
 
     suspend fun getCurrentRoom(myEmail: String, otherEmail: String): ChatRoom? {
