@@ -1,15 +1,21 @@
 package com.skysmyoo.publictalk.ui.chat_room
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.utils.Event
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,18 +62,41 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun sendMessage(chatRoom: ChatRoom, messageBody: String) {
-        val message =
-            Message(chatRoom.me, chatRoom.other?.userEmail ?: "", messageBody, false, currentTime)
+        val myEmail = chatRoom.member.find { it == getMyEmail() } ?: ""
+        val otherEmail = chatRoom.member.find { it != myEmail } ?: ""
+        val message = Message(myEmail, otherEmail, messageBody, false, currentTime)
         FirebaseData.getIdToken {
             viewModelScope.launch {
-                if (chatRoom.other != null) {
-                    val newMessage =
-                        chatRepository.sendMessage(it, chatRoom.me, chatRoom.other, message)
-                    if (newMessage != null) {
-                        _newMessage.value = Event(newMessage)
-                    }
-                }
+                chatRepository.sendMessage(it, message)
             }
+        }
+    }
+
+    fun listenForChat(chatRoom: ChatRoom) {
+        viewModelScope.launch {
+            val roomKey = chatRepository.getRoomKey(chatRoom.member)
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference("chatRooms/$roomKey/messages")
+
+            ref.addValueEventListener(object : ValueEventListener {
+                private var initialDataLoaded = false
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (!initialDataLoaded) {
+                        initialDataLoaded = true
+                        return
+                    }
+
+                    val messageData = snapshot.children.last()
+                    val message = messageData.getValue(Message::class.java) ?: return
+                    if (message.sender.isEmpty() || message.receiver.isEmpty()) return
+                    _newMessage.value = Event(message)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "DataSnapshotCancelled: $error")
+                }
+            })
         }
     }
 

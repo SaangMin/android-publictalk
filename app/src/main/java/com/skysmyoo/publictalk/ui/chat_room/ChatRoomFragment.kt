@@ -37,6 +37,7 @@ class ChatRoomFragment : BaseFragment() {
         binding.btnChatRoomSend.setOnClickListener {
             onSendMessage(chatRoomInfo)
         }
+        viewModel.listenForChat(chatRoomInfo)
     }
 
     private fun setLayout(chatRoomInfo: ChatRoom) {
@@ -50,6 +51,11 @@ class ChatRoomFragment : BaseFragment() {
                 findNavController().navigateUp()
             }
         }
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.rvChatRoom.layoutManager?.scrollToPosition(adapter.currentList.size - 1)
+            }
+        })
     }
 
     private fun friendDataObserver() {
@@ -78,11 +84,6 @@ class ChatRoomFragment : BaseFragment() {
                 adapter.submitList(currentList)
             }
             binding.etChatRoomMessage.setText("")
-            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    binding.rvChatRoom.layoutManager?.scrollToPosition(currentList.size - 1)
-                }
-            })
         })
     }
 
