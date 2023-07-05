@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,8 @@ class HomeViewModel @Inject constructor(
     val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
     private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
     val chatRoomList: LiveData<Event<List<ChatRoom>>> = _chatRoomList
+    private val _friendList = MutableLiveData<List<User>>()
+    val friendList: LiveData<List<User>> = _friendList
 
     var clickedChatRoom: ChatRoom? = null
 
@@ -31,6 +34,7 @@ class HomeViewModel @Inject constructor(
             val myEmail = repository.getMyEmail() ?: return@launch
             val myInfo = repository.getMyInfo(myEmail) ?: return@launch
             val friendList = repository.getFriends()
+            _friendList.value = friendList
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),
@@ -47,10 +51,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun getOtherUser(chatRoom: ChatRoom, friendList: List<User>): User? {
+        val otherUserEmail = chatRoom.member.find { it != getMyEmail() }
+        return friendList.find { it.userEmail == otherUserEmail }
+    }
+
     fun getChatRooms() {
         viewModelScope.launch {
             val chatRoomList = repository.getChatRooms()
-            if (chatRoomList != null){
+            if (chatRoomList != null) {
                 _chatRoomList.value = Event(chatRoomList)
             }
         }

@@ -2,7 +2,6 @@ package com.skysmyoo.publictalk.data.source
 
 import android.net.Uri
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
-import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
@@ -59,18 +58,13 @@ class UserRepository @Inject constructor(
         userLocalDataSource.addFriend(myInfo, friend)
     }
 
-    suspend fun removeFriend(myInfo: User, friend: User) {
-        userLocalDataSource.removeFriend(myInfo, friend)
-    }
-
     suspend fun updateUser(auth: String, user: User): Response<User>? {
         userLocalDataSource.insertUser(user)
         return userRemoteDataSource.updateUser(auth, user)
     }
 
-    suspend fun updateFriends(myInfo: User, friendList: List<Friend>): List<User?> {
-        val friendEmailList = friendList.map { it.userEmail }
-        val updatedFriendList = userRemoteDataSource.updateFriendsData(friendEmailList)
+    suspend fun updateFriends(myInfo: User, friendList: List<String>): List<User?> {
+        val updatedFriendList = userRemoteDataSource.updateFriendsData(friendList)
         updatedFriendList.forEach {
             if (it != null) {
                 userLocalDataSource.clearFriendsData()
@@ -88,13 +82,15 @@ class UserRepository @Inject constructor(
         return chatLocalDataSource.getChatRoomList()
     }
 
-    suspend fun updateChatRoom(myEmail: String) {
-        val chatRoomDataList = chatRemoteDataSource.getChatRooms(myEmail)
-        val chatRoomList = chatRoomDataList?.map { it.getValue(ChatRoom::class.java) ?: return }
-
+    suspend fun updateChatRoom(auth: String, myEmail: String) {
+        val chatRoomList = chatRemoteDataSource.getChatRooms(auth, myEmail)
         chatLocalDataSource.clearChatRooms()
-        chatRoomList?.forEach {
+        chatRoomList.forEach {
             chatLocalDataSource.insertChatRoom(it)
         }
+    }
+
+    companion object {
+        private const val TAG = "UserRepository"
     }
 }

@@ -1,13 +1,14 @@
 package com.skysmyoo.publictalk.data.model.remote
 
+import com.google.firebase.database.PropertyName
 import com.squareup.moshi.JsonClass
 import java.io.Serializable
 
 @JsonClass(generateAdapter = true)
 data class Message(
-    val sender: String = "",
-    val receiver: String = "",
-    val body: String = "",
-    val isReading: Boolean = false,
-    val createdAt: String = "",
-): Serializable
+    @PropertyName("sender") val sender: String = "",
+    @PropertyName("receiver") val receiver: String = "",
+    @PropertyName("body") val body: String = "",
+    @PropertyName("isReading") val isReading: Boolean = false,
+    @PropertyName("createdAt") val createdAt: String = "",
+) : Serializable

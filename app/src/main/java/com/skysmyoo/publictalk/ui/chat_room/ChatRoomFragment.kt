@@ -39,9 +39,11 @@ class ChatRoomFragment : BaseFragment() {
     }
 
     private fun setLayout(chatRoomInfo: ChatRoom) {
+        val chatMember = chatRoomInfo.member
+        val myEmail = viewModel.getMyEmail()
         with(binding) {
             rvChatRoom.adapter = adapter
-            abChatRoom.title = chatRoomInfo.other?.userName
+            abChatRoom.title = chatMember.find { it == myEmail }
             abChatRoom.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }

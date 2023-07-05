@@ -5,6 +5,7 @@ import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -37,4 +38,9 @@ interface ApiClient {
         @Query("auth") auth: String,
         @Body message: Message
     ): Response<Map<String, String>>
+
+    @GET("chatRooms.json")
+    suspend fun getChatRooms(
+        @Query("auth") auth: String,
+    ): Response<Map<String, ChatRoom>>
 }

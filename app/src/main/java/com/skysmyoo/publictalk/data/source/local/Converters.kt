@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.data.source.local
 
 import androidx.room.TypeConverter
-import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.di.AppModule
@@ -11,8 +10,6 @@ import com.squareup.moshi.Types
 class Converters {
 
     private val moshi = AppModule.moshi
-    private val friendListAdapter: JsonAdapter<List<Friend>> =
-        moshi.adapter(Types.newParameterizedType(List::class.java, Friend::class.java))
     private val userAdapter: JsonAdapter<User> =
         moshi.adapter(User::class.java)
     private val messageMapAdapter: JsonAdapter<Map<String, Message>> =
@@ -23,15 +20,21 @@ class Converters {
                 Message::class.java
             )
         )
+    private val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(
+        Types.newParameterizedType(
+            List::class.java,
+            String::class.java
+        )
+    )
 
     @TypeConverter
-    fun friendListFromString(value: String): List<Friend>? {
-        return friendListAdapter.fromJson(value)
+    fun listFromString(value: String):List<String>? {
+        return stringListAdapter.fromJson(value)
     }
 
     @TypeConverter
-    fun fromFriendList(list: List<Friend>?): String {
-        return friendListAdapter.toJson(list)
+    fun fromList(list: List<String>): String {
+        return stringListAdapter.toJson(list)
     }
 
     @TypeConverter
