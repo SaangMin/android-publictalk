@@ -24,12 +24,12 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         val ref = Firebase.database(BuildConfig.BASE_URL).getReference("chatRooms")
 
         val query1 = ref.orderByChild("me").equalTo(email)
-        val query2 = ref.orderByChild("other").equalTo(email)
+        val query2 = ref.orderByChild("other/userEmail").equalTo(email)
 
         val results1 = performQuery(query1)
         val results2 = performQuery(query2)
 
-        return results1?.plus(results2 ?: emptyList())
+        return results1?.plus(results2 ?: emptyList()) ?: results2
     }
 
     private suspend fun performQuery(query: Query): List<DataSnapshot>? {
