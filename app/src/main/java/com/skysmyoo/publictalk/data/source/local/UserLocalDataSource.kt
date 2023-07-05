@@ -52,7 +52,7 @@ class UserLocalDataSource @Inject constructor(
     suspend fun addFriend(myInfo: User, friend: User) {
         val updatedFriendList = myInfo.userFriendIdList.toMutableList()
         updatedFriendList.add(friend.userEmail)
-        friendModelDao.insertFriend(SavedFriend(friendData = friend))
+        friendModelDao.insertFriend(SavedFriend(userEmail = friend.userEmail, friendData = friend))
 
         myInfo.userFriendIdList = updatedFriendList
         userModelDao.updateUser(myInfo)
@@ -61,5 +61,10 @@ class UserLocalDataSource @Inject constructor(
     suspend fun getFriendList(): List<User> {
         val savedFriendList = friendModelDao.getFriendList()
         return savedFriendList.map { it.friendData }
+    }
+
+    suspend fun findFriend(email: String): User? {
+        val savedFriend = friendModelDao.findFriend(email) ?: return null
+        return savedFriend.friendData
     }
 }

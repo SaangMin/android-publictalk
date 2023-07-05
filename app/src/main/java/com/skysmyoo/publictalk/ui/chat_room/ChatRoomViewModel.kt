@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.utils.Event
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +26,8 @@ class ChatRoomViewModel @Inject constructor(
     val adapterItemList: LiveData<Event<List<MessageBox>>> = _adapterItemList
     private val _newMessage = MutableLiveData<Event<Message>>()
     val newMessage: LiveData<Event<Message>> = _newMessage
+    private val _friendData = MutableLiveData<Event<User>>()
+    val friendData: LiveData<Event<User>> = _friendData
 
     private val currentTime = TimeUtil.getCurrentDateString()
 
@@ -44,6 +46,13 @@ class ChatRoomViewModel @Inject constructor(
             }
         }
         _adapterItemList.value = Event(resultMessageList)
+    }
+
+    fun findFriend(email: String) {
+        viewModelScope.launch {
+            val friend = userRepository.findFriend(email) ?: return@launch
+            _friendData.value = Event(friend)
+        }
     }
 
     fun sendMessage(chatRoom: ChatRoom, messageBody: String) {

@@ -90,6 +90,10 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun findFriend(email: String): User? {
+        return userLocalDataSource.findFriend(email)
+    }
+
     companion object {
         private const val TAG = "UserRepository"
     }
