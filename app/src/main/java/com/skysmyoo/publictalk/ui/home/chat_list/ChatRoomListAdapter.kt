@@ -10,9 +10,7 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
 
-class ChatRoomListAdapter(
-    private val viewModel: HomeViewModel
-) :
+class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
     ListAdapter<ChatRoom, ChatRoomListAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomViewHolder {
@@ -29,20 +27,19 @@ class ChatRoomListAdapter(
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val friendList = viewModel.friendList.value ?: emptyList()
-
         fun bind(item: ChatRoom) {
             val messageList = item.messages.values.toList()
-            viewModel.getOtherUser(item, friendList)
+            val otherUser = viewModel.getOtherUser(item)
             with(binding) {
                 chatRoom = item
+                this.other = otherUser
                 lastMessage = messageList.lastOrNull()
                 unreadMessage =
                     messageList.filter {
                         !it.isReading && it.receiver == preferencesManager.getMyEmail()
                     }.size
-                this.viewModel = viewModel
             }
+            binding.viewModel = viewModel
         }
 
         companion object {

@@ -65,9 +65,9 @@ class UserRepository @Inject constructor(
 
     suspend fun updateFriends(myInfo: User, friendList: List<String>): List<User?> {
         val updatedFriendList = userRemoteDataSource.updateFriendsData(friendList)
+        userLocalDataSource.clearFriendsData()
         updatedFriendList.forEach {
             if (it != null) {
-                userLocalDataSource.clearFriendsData()
                 addFriend(myInfo, it)
             }
         }
