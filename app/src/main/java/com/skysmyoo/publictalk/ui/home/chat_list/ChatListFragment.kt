@@ -6,9 +6,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
-import com.skysmyoo.publictalk.data.model.local.TestSampleData
-import com.skysmyoo.publictalk.data.model.remote.ChatRoom
-import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.databinding.FragmentChatListBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
 import com.skysmyoo.publictalk.utils.EventObserver
@@ -27,36 +24,9 @@ class ChatListFragment : BaseFragment() {
 
         adapter = ChatRoomListAdapter(viewModel)
         binding.rvChatList.adapter = adapter
-        setSampleChatRoom()
+        viewModel.getChatRooms()
         chatRoomClickObserver()
-    }
-
-    private fun setSampleChatRoom() {
-        val sampleMessage = Message(
-            TestSampleData.sampleUser.userEmail,
-            viewModel.getMyEmail(),
-            "안녕!",
-            false,
-            "2023-06-29 13:44:15"
-        )
-
-        val sampleMessage2 = Message(
-            viewModel.getMyEmail(),
-            TestSampleData.sampleUser.userEmail,
-            "응 안녕!",
-            false,
-            "2023-06-30 13:50:24"
-        )
-
-        val sampleChatRoom = ChatRoom(
-            0,
-            viewModel.getMyEmail(),
-            TestSampleData.sampleUser,
-            listOf(sampleMessage, sampleMessage, sampleMessage2),
-            "148290321"
-        )
-
-        adapter.submitList(listOf(sampleChatRoom))
+        chatRoomListObserver()
     }
 
     private fun chatRoomClickObserver() {
@@ -66,6 +36,12 @@ class ChatListFragment : BaseFragment() {
                 val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
                 findNavController().navigate(action)
             }
+        })
+    }
+
+    private fun chatRoomListObserver() {
+        viewModel.chatRoomList.observe(viewLifecycleOwner, EventObserver {
+            adapter.submitList(it)
         })
     }
 

@@ -1,49 +1,54 @@
 package com.skysmyoo.publictalk.data.source
 
 import android.net.Uri
+import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
+import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
+import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import retrofit2.Response
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
-    private val localDataSource: UserLocalDataSource,
-    private val remoteDataSource: UserRemoteDataSource,
+    private val chatLocalDataSource: ChatLocalDataSource,
+    private val userLocalDataSource: UserLocalDataSource,
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val chatRemoteDataSource: ChatRemoteDataSource,
 ) {
 
     suspend fun insertUser(user: User) {
-        localDataSource.insertUser(user)
+        userLocalDataSource.insertUser(user)
     }
 
     suspend fun getMyInfo(email: String): User? {
-        return localDataSource.getMyInfo(email)
+        return userLocalDataSource.getMyInfo(email)
     }
 
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
-        localDataSource.insertUser(user)
-        return remoteDataSource.putUser(auth, user)
+        userLocalDataSource.insertUser(user)
+        return userRemoteDataSource.putUser(auth, user)
     }
 
     suspend fun uploadImage(image: Uri?): String? {
-        return remoteDataSource.uploadImage(image)
+        return userRemoteDataSource.uploadImage(image)
     }
 
     fun getMyEmail(): String? {
-        return localDataSource.getMyEmail()
+        return userLocalDataSource.getMyEmail()
     }
 
     fun getMyLocale(): String {
-        return localDataSource.getMyLocale()
+        return userLocalDataSource.getMyLocale()
     }
 
     fun clearMyData() {
-        return localDataSource.clearMyData()
+        return userLocalDataSource.clearMyData()
     }
 
     suspend fun getExistUser(email: String?): Map<String, User>? {
-        val userDataSnapshot = remoteDataSource.getExistUser(email)
+        val userDataSnapshot = userRemoteDataSource.getExistUser(email)
         val userUid = userDataSnapshot?.key ?: return null
         val user = userDataSnapshot.getValue(User::class.java) ?: return null
 
@@ -51,24 +56,24 @@ class UserRepository @Inject constructor(
     }
 
     private suspend fun addFriend(myInfo: User, friend: User) {
-        localDataSource.addFriend(myInfo, friend)
+        userLocalDataSource.addFriend(myInfo, friend)
     }
 
     suspend fun removeFriend(myInfo: User, friend: User) {
-        localDataSource.removeFriend(myInfo, friend)
+        userLocalDataSource.removeFriend(myInfo, friend)
     }
 
     suspend fun updateUser(auth: String, user: User): Response<User>? {
-        localDataSource.insertUser(user)
-        return remoteDataSource.updateUser(auth, user)
+        userLocalDataSource.insertUser(user)
+        return userRemoteDataSource.updateUser(auth, user)
     }
 
     suspend fun updateFriends(myInfo: User, friendList: List<Friend>): List<User?> {
         val friendEmailList = friendList.map { it.userEmail }
-        val updatedFriendList = remoteDataSource.updateFriendsData(friendEmailList)
+        val updatedFriendList = userRemoteDataSource.updateFriendsData(friendEmailList)
         updatedFriendList.forEach {
             if (it != null) {
-                localDataSource.clearFriendsData()
+                userLocalDataSource.clearFriendsData()
                 addFriend(myInfo, it)
             }
         }
@@ -76,6 +81,20 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getFriends(): List<User> {
-        return localDataSource.getFriendList()
+        return userLocalDataSource.getFriendList()
+    }
+
+    suspend fun getChatRooms(): List<ChatRoom>? {
+        return chatLocalDataSource.getChatRoomList()
+    }
+
+    suspend fun updateChatRoom(myEmail: String) {
+        val chatRoomDataList = chatRemoteDataSource.getChatRooms(myEmail)
+        val chatRoomList = chatRoomDataList?.map { it.getValue(ChatRoom::class.java) ?: return }
+
+        chatLocalDataSource.clearChatRooms()
+        chatRoomList?.forEach {
+            chatLocalDataSource.insertChatRoom(it)
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.skysmyoo.publictalk.di
 import android.content.Context
 import androidx.room.Room
 import com.skysmyoo.publictalk.data.source.local.AppDatabase
+import com.skysmyoo.publictalk.data.source.local.ChatModelDao
 import com.skysmyoo.publictalk.data.source.local.FriendModelDao
 import com.skysmyoo.publictalk.data.source.local.SharedPreferencesManager
 import com.skysmyoo.publictalk.data.source.local.UserModelDao
@@ -39,6 +40,11 @@ object AppModule {
     @Provides
     fun provideFriendDao(appDatabase: AppDatabase): FriendModelDao {
         return appDatabase.friendModelDao()
+    }
+
+    @Provides
+    fun provideChatDao(appDatabase: AppDatabase): ChatModelDao {
+        return appDatabase.chatModelDao()
     }
 
     @Provides

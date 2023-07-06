@@ -10,7 +10,7 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
 
-class ChatRoomListAdapter (
+class ChatRoomListAdapter(
     private val viewModel: HomeViewModel
 ) :
     ListAdapter<ChatRoom, ChatRoomListAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
@@ -27,13 +27,14 @@ class ChatRoomListAdapter (
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatRoom, viewModel: HomeViewModel) {
+            val messageList = item.messages.values.toList()
             with(binding) {
                 chatRoom = item
-                lastMessage = item.messageList?.lastOrNull()
+                lastMessage = messageList.lastOrNull()
                 unreadMessage =
-                    item.messageList?.filter {
+                    messageList.filter {
                         !it.isReading && it.receiver == preferencesManager.getMyEmail()
-                    }?.size ?: 0
+                    }.size
                 this.viewModel = viewModel
             }
         }
@@ -52,7 +53,7 @@ class ChatRoomListAdapter (
 
 class ChatRoomDiffCallback : DiffUtil.ItemCallback<ChatRoom>() {
     override fun areItemsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-        return oldItem.uid == newItem.uid
+        return oldItem.me == newItem.me && oldItem.other == newItem.other
     }
 
     override fun areContentsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {

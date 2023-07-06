@@ -5,8 +5,10 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.FragmentChatRoomBinding
 import com.skysmyoo.publictalk.utils.EventObserver
@@ -27,15 +29,19 @@ class ChatRoomFragment : BaseFragment() {
 
         adapter = ChatRoomAdapter(viewModel)
         setLayout(chatRoomInfo)
-        viewModel.setAdapterItemList(chatRoomInfo.messageList ?: emptyList())
+        viewModel.setAdapterItemList(chatRoomInfo.messages.values.toList())
         messageListObserver()
+        newMessageObserver()
 
+        binding.btnChatRoomSend.setOnClickListener {
+            onSendMessage(chatRoomInfo)
+        }
     }
 
     private fun setLayout(chatRoomInfo: ChatRoom) {
         with(binding) {
             rvChatRoom.adapter = adapter
-            abChatRoom.title = chatRoomInfo.other.userName
+            abChatRoom.title = chatRoomInfo.other?.userName
             abChatRoom.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -46,7 +52,33 @@ class ChatRoomFragment : BaseFragment() {
         viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
             adapter.submitList(it)
         })
+    }
 
+    private fun newMessageObserver() {
+        viewModel.newMessage.observe(viewLifecycleOwner, EventObserver {
+            val myEmail = viewModel.getMyEmail()
+            val currentList = adapter.currentList.toMutableList()
+            if (it.sender == myEmail) {
+                val newMessageBox = MessageBox.SenderMessageBox(it)
+                currentList.add(newMessageBox)
+                adapter.submitList(currentList)
+            } else {
+                val newMessageBox = MessageBox.ReceiverMessageBox(it)
+                currentList.add(newMessageBox)
+                adapter.submitList(currentList)
+            }
+            binding.etChatRoomMessage.setText("")
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    binding.rvChatRoom.layoutManager?.scrollToPosition(currentList.size - 1)
+                }
+            })
+        })
+    }
+
+    private fun onSendMessage(chatRoomInfo: ChatRoom) {
+        val messageText = binding.etChatRoomMessage.text.toString()
+        viewModel.sendMessage(chatRoomInfo, messageText)
     }
 
     companion object {
