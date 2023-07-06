@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ChattingMember(
-    val userEmail: String = "",
     val isChatting: Boolean = false,
+    val userEmail: String = "",
 )

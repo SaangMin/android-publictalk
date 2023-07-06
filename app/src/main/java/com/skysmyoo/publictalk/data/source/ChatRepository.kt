@@ -14,15 +14,13 @@ class ChatRepository @Inject constructor(
     private val remoteDataSource: ChatRemoteDataSource,
 ) {
 
-    suspend fun sendMessage(auth: String, message: Message): Message? {
+    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Message? {
         val database = FirebaseDatabase.getInstance()
-        val member = listOf(message.sender, message.receiver)
-        val chatRoomId = remoteDataSource.getChatRoomKey(member)
         val currentTime = TimeUtil.getCurrentDateString()
 
         if (chatRoomId == null) {
-            val senderMember = ChattingMember(message.sender)
-            val receiverMember = ChattingMember(message.receiver)
+            val senderMember = ChattingMember(userEmail = message.sender)
+            val receiverMember = ChattingMember(userEmail = message.receiver)
             val chattingMember = listOf(senderMember, receiverMember)
             val chatRoom = ChatRoom(member = chattingMember, chatCreatedAt = currentTime)
             val createRoomResponse = remoteDataSource.createChatRoom(auth, chatRoom)

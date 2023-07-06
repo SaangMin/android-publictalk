@@ -66,12 +66,33 @@ class ChatRoomViewModel @Inject constructor(
     fun sendMessage(chatRoom: ChatRoom, messageBody: String) {
         val myEmail = chatRoom.member.map { it.userEmail }.find { it == getMyEmail() } ?: ""
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
-        val message = Message(myEmail, otherEmail, messageBody, false, currentTime)
-        FirebaseData.getIdToken {
-            viewModelScope.launch {
-                chatRepository.sendMessage(it, message)
+
+        val database = FirebaseDatabase.getInstance()
+        val membersRef = database.getReference("chatRooms/${chatRoomKey.value}/member")
+
+        membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var isPartnerChatting = false
+                snapshot.children.forEach { memberSnapshot ->
+                    val memberName = memberSnapshot.child("userEmail").getValue(String::class.java)
+                    if (memberName == otherEmail) {
+                        val memberChatting = memberSnapshot.child("isChatting").getValue(Boolean::class.java) ?: false
+                        isPartnerChatting = memberChatting
+                        return@forEach
+                    }
+                }
+                val message = Message(myEmail, otherEmail, messageBody, isPartnerChatting, currentTime)
+                FirebaseData.getIdToken { token ->
+                    viewModelScope.launch {
+                        chatRepository.sendMessage(token, message, chatRoomKey.value)
+                    }
+                }
             }
-        }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "DataSnapshotCancelled: $error")
+            }
+        })
     }
 
     fun getRoomKey(chatRoom: ChatRoom) {
