@@ -76,6 +76,7 @@ class ChatRoomFragment : BaseFragment() {
                 FirebaseDatabase.getInstance().getReference("chatRooms/$it/member/$myIdKey")
             chatRoomRef.child("isChatting").setValue(true)
             viewModel.listenForChat(it)
+            viewModel.updateIsReadingForMessages()
         }
     }
 

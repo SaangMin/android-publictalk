@@ -38,6 +38,8 @@ class ChatRoomViewModel @Inject constructor(
     val chatRoomKey: LiveData<String> = _chatRoomKey
 
     private val currentTime = TimeUtil.getCurrentDateString()
+    private val database = FirebaseDatabase.getInstance()
+
     val messageBody = MutableLiveData<String>()
 
     fun getMyEmail(): String {
@@ -67,8 +69,6 @@ class ChatRoomViewModel @Inject constructor(
     fun sendMessage(chatRoom: ChatRoom) {
         val myEmail = chatRoom.member.map { it.userEmail }.find { it == getMyEmail() } ?: ""
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
-
-        val database = FirebaseDatabase.getInstance()
         val membersRef = database.getReference("chatRooms/${chatRoomKey.value}/member")
 
         membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -82,7 +82,13 @@ class ChatRoomViewModel @Inject constructor(
                         return@forEach
                     }
                 }
-                val message = Message(myEmail, otherEmail, messageBody.value ?: "", isPartnerChatting, currentTime)
+                val message = Message(
+                    myEmail,
+                    otherEmail,
+                    messageBody.value ?: "",
+                    isPartnerChatting,
+                    currentTime
+                )
                 FirebaseData.getIdToken { token ->
                     viewModelScope.launch {
                         chatRepository.sendMessage(token, message, chatRoomKey.value)
@@ -106,10 +112,9 @@ class ChatRoomViewModel @Inject constructor(
 
     fun listenForChat(roomKey: String) {
         viewModelScope.launch {
-            val database = FirebaseDatabase.getInstance()
-            val ref = database.getReference("chatRooms/$roomKey/messages")
+            val messageRef = database.getReference("chatRooms/$roomKey/messages")
 
-            ref.addValueEventListener(object : ValueEventListener {
+            messageRef.addValueEventListener(object : ValueEventListener {
                 private var initialDataLoaded = false
 
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -119,7 +124,8 @@ class ChatRoomViewModel @Inject constructor(
                     }
 
                     val messageData = snapshot.children.last()
-                    val isMessageReading = messageData.child("reading").getValue(Boolean::class.java) ?: false
+                    val isMessageReading =
+                        messageData.child("reading").getValue(Boolean::class.java) ?: false
                     val message = messageData.getValue(Message::class.java) ?: return
                     message.reading = isMessageReading
                     if (message.sender.isEmpty() || message.receiver.isEmpty()) return
@@ -133,6 +139,45 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+    fun updateIsReadingForMessages() {
+        val myEmail = getMyEmail()
+        val messagesRef = FirebaseDatabase.getInstance().getReference("chatRooms/${chatRoomKey.value}/messages")
+        val memberRef = FirebaseDatabase.getInstance().getReference("chatRooms/${chatRoomKey.value}/member")
+        memberRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var isPartnerChatting = false
+                snapshot.children.forEach { memberSnapshot ->
+                    val memberChatting = memberSnapshot.child("isChatting").getValue(Boolean::class.java) ?: false
+                    val memberEmail = memberSnapshot.child("userEmail").getValue(String::class.java)
+                    if(memberEmail != myEmail) {
+                        isPartnerChatting = memberChatting
+                        return@forEach
+                    }
+                }
+
+                messagesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        snapshot.children.forEach { messageSnapshot ->
+                            val message = messageSnapshot.getValue(Message::class.java)
+                            if(message?.reading == false) {
+                                messageSnapshot.ref.child("reading").setValue(isPartnerChatting)
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(TAG, "MessageDataSnapshotCancelled: $error")
+                    }
+
+                })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "MemberDataSnapshotCancelled: $error")
+            }
+
+        })
+    }
     companion object {
         private const val TAG = "ChatViewModel"
     }
