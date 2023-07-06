@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
@@ -30,13 +29,14 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
         fun bind(item: ChatRoom) {
             val messageList = item.messages.values.toList()
             val otherUser = viewModel.getOtherUser(item)
+            val myEmail = viewModel.getMyEmail()
             with(binding) {
                 chatRoom = item
                 this.other = otherUser
                 lastMessage = messageList.lastOrNull()
                 unreadMessage =
                     messageList.filter {
-                        !it.reading && it.receiver == preferencesManager.getMyEmail()
+                        !it.reading && it.receiver == myEmail
                     }.size
             }
             binding.viewModel = viewModel

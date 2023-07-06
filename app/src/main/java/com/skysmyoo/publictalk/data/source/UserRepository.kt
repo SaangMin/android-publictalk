@@ -82,12 +82,13 @@ class UserRepository @Inject constructor(
         return chatLocalDataSource.getChatRoomList()
     }
 
-    suspend fun updateChatRoom(auth: String, myEmail: String) {
+    suspend fun updateChatRoom(auth: String, myEmail: String): List<ChatRoom> {
         val chatRoomList = chatRemoteDataSource.getChatRooms(auth, myEmail)
         chatLocalDataSource.clearChatRooms()
         chatRoomList.forEach {
             chatLocalDataSource.insertChatRoom(it)
         }
+        return chatRoomList
     }
 
     suspend fun findFriend(email: String): User? {
