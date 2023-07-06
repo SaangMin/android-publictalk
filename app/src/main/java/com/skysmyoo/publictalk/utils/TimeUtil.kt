@@ -6,9 +6,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 object TimeUtil {
-    private const val DATE_YEAR_MONTH_DAY_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss"
+    private const val DATE_YEAR_MONTH_DAY_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'"
     private const val TIME_PATTERN = "a h : mm"
     private const val DATE_AND_TIME_PATTERN = " M / d\n $TIME_PATTERN"
 
@@ -23,7 +24,9 @@ object TimeUtil {
 
     fun getCurrentDateString(): String {
         val date = Date()
-        return SimpleDateFormat(DATE_YEAR_MONTH_DAY_TIME_PATTERN, currentLocale).format(date)
+        val sdf = SimpleDateFormat(DATE_YEAR_MONTH_DAY_TIME_PATTERN, Locale.getDefault())
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        return sdf.format(date)
     }
 
     fun convertDateTime(dateTimeString: String): String {
