@@ -59,6 +59,8 @@ class ChatRoomFragment : BaseFragment() {
                 findNavController().navigateUp()
             }
         }
+        binding.viewModel = viewModel
+
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 binding.rvChatRoom.layoutManager?.scrollToPosition(adapter.currentList.size - 1)
@@ -116,8 +118,7 @@ class ChatRoomFragment : BaseFragment() {
     }
 
     private fun onSendMessage() {
-        val messageText = binding.etChatRoomMessage.text.toString()
-        viewModel.sendMessage(chatRoomInfo, messageText)
+        viewModel.sendMessage(chatRoomInfo)
     }
 
     companion object {

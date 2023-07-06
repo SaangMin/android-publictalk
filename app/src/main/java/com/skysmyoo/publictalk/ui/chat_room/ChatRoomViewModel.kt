@@ -38,6 +38,7 @@ class ChatRoomViewModel @Inject constructor(
     val chatRoomKey: LiveData<String> = _chatRoomKey
 
     private val currentTime = TimeUtil.getCurrentDateString()
+    val messageBody = MutableLiveData<String>()
 
     fun getMyEmail(): String {
         return userRepository.getMyEmail() ?: ""
@@ -63,7 +64,7 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(chatRoom: ChatRoom, messageBody: String) {
+    fun sendMessage(chatRoom: ChatRoom) {
         val myEmail = chatRoom.member.map { it.userEmail }.find { it == getMyEmail() } ?: ""
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
 
@@ -81,7 +82,7 @@ class ChatRoomViewModel @Inject constructor(
                         return@forEach
                     }
                 }
-                val message = Message(myEmail, otherEmail, messageBody, isPartnerChatting, currentTime)
+                val message = Message(myEmail, otherEmail, messageBody.value ?: "", isPartnerChatting, currentTime)
                 FirebaseData.getIdToken { token ->
                     viewModelScope.launch {
                         chatRepository.sendMessage(token, message, chatRoomKey.value)
@@ -118,7 +119,9 @@ class ChatRoomViewModel @Inject constructor(
                     }
 
                     val messageData = snapshot.children.last()
+                    val isMessageReading = messageData.child("reading").getValue(Boolean::class.java) ?: false
                     val message = messageData.getValue(Message::class.java) ?: return
+                    message.reading = isMessageReading
                     if (message.sender.isEmpty() || message.receiver.isEmpty()) return
                     _newMessage.value = Event(message)
                 }

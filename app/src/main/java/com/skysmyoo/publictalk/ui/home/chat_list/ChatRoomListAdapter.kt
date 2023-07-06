@@ -36,7 +36,7 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
                 lastMessage = messageList.lastOrNull()
                 unreadMessage =
                     messageList.filter {
-                        !it.isReading && it.receiver == preferencesManager.getMyEmail()
+                        !it.reading && it.receiver == preferencesManager.getMyEmail()
                     }.size
             }
             binding.viewModel = viewModel

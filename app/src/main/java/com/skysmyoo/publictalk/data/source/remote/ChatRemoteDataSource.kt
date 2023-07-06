@@ -31,11 +31,8 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val chatRoomId = snapshot.children.find {
-                    Log.d(TAG, "$it")
                     val chatRoom = it.getValue(ChatRoom::class.java)
-                    Log.d(TAG, "$chatRoom")
                     val chattingMember = chatRoom?.member?.map { member -> member.userEmail }
-                    Log.d(TAG, "chattingMember = $chattingMember")
                     chattingMember?.contains(member[0]) == true && chattingMember.contains(member[1])
                 }?.key ?: return
 
