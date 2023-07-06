@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
 
     fun getOtherUser(chatRoom: ChatRoom): User? {
         val friendList = runBlocking { repository.getFriends() }
-        val otherUserEmail = chatRoom.member.find { it != getMyEmail() }
+        val otherUserEmail = chatRoom.member.map { it.userEmail }.find { it != getMyEmail() }
         return friendList.find { it.userEmail == otherUserEmail }
     }
 

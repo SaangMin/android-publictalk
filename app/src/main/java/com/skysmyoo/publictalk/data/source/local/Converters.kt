@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.source.local
 
 import androidx.room.TypeConverter
+import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.di.AppModule
@@ -26,15 +27,31 @@ class Converters {
             String::class.java
         )
     )
+    private val memberListAdapter: JsonAdapter<List<ChattingMember>> = moshi.adapter(
+        Types.newParameterizedType(
+            List::class.java,
+            ChattingMember::class.java
+        )
+    )
 
     @TypeConverter
-    fun listFromString(value: String):List<String>? {
+    fun listFromString(value: String): List<String>? {
         return stringListAdapter.fromJson(value)
     }
 
     @TypeConverter
     fun fromList(list: List<String>): String {
         return stringListAdapter.toJson(list)
+    }
+
+    @TypeConverter
+    fun memberListFromString(value: String): List<ChattingMember>? {
+        return memberListAdapter.fromJson(value)
+    }
+
+    @TypeConverter
+    fun fromMemberList(list: List<ChattingMember>): String {
+        return memberListAdapter.toJson(list)
     }
 
     @TypeConverter

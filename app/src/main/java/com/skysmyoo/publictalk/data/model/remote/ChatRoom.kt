@@ -11,7 +11,7 @@ import java.io.Serializable
 data class ChatRoom(
     @PrimaryKey(autoGenerate = true)
     @PropertyName("uid") val uid: Int = 0,
-    @PropertyName("member") val member: List<String> = emptyList(),
+    @PropertyName("member") val member: List<ChattingMember> = emptyList(),
     @PropertyName("messages") val messages: Map<String, Message> = emptyMap(),
     @PropertyName("chatCreatedAt") val chatCreatedAt: String = "",
 ) : Serializable

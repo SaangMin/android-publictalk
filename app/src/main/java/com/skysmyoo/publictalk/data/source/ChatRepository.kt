@@ -2,6 +2,7 @@ package com.skysmyoo.publictalk.data.source
 
 import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
@@ -20,7 +21,10 @@ class ChatRepository @Inject constructor(
         val currentTime = TimeUtil.getCurrentDateString()
 
         if (chatRoomId == null) {
-            val chatRoom = ChatRoom(member = member, chatCreatedAt = currentTime)
+            val senderMember = ChattingMember(message.sender)
+            val receiverMember = ChattingMember(message.receiver)
+            val chattingMember = listOf(senderMember, receiverMember)
+            val chatRoom = ChatRoom(member = chattingMember, chatCreatedAt = currentTime)
             val createRoomResponse = remoteDataSource.createChatRoom(auth, chatRoom)
             val chatRoomUid = createRoomResponse.body()?.values?.first() ?: return null
             val messagesRef = database.getReference("chatRooms/$chatRoomUid/messages")

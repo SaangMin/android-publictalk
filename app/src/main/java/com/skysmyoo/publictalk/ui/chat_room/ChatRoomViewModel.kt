@@ -34,6 +34,8 @@ class ChatRoomViewModel @Inject constructor(
     val newMessage: LiveData<Event<Message>> = _newMessage
     private val _friendData = MutableLiveData<Event<User>>()
     val friendData: LiveData<Event<User>> = _friendData
+    private val _chatRoomKey = MutableLiveData<String>()
+    val chatRoomKey: LiveData<String> = _chatRoomKey
 
     private val currentTime = TimeUtil.getCurrentDateString()
 
@@ -62,8 +64,8 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun sendMessage(chatRoom: ChatRoom, messageBody: String) {
-        val myEmail = chatRoom.member.find { it == getMyEmail() } ?: ""
-        val otherEmail = chatRoom.member.find { it != myEmail } ?: ""
+        val myEmail = chatRoom.member.map { it.userEmail }.find { it == getMyEmail() } ?: ""
+        val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
         val message = Message(myEmail, otherEmail, messageBody, false, currentTime)
         FirebaseData.getIdToken {
             viewModelScope.launch {
@@ -72,9 +74,16 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun listenForChat(chatRoom: ChatRoom) {
+    fun getRoomKey(chatRoom: ChatRoom) {
         viewModelScope.launch {
-            val roomKey = chatRepository.getRoomKey(chatRoom.member)
+            val chatRoomKey =
+                chatRepository.getRoomKey(chatRoom.member.map { it.userEmail }) ?: return@launch
+            _chatRoomKey.value = chatRoomKey
+        }
+    }
+
+    fun listenForChat(roomKey: String) {
+        viewModelScope.launch {
             val database = FirebaseDatabase.getInstance()
             val ref = database.getReference("chatRooms/$roomKey/messages")
 
