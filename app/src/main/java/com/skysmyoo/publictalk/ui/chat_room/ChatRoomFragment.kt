@@ -103,18 +103,20 @@ class ChatRoomFragment : BaseFragment() {
 
     private fun newMessageObserver() {
         viewModel.newMessage.observe(viewLifecycleOwner, EventObserver {
-            val myEmail = viewModel.getMyEmail()
-            val currentList = adapter.currentList.toMutableList()
-            if (it.sender == myEmail) {
-                val newMessageBox = MessageBox.SenderMessageBox(it)
-                currentList.add(newMessageBox)
-                adapter.submitList(currentList)
-            } else {
-                val newMessageBox = MessageBox.ReceiverMessageBox(it)
-                currentList.add(newMessageBox)
-                adapter.submitList(currentList)
+            if (!chatRoomInfo.messages.values.toList().contains(it)) {
+                val myEmail = viewModel.getMyEmail()
+                val currentList = adapter.currentList.toMutableList()
+                if (it.sender == myEmail) {
+                    val newMessageBox = MessageBox.SenderMessageBox(it)
+                    currentList.add(newMessageBox)
+                    adapter.submitList(currentList)
+                } else {
+                    val newMessageBox = MessageBox.ReceiverMessageBox(it)
+                    currentList.add(newMessageBox)
+                    adapter.submitList(currentList)
+                }
+                binding.etChatRoomMessage.setText("")
             }
-            binding.etChatRoomMessage.setText("")
         })
     }
 
