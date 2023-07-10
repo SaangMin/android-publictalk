@@ -16,8 +16,6 @@ class ChatRepository @Inject constructor(
     private val remoteDataSource: ChatRemoteDataSource,
 ) {
 
-    private val chatRoomRef = FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS)
-
     suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Message? {
         val database = FirebaseDatabase.getInstance()
         val currentTime = TimeUtil.getCurrentDateString()
