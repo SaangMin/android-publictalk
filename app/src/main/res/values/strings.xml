@@ -21,7 +21,6 @@
     <string name="channel_name">public talk notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
-    <string name="add_friend">Search friend</string>
     <string name="friend_list">Friends</string>
     <string name="chat_list">Chats</string>
     <string name="setting">Setting</string>
@@ -60,4 +59,5 @@
     <string name="searched_friend_profile">Searched Friend Profile Image</string>
     <string name="not_exist_user_error_msg">User not found.</string>
     <string name="find_success_user_msg">User found.</string>
+    <string name="add_friend">Add friend</string>
 </resources>

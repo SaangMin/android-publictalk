@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/color_bn_background"
-            android:visibility="invisible"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_searching_email">
@@ -68,6 +68,17 @@
                 app:layout_constraintStart_toEndOf="@id/iv_searching_profile"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/friend_name_sample" />
+
+            <Button
+                android:id="@+id/btn_searching_add_friend"
+                android:backgroundTint="@color/color_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/add_friend"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
