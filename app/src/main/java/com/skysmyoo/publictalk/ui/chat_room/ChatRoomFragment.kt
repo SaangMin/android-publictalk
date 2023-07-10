@@ -43,11 +43,6 @@ class ChatRoomFragment : BaseFragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        leaveChatting()
-    }
-
     private fun setLayout() {
         val chatMember = chatRoomInfo.member
         val myEmail = viewModel.getMyEmail()
@@ -70,23 +65,22 @@ class ChatRoomFragment : BaseFragment() {
 
     private fun roomKeyObserver() {
         viewModel.chatRoomKey.observe(viewLifecycleOwner) {
-            val myEmail = viewModel.getMyEmail()
-            val myIdKey = chatRoomInfo.member.indexOfFirst { member -> member.userEmail == myEmail }
-            val chatRoomRef =
-                FirebaseDatabase.getInstance().getReference("chatRooms/$it/member/$myIdKey")
-            chatRoomRef.child("isChatting").setValue(true)
+            enterChatting()
             viewModel.listenForChat(it)
             viewModel.updateIsReadingForMessages()
         }
     }
 
-    private fun leaveChatting() {
+    private fun enterChatting() {
         val roomKey = viewModel.chatRoomKey.value
         val myEmail = viewModel.getMyEmail()
         val myIdKey = chatRoomInfo.member.indexOfFirst { member -> member.userEmail == myEmail }
         val chatRoomRef =
             FirebaseDatabase.getInstance().getReference("chatRooms/$roomKey/member/$myIdKey")
-        chatRoomRef.child("isChatting").setValue(false)
+
+        chatRoomRef.child("isChatting").setValue(true)
+
+        chatRoomRef.child("isChatting").onDisconnect().setValue(false)
     }
 
     private fun friendDataObserver() {
@@ -103,18 +97,20 @@ class ChatRoomFragment : BaseFragment() {
 
     private fun newMessageObserver() {
         viewModel.newMessage.observe(viewLifecycleOwner, EventObserver {
-            val myEmail = viewModel.getMyEmail()
-            val currentList = adapter.currentList.toMutableList()
-            if (it.sender == myEmail) {
-                val newMessageBox = MessageBox.SenderMessageBox(it)
-                currentList.add(newMessageBox)
-                adapter.submitList(currentList)
-            } else {
-                val newMessageBox = MessageBox.ReceiverMessageBox(it)
-                currentList.add(newMessageBox)
-                adapter.submitList(currentList)
+            if (!chatRoomInfo.messages.values.toList().contains(it)) {
+                val myEmail = viewModel.getMyEmail()
+                val currentList = adapter.currentList.toMutableList()
+                if (it.sender == myEmail) {
+                    val newMessageBox = MessageBox.SenderMessageBox(it)
+                    currentList.add(newMessageBox)
+                    adapter.submitList(currentList)
+                } else {
+                    val newMessageBox = MessageBox.ReceiverMessageBox(it)
+                    currentList.add(newMessageBox)
+                    adapter.submitList(currentList)
+                }
+                binding.etChatRoomMessage.setText("")
             }
-            binding.etChatRoomMessage.setText("")
         })
     }
 
