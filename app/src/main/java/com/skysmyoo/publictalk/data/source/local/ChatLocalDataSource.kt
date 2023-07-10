@@ -8,6 +8,10 @@ class ChatLocalDataSource @Inject constructor(
     private val preferencesManager: SharedPreferencesManager
 ) {
 
+    fun getMyEmail(): String {
+        return preferencesManager.getMyEmail() ?: ""
+    }
+
     suspend fun getChatRoomList(): List<ChatRoom>? {
         return chatModelDao.getChatRoomList()
     }
