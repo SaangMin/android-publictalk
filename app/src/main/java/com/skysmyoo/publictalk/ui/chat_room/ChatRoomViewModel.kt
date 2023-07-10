@@ -91,7 +91,7 @@ class ChatRoomViewModel @Inject constructor(
 
     fun listenForChat(chatRoom: ChatRoom, roomKey: String) {
         viewModelScope.launch {
-            chatRepository.listenForChat(roomKey) {
+            chatRepository.chatListener(roomKey) {
                 if (!chatRoom.messages.values.toList().contains(it)) {
                     val newMessage = convertToMessage(it)
                     _newMessage.value = Event(newMessage)
