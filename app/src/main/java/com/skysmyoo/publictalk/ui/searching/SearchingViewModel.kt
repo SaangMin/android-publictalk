@@ -18,20 +18,38 @@ class SearchingViewModel @Inject constructor(
 
     private val _notExistUserEvent = MutableLiveData<Event<Unit>>()
     val notExistUserEvent: LiveData<Event<Unit>> = _notExistUserEvent
-    private val _foundUser = MutableLiveData<Event<User>>()
-    val foundUser: LiveData<Event<User>> = _foundUser
+    private val _foundUser = MutableLiveData<User>()
+    val foundUser: LiveData<User> = _foundUser
+    private val _alreadyFriendEvent = MutableLiveData<Event<Unit>>()
+    val alreadyFriendEvent: LiveData<Event<Unit>> = _alreadyFriendEvent
+    private val _addFriendEvent = MutableLiveData<Event<Unit>>()
+    val addFriendEvent: LiveData<Event<Unit>> = _addFriendEvent
 
     val searchingTargetEmail = MutableLiveData<String>()
 
     fun searchingFriend() {
         viewModelScope.launch {
             if (!searchingTargetEmail.value.isNullOrEmpty()) {
-                val foundUser = repository.findFriend(searchingTargetEmail.value ?: "")
+                val foundUser = repository.searchFriendFromRemote(searchingTargetEmail.value ?: "")
                 if (foundUser == null) {
                     _notExistUserEvent.value = Event(Unit)
                 } else {
-                    _foundUser.value = Event(foundUser)
+                    _foundUser.value = foundUser
                 }
+            }
+        }
+    }
+
+    fun addFriendButtonClick() {
+        if(foundUser.value == null) return
+        viewModelScope.launch {
+            val friendEmailList = repository.getFriends().map { it.userEmail }
+            if(friendEmailList.contains(searchingTargetEmail.value)) {
+                _alreadyFriendEvent.value = Event(Unit)
+            } else {
+                val myInfo = repository.getMyInfo() ?: return@launch
+                repository.addFriend(myInfo, foundUser.value ?: return@launch)
+                _addFriendEvent.value = Event(Unit)
             }
         }
     }

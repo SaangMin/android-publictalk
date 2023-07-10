@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentSearchingBinding
@@ -24,6 +25,8 @@ class SearchingFragment : BaseFragment() {
         binding.viewModel = viewModel
         notExistUserObserver()
         foundUserObserver()
+        alreadyFriendEventObserver()
+        addFriendObserver()
     }
 
     private fun notExistUserObserver() {
@@ -38,10 +41,32 @@ class SearchingFragment : BaseFragment() {
     }
 
     private fun foundUserObserver() {
-        viewModel.foundUser.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(),getString(R.string.find_success_user_msg),Toast.LENGTH_SHORT).show()
+        viewModel.foundUser.observe(viewLifecycleOwner) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.find_success_user_msg),
+                Toast.LENGTH_SHORT
+            ).show()
             binding.clSearchingFriend.isVisible = true
             binding.foundUser = it
+        }
+    }
+
+    private fun alreadyFriendEventObserver() {
+        viewModel.alreadyFriendEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.already_friend_msg),
+                Toast.LENGTH_SHORT
+            ).show()
+            findNavController().navigateUp()
+        })
+    }
+
+    private fun addFriendObserver() {
+        viewModel.addFriendEvent.observe(viewLifecycleOwner, EventObserver{
+            Toast.makeText(requireContext(),getString(R.string.add_friend_msg), Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
         })
     }
 }
