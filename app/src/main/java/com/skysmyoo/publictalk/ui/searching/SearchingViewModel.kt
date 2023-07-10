@@ -34,7 +34,7 @@ class SearchingViewModel @Inject constructor(
                 if (foundUser == null) {
                     _notExistUserEvent.value = Event(Unit)
                 } else {
-                    _foundUser.value = foundUser
+                    _foundUser.value = foundUser ?: return@launch
                 }
             }
         }
