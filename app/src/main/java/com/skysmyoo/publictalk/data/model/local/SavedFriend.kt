@@ -11,5 +11,6 @@ import java.io.Serializable
 @JsonClass(generateAdapter = true)
 data class SavedFriend(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
+    @PropertyName("userEmail") val userEmail: String,
     @PropertyName("friendData") val friendData: User,
 ) : Serializable

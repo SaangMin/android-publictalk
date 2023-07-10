@@ -6,10 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,11 +50,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun getOtherUser(chatRoom: ChatRoom): User? {
+        val friendList = runBlocking { repository.getFriends() }
+        val otherUserEmail = chatRoom.member.map { it.userEmail }.find { it != getMyEmail() }
+        return friendList.find { it.userEmail == otherUserEmail }
+    }
+
     fun getChatRooms() {
         viewModelScope.launch {
-            val chatRoomList = repository.getChatRooms()
-            if (chatRoomList != null){
-                _chatRoomList.value = Event(chatRoomList)
+            val myEmail = getMyEmail()
+            FirebaseData.getIdToken {
+                viewModelScope.launch {
+                    val chatRoomList = repository.updateChatRoom(it, myEmail)
+                    _chatRoomList.value = Event(chatRoomList)
+                }
             }
         }
     }

@@ -10,6 +10,10 @@
             type="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
 
         <variable
+            name="other"
+            type="com.skysmyoo.publictalk.data.model.remote.User" />
+
+        <variable
             name="lastMessage"
             type="com.skysmyoo.publictalk.data.model.remote.Message" />
 
@@ -29,7 +33,7 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_item_chat_list_profile"
-            profileImage="@{chatRoom.other.userProfileImage}"
+            profileImage="@{other.userProfileImage}"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_margin="@dimen/margin_chat_list_image"
@@ -46,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_chat_list_text"
-            android:text="@{chatRoom.other.userName}"
+            android:text="@{other.userName}"
             android:textColor="@color/color_text"
             android:textSize="20sp"
             android:textStyle="bold"

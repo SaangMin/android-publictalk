@@ -7,7 +7,7 @@ import com.skysmyoo.publictalk.data.model.local.SavedFriend
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.User
 
-@Database(entities = [User::class, SavedFriend::class, ChatRoom::class], version = 4)
+@Database(entities = [User::class, SavedFriend::class, ChatRoom::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userModelDao(): UserModelDao

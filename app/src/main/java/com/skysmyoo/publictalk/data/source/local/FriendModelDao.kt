@@ -21,4 +21,7 @@ interface FriendModelDao {
     @Query("SELECT * FROM saved_friend_models")
     suspend fun getFriendList(): List<SavedFriend>
 
+    @Query("SELECT * FROM saved_friend_models WHERE userEmail = :email")
+    suspend fun findFriend(email: String): SavedFriend?
+
 }

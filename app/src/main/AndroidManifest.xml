@@ -15,8 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PublicTalk"
         tools:targetApi="31">
-        <activity android:name=".ui.HomeActivity"
-            android:windowSoftInputMode="adjustPan"/>
+        <activity android:name=".ui.HomeActivity" />
         <activity
             android:name=".ui.StartActivity"
             android:exported="true">

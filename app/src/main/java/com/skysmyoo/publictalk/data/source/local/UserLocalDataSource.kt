@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.data.source.local
 
 import com.skysmyoo.publictalk.data.model.local.SavedFriend
-import com.skysmyoo.publictalk.data.model.remote.Friend
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import javax.inject.Inject
@@ -52,26 +51,20 @@ class UserLocalDataSource @Inject constructor(
 
     suspend fun addFriend(myInfo: User, friend: User) {
         val updatedFriendList = myInfo.userFriendIdList.toMutableList()
-        updatedFriendList.add(Friend(userEmail = friend.userEmail))
-        friendModelDao.insertFriend(SavedFriend(friendData = friend))
+        updatedFriendList.add(friend.userEmail)
+        friendModelDao.insertFriend(SavedFriend(userEmail = friend.userEmail, friendData = friend))
 
         myInfo.userFriendIdList = updatedFriendList
         userModelDao.updateUser(myInfo)
     }
 
-    suspend fun removeFriend(myInfo: User, friend: User) {
-        val updatedFriendList =
-            myInfo.userFriendIdList.toMutableList()
-        val removeTarget = updatedFriendList.find { it.userEmail == friend.userEmail }
-        updatedFriendList.remove(removeTarget)
-        friendModelDao.removeFriend(friend)
-
-        val updatedMyInfo = myInfo.copy(userFriendIdList = updatedFriendList)
-        userModelDao.updateUser(updatedMyInfo)
-    }
-
     suspend fun getFriendList(): List<User> {
         val savedFriendList = friendModelDao.getFriendList()
         return savedFriendList.map { it.friendData }
+    }
+
+    suspend fun findFriend(email: String): User? {
+        val savedFriend = friendModelDao.findFriend(email) ?: return null
+        return savedFriend.friendData
     }
 }

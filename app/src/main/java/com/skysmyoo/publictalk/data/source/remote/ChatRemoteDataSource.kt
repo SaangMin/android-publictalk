@@ -1,14 +1,11 @@
 package com.skysmyoo.publictalk.data.source.remote
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.Query
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
-import com.skysmyoo.publictalk.data.model.remote.Message
 import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -20,42 +17,33 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         return apiClient.createChatRoom(auth, chatRoom)
     }
 
-    suspend fun getChatRooms(email: String): List<DataSnapshot>? {
-        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("chatRooms")
-
-        val query1 = ref.orderByChild("me").equalTo(email)
-        val query2 = ref.orderByChild("other").equalTo(email)
-
-        val results1 = performQuery(query1)
-        val results2 = performQuery(query2)
-
-        return results1?.plus(results2 ?: emptyList())
+    suspend fun getChatRooms(auth: String, email: String): List<ChatRoom> {
+        val response = apiClient.getChatRooms(auth)
+        val chatRooms = response.body()
+            ?.filterValues { it.member.map { member -> member.userEmail }.contains(email) }
+        return chatRooms?.values?.toList() ?: emptyList()
     }
 
-    private suspend fun performQuery(query: Query): List<DataSnapshot>? {
-        return suspendCoroutine { continuation ->
-            query.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        continuation.resume(snapshot.children.toList())
-                    } else {
-                        continuation.resume(null)
-                    }
-                }
+    suspend fun getChatRoomKey(member: List<String>): String? = suspendCoroutine { continuation ->
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("chatRooms")
 
-                override fun onCancelled(error: DatabaseError) {
-                    continuation.resume(null)
-                }
-            })
-        }
-    }
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val chatRoomId = snapshot.children.find {
+                    val chatRoom = it.getValue(ChatRoom::class.java)
+                    val chattingMember = chatRoom?.member?.map { member -> member.userEmail }
+                    chattingMember?.contains(member[0]) == true && chattingMember.contains(member[1])
+                }?.key ?: return
 
-    suspend fun sendMessage(
-        chatRoomId: String,
-        auth: String,
-        message: Message
-    ): Response<Map<String, String>> {
-        return apiClient.sendMessage(chatRoomId, auth, message)
+                continuation.resume(chatRoomId)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "DataSnapshotCancelled: $error")
+                continuation.resume(null)
+            }
+        })
     }
 
     companion object {

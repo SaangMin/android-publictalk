@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/tv_item_sender_not_reading"
-            isReading="@{Boolean.valueOf(message.isReading)}"
+            isReading="@{Boolean.valueOf(message.reading)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:text="@{time}"
             android:textColor="@color/color_text"
+            android:textAlignment="textEnd"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_item_sender_body"
@@ -48,13 +49,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_sender_message_box"
+            android:maxWidth="300dp"
             android:padding="@dimen/margin_msg_box"
             android:text="@{message.body}"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/hello" />
 

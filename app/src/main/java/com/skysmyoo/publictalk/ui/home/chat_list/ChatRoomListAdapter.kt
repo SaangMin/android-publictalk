@@ -5,45 +5,49 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
 
-class ChatRoomListAdapter(
-    private val viewModel: HomeViewModel
-) :
+class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
     ListAdapter<ChatRoom, ChatRoomListAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomViewHolder {
-        return ChatRoomViewHolder.from(parent)
+        return ChatRoomViewHolder.from(parent, viewModel)
     }
 
     override fun onBindViewHolder(holder: ChatRoomViewHolder, position: Int) {
-        holder.bind(getItem(position), viewModel)
+        holder.bind(getItem(position))
     }
 
-    class ChatRoomViewHolder(private val binding: ItemChatRoomBinding) :
+    class ChatRoomViewHolder(
+        private val binding: ItemChatRoomBinding,
+        private val viewModel: HomeViewModel
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ChatRoom, viewModel: HomeViewModel) {
+        fun bind(item: ChatRoom) {
             val messageList = item.messages.values.toList()
+            val otherUser = viewModel.getOtherUser(item)
+            val myEmail = viewModel.getMyEmail()
             with(binding) {
                 chatRoom = item
+                this.other = otherUser
                 lastMessage = messageList.lastOrNull()
                 unreadMessage =
                     messageList.filter {
-                        !it.isReading && it.receiver == preferencesManager.getMyEmail()
+                        !it.reading && it.receiver == myEmail
                     }.size
-                this.viewModel = viewModel
             }
+            binding.viewModel = viewModel
         }
 
         companion object {
-            fun from(parent: ViewGroup): ChatRoomViewHolder {
+            fun from(parent: ViewGroup, viewModel: HomeViewModel): ChatRoomViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 return ChatRoomViewHolder(
-                    ItemChatRoomBinding.inflate(inflater, parent, false)
+                    ItemChatRoomBinding.inflate(inflater, parent, false),
+                    viewModel
                 )
             }
         }
@@ -53,7 +57,7 @@ class ChatRoomListAdapter(
 
 class ChatRoomDiffCallback : DiffUtil.ItemCallback<ChatRoom>() {
     override fun areItemsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-        return oldItem.me == newItem.me && oldItem.other == newItem.other
+        return oldItem.member == newItem.member
     }
 
     override fun areContentsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
