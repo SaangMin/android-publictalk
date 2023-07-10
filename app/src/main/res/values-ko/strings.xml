@@ -53,4 +53,9 @@
     <string name="chat_room_title_sample">개똥이</string>
     <string name="message_box_not_reading_count">1</string>
     <string name="empty_message_error">메세지를 입력해주세요.</string>
+    <string name="navigation_searching_label">친구 찾기 화면</string>
+    <string name="searching_friend">친구 찾기</string>
+    <string name="input_email">이메일 입력</string>
+    <string name="search">찾기</string>
+    <string name="searched_friend_profile">찾은 친구 이미지</string>
 </resources>
