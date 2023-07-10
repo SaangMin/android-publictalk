@@ -47,6 +47,6 @@ object TimeUtil {
         val targetDateString = dateFormat.format(this)
         val currentDateString = dateFormat.format(Date())
 
-        return targetDateString.toInt() <= currentDateString.toInt()
+        return targetDateString.toInt() >= currentDateString.toInt()
     }
 }

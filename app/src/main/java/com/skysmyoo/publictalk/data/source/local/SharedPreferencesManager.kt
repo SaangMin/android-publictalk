@@ -2,8 +2,8 @@ package com.skysmyoo.publictalk.data.source.local
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.skysmyoo.publictalk.data.model.local.Constants
-import com.skysmyoo.publictalk.data.model.local.Constants.KEY_USER_LANGUAGE
+import com.skysmyoo.publictalk.utils.Constants
+import com.skysmyoo.publictalk.utils.Constants.KEY_USER_LANGUAGE
 import javax.inject.Inject
 
 class SharedPreferencesManager @Inject constructor(context: Context) {

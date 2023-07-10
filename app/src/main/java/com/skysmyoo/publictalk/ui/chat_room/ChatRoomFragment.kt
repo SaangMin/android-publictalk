@@ -2,14 +2,13 @@ package com.skysmyoo.publictalk.ui.chat_room
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
-import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.FragmentChatRoomBinding
 import com.skysmyoo.publictalk.utils.EventObserver
@@ -44,10 +43,7 @@ class ChatRoomFragment : BaseFragment() {
     }
 
     private fun setLayout() {
-        val chatMember = chatRoomInfo.member
-        val myEmail = viewModel.getMyEmail()
-        val otherUserEmail = chatMember.map { it.userEmail }.find { it != myEmail } ?: ""
-        viewModel.findFriend(otherUserEmail)
+        viewModel.findFriend(chatRoomInfo)
         with(binding) {
             rvChatRoom.adapter = adapter
             abChatRoom.setNavigationOnClickListener {
@@ -66,21 +62,13 @@ class ChatRoomFragment : BaseFragment() {
     private fun roomKeyObserver() {
         viewModel.chatRoomKey.observe(viewLifecycleOwner) {
             enterChatting()
-            viewModel.listenForChat(it)
+            viewModel.listenForChat(chatRoomInfo, it)
             viewModel.updateIsReadingForMessages()
         }
     }
 
     private fun enterChatting() {
-        val roomKey = viewModel.chatRoomKey.value
-        val myEmail = viewModel.getMyEmail()
-        val myIdKey = chatRoomInfo.member.indexOfFirst { member -> member.userEmail == myEmail }
-        val chatRoomRef =
-            FirebaseDatabase.getInstance().getReference("chatRooms/$roomKey/member/$myIdKey")
-
-        chatRoomRef.child("isChatting").setValue(true)
-
-        chatRoomRef.child("isChatting").onDisconnect().setValue(false)
+        viewModel.enterChatting(chatRoomInfo)
     }
 
     private fun friendDataObserver() {
@@ -97,25 +85,17 @@ class ChatRoomFragment : BaseFragment() {
 
     private fun newMessageObserver() {
         viewModel.newMessage.observe(viewLifecycleOwner, EventObserver {
-            if (!chatRoomInfo.messages.values.toList().contains(it)) {
-                val myEmail = viewModel.getMyEmail()
-                val currentList = adapter.currentList.toMutableList()
-                if (it.sender == myEmail) {
-                    val newMessageBox = MessageBox.SenderMessageBox(it)
-                    currentList.add(newMessageBox)
-                    adapter.submitList(currentList)
-                } else {
-                    val newMessageBox = MessageBox.ReceiverMessageBox(it)
-                    currentList.add(newMessageBox)
-                    adapter.submitList(currentList)
-                }
-                binding.etChatRoomMessage.setText("")
-            }
+            val currentList = adapter.currentList.toMutableList()
+            currentList.add(it)
+            adapter.submitList(currentList)
         })
     }
 
     private fun onSendMessage() {
-        viewModel.sendMessage(chatRoomInfo)
+        viewModel.sendMessage(chatRoomInfo){
+            Toast.makeText(requireContext(), getString(R.string.empty_message_error), Toast.LENGTH_SHORT).show()
+        }
+        binding.etChatRoomMessage.setText("")
     }
 
     companion object {

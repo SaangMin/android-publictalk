@@ -52,4 +52,5 @@
     <string name="delete_chat_room">Delete Chat Room</string>
     <string name="chat_room_title_sample">Steve</string>
     <string name="message_box_not_reading_count">1</string>
+    <string name="empty_message_error">Please enter your message.</string>
 </resources>
