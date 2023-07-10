@@ -9,7 +9,11 @@
         android:id="@+id/navigation_friend_list"
         android:name="com.skysmyoo.publictalk.ui.home.friend.FriendListFragment"
         android:label="@string/navigation_friend_list_label"
-        tools:layout="@layout/fragment_friend_list" />
+        tools:layout="@layout/fragment_friend_list" >
+        <action
+            android:id="@+id/action_friend_list_to_searching"
+            app:destination="@id/navigation_searching" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_chat_list"

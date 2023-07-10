@@ -9,6 +9,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.ActivityHomeBinding
+import com.skysmyoo.publictalk.ui.home.friend.FriendListFragmentDirections
 import com.skysmyoo.publictalk.utils.LanguageContextWrapper
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,8 +45,7 @@ class HomeActivity : AppCompatActivity() {
             val toolBar = binding.abHome
             when (destination.id) {
                 R.id.navigation_friend_list -> {
-                    setToolbar(getString(R.string.friend_list))
-                    toolBar.inflateMenu(R.menu.home_ab_menu)
+                    setFriendListToolbar()
                     bottomNavigation.isVisible = true
                 }
 
@@ -77,6 +77,18 @@ class HomeActivity : AppCompatActivity() {
             this.title = title
             menu.clear()
             isVisible = true
+        }
+    }
+
+    private fun setFriendListToolbar() {
+        setToolbar(getString(R.string.friend_list))
+        binding.abHome.inflateMenu(R.menu.home_ab_menu)
+        binding.abHome.setOnMenuItemClickListener {
+            val navController =
+                supportFragmentManager.findFragmentById(R.id.fcv_home)?.findNavController()
+            val action = FriendListFragmentDirections.actionFriendListToSearching()
+            navController?.navigate(action)
+            true
         }
     }
 }
