@@ -10,4 +10,5 @@ object Constants {
     const val PATH_READING = "reading"
     const val PATH_USER_EMAIL = "userEmail"
     const val PATH_MESSAGES = "messages"
+    const val PATH_USERS = "users"
 }

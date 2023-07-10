@@ -71,7 +71,7 @@
         <item name="android:padding">12dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:imeOptions">actionDone</item>
         <item name="android:inputType">textEmailAddress</item>
     </style>
 

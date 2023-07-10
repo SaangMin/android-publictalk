@@ -8,6 +8,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.User
+import com.skysmyoo.publictalk.utils.Constants.PATH_USERS
 import com.skysmyoo.publictalk.utils.Constants.PATH_USER_EMAIL
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.coroutineScope
@@ -44,7 +45,7 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
     }
 
     suspend fun getExistUser(email: String?): DataSnapshot? {
-        val ref = Firebase.database(BuildConfig.BASE_URL).getReference("users")
+        val ref = Firebase.database(BuildConfig.BASE_URL).getReference(PATH_USERS)
         return suspendCoroutine { continuation ->
             ref.orderByChild(PATH_USER_EMAIL).equalTo(email)
                 .addListenerForSingleValueEvent(object : ValueEventListener {

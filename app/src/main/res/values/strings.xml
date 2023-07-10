@@ -58,4 +58,6 @@
     <string name="input_email">Input Email.</string>
     <string name="search">Search</string>
     <string name="searched_friend_profile">Searched Friend Profile Image</string>
+    <string name="not_exist_user_error_msg">User not found.</string>
+    <string name="find_success_user_msg">User found.</string>
 </resources>
