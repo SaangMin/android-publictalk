@@ -63,6 +63,11 @@ class HomeActivity : AppCompatActivity() {
                     toolBar.isVisible = false
                     bottomNavigation.isVisible = false
                 }
+
+                R.id.navigation_searching -> {
+                    setToolbar(getString(R.string.searching_friend))
+                    bottomNavigation.isVisible = false
+                }
             }
         }
     }
