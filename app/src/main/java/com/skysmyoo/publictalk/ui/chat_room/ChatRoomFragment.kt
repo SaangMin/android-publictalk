@@ -62,7 +62,7 @@ class ChatRoomFragment : BaseFragment() {
     private fun roomKeyObserver() {
         viewModel.chatRoomKey.observe(viewLifecycleOwner) {
             enterChatting()
-            viewModel.listenForChat(it)
+            viewModel.listenForChat(chatRoomInfo, it)
             viewModel.updateIsReadingForMessages()
         }
     }
@@ -95,6 +95,7 @@ class ChatRoomFragment : BaseFragment() {
         viewModel.sendMessage(chatRoomInfo){
             Toast.makeText(requireContext(), getString(R.string.empty_message_error), Toast.LENGTH_SHORT).show()
         }
+        binding.etChatRoomMessage.setText("")
     }
 
     companion object {

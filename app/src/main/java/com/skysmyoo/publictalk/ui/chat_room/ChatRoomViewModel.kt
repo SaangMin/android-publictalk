@@ -89,11 +89,13 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun listenForChat(roomKey: String) {
+    fun listenForChat(chatRoom: ChatRoom, roomKey: String) {
         viewModelScope.launch {
             chatRepository.listenForChat(roomKey) {
-                val newMessage = convertToMessage(it)
-                _newMessage.value = Event(newMessage)
+                if (!chatRoom.messages.values.toList().contains(it)) {
+                    val newMessage = convertToMessage(it)
+                    _newMessage.value = Event(newMessage)
+                }
             }
         }
     }
