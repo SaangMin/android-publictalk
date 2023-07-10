@@ -17,6 +17,12 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
+import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
+import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
+import com.skysmyoo.publictalk.utils.Constants.PATH_MESSAGES
+import com.skysmyoo.publictalk.utils.Constants.PATH_READING
+import com.skysmyoo.publictalk.utils.Constants.PATH_USER_EMAIL
 import com.skysmyoo.publictalk.utils.Event
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,16 +76,16 @@ class ChatRoomViewModel @Inject constructor(
     fun sendMessage(chatRoom: ChatRoom) {
         val myEmail = chatRoom.member.map { it.userEmail }.find { it == getMyEmail() } ?: ""
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
-        val membersRef = database.getReference("chatRooms/${chatRoomKey.value}/member")
+        val membersRef = database.getReference(PATH_CHAT_ROOMS).child(chatRoomKey.value.toString()).child(PATH_MEMBER)
 
         membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var isPartnerChatting = false
                 snapshot.children.forEach { memberSnapshot ->
-                    val memberName = memberSnapshot.child("userEmail").getValue(String::class.java)
+                    val memberName = memberSnapshot.child(PATH_USER_EMAIL).getValue(String::class.java)
                     if (memberName == otherEmail) {
                         val memberChatting =
-                            memberSnapshot.child("isChatting").getValue(Boolean::class.java)
+                            memberSnapshot.child(PATH_IS_CHATTING).getValue(Boolean::class.java)
                                 ?: false
                         isPartnerChatting = memberChatting
                         return@forEach
@@ -115,12 +121,12 @@ class ChatRoomViewModel @Inject constructor(
 
     fun listenForChat(roomKey: String) {
         viewModelScope.launch {
-            val messageRef = database.getReference("chatRooms/$roomKey/messages")
+            val messageRef = database.getReference(PATH_CHAT_ROOMS).child(roomKey).child(PATH_MESSAGES)
 
             messageRef.addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     val isMessageReading =
-                        snapshot.child("reading").getValue(Boolean::class.java) ?: false
+                        snapshot.child(PATH_READING).getValue(Boolean::class.java) ?: false
                     val message = snapshot.getValue(Message::class.java) ?: return
                     message.reading = isMessageReading
                     if (message.sender.isEmpty() || message.receiver.isEmpty()) return
@@ -146,9 +152,9 @@ class ChatRoomViewModel @Inject constructor(
     fun updateIsReadingForMessages() {
         val myEmail = getMyEmail()
         val messagesRef =
-            FirebaseDatabase.getInstance().getReference("chatRooms/${chatRoomKey.value}/messages")
+            FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS).child(chatRoomKey.value.toString()).child(PATH_MESSAGES)
         val memberRef =
-            FirebaseDatabase.getInstance().getReference("chatRooms/${chatRoomKey.value}/member")
+            FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS).child(chatRoomKey.value.toString()).child(PATH_MEMBER)
 
         memberRef.addChildEventListener(object : ChildEventListener {
             var isPartnerChatting = false
@@ -158,8 +164,8 @@ class ChatRoomViewModel @Inject constructor(
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val memberChatting =
-                    snapshot.child("isChatting").getValue(Boolean::class.java) ?: false
-                val memberEmail = snapshot.child("userEmail").getValue(String::class.java)
+                    snapshot.child(PATH_IS_CHATTING).getValue(Boolean::class.java) ?: false
+                val memberEmail = snapshot.child(PATH_USER_EMAIL).getValue(String::class.java)
                 if (memberEmail != myEmail) {
                     isPartnerChatting = memberChatting
                 }
@@ -170,7 +176,7 @@ class ChatRoomViewModel @Inject constructor(
                             snapshot.children.forEach { messageSnapshot ->
                                 val message = messageSnapshot.getValue(Message::class.java)
                                 if (message?.reading == false) {
-                                    messageSnapshot.ref.child("reading").setValue(true)
+                                    messageSnapshot.ref.child(PATH_READING).setValue(true)
                                 }
                             }
                         }
@@ -193,6 +199,15 @@ class ChatRoomViewModel @Inject constructor(
             }
 
         })
+    }
+
+    fun enterChatting(chatRoom: ChatRoom) {
+        val roomKey = chatRoomKey.value ?: return
+        val myIdKey = chatRoom.member.indexOfFirst { member -> member.userEmail == getMyEmail() }.toString()
+        val chatRoomRef = FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS).child(roomKey).child(PATH_MEMBER).child(myIdKey)
+
+        chatRoomRef.child(PATH_IS_CHATTING).setValue(true)
+        chatRoomRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
     }
 
     companion object {

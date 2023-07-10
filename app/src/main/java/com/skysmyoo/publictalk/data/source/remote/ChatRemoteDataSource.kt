@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -26,7 +27,7 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
 
     suspend fun getChatRoomKey(member: List<String>): String? = suspendCoroutine { continuation ->
         val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("chatRooms")
+        val ref = database.getReference(PATH_CHAT_ROOMS)
 
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
