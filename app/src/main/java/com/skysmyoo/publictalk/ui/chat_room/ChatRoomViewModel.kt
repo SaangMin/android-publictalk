@@ -34,6 +34,10 @@ class ChatRoomViewModel @Inject constructor(
     val friendData: LiveData<Event<User>> = _friendData
     private val _chatRoomKey = MutableLiveData<String>()
     val chatRoomKey: LiveData<String> = _chatRoomKey
+    private val _firebaseErrorEvent = MutableLiveData<Event<Unit>>()
+    val firebaseErrorEvent: LiveData<Event<Unit>> = _firebaseErrorEvent
+    private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
+    val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
 
     val messageBody = MutableLiveData<String>()
 
@@ -72,20 +76,25 @@ class ChatRoomViewModel @Inject constructor(
                 chatRoomKey.value.toString(),
                 messageBody.value.toString()
             ) {
-                FirebaseData.getIdToken { token ->
+                FirebaseData.getIdToken({ token ->
                     viewModelScope.launch {
                         chatRepository.sendMessage(token, it, chatRoomKey.value)
                     }
-                }
+                }, {
+                    _firebaseErrorEvent.value = Event(Unit)
+                })
             }
         }
     }
 
     fun getRoomKey(chatRoom: ChatRoom) {
         viewModelScope.launch {
-            val chatRoomKey =
-                chatRepository.getRoomKey(chatRoom.member.map { it.userEmail }) ?: return@launch
-            _chatRoomKey.value = chatRoomKey
+            val chatRoomKey = chatRepository.getRoomKey(chatRoom.member.map { it.userEmail })
+            if (chatRoomKey != null) {
+                _chatRoomKey.value = chatRoomKey
+            } else {
+                _networkErrorEvent.value = Event(Unit)
+            }
         }
     }
 
