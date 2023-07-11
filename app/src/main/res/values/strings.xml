@@ -62,4 +62,8 @@
     <string name="add_friend">Add friend</string>
     <string name="already_friend_msg">Already friend.</string>
     <string name="add_friend_msg">Friend added.</string>
+    <string name="open_chatting_room">Chatting</string>
+    <string name="delete_friend">Delete Friend</string>
+    <string name="friend_info_profile_image">Friend info profile image</string>
+    <string name="navigation_friend_info_label">Friend Info Screen</string>
 </resources>

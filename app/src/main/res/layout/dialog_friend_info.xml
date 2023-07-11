@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="friend"
+            type="com.skysmyoo.publictalk.data.model.remote.User" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_message_box">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_friend_info_profile"
+            profileImage="@{friend.userProfileImage}"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_margin="@dimen/margin_friend_info"
+            android:contentDescription="@string/friend_info_profile_image"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@id/tv_friend_info_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/MyShapeImageStyle"
+            tools:src="@drawable/icon_profile_image" />
+
+        <TextView
+            android:id="@+id/tv_friend_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{friend.userName}"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_friend_info_open_chat"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_friend_info_profile"
+            tools:text="@string/friend_name_sample" />
+
+        <Button
+            android:id="@+id/btn_friend_info_open_chat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_friend_info_button"
+            android:layout_marginTop="@dimen/margin_friend_info"
+            android:layout_marginEnd="@dimen/margin_friend_info_button"
+            android:backgroundTint="@color/color_submit"
+            android:padding="16dp"
+            android:text="@string/open_chatting_room"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_friend_info_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_friend_info_name" />
+
+        <Button
+            android:id="@+id/btn_friend_info_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_friend_info_button"
+            android:layout_marginTop="@dimen/margin_friend_info"
+            android:layout_marginEnd="@dimen/margin_friend_info_button"
+            android:layout_marginBottom="@dimen/margin_friend_info"
+            android:backgroundTint="@color/color_cancel"
+            android:text="@string/delete_friend"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_friend_info_open_chat" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
