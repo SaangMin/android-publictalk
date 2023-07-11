@@ -3,7 +3,7 @@ package com.skysmyoo.publictalk.data.source.remote
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
-import retrofit2.Response
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -17,30 +17,30 @@ interface ApiClient {
     suspend fun putUser(
         @Query("auth") auth: String,
         @Body user: User
-    ): Response<Map<String, String>>
+    ): ApiResponse<Map<String, String>>
 
     @PUT("users/{uid}.json")
     suspend fun updateUser(
         @Path("uid") uid: String,
         @Query("auth") auth: String,
         @Body user: User
-    ): Response<User>
+    ): ApiResponse<User>
 
     @POST("chatRooms.json")
     suspend fun createChatRoom(
         @Query("auth") auth: String,
         @Body chatRoom: ChatRoom
-    ): Response<Map<String, String>>
+    ): ApiResponse<Map<String, String>>
 
     @POST("chatRooms/{chatRoomId}/messages.json")
     suspend fun sendMessage(
         @Path("chatRoomId") chatRoomId: String,
         @Query("auth") auth: String,
         @Body message: Message
-    ): Response<Map<String, String>>
+    ): ApiResponse<Map<String, String>>
 
     @GET("chatRooms.json")
     suspend fun getChatRooms(
         @Query("auth") auth: String,
-    ): Response<Map<String, ChatRoom>>
+    ): ApiResponse<Map<String, ChatRoom>>
 }

@@ -2,6 +2,7 @@ package com.skysmyoo.publictalk.di
 
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.source.remote.ApiClient
+import com.skysmyoo.publictalk.data.source.remote.response.ApiCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +39,7 @@ object ApiClientModule {
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create())
+            .addCallAdapterFactory(ApiCallAdapterFactory.create())
             .build()
     }
 
