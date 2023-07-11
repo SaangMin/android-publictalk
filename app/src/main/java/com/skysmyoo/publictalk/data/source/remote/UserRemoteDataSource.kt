@@ -23,7 +23,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient) {
 
-    val userRef = Firebase.database(BuildConfig.BASE_URL).getReference(PATH_USERS)
+    private val userRef = Firebase.database(BuildConfig.BASE_URL).getReference(PATH_USERS)
 
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
         return apiClient.putUser(auth, user)

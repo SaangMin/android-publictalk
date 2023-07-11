@@ -8,11 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.databinding.ItemFriendListBinding
 import com.skysmyoo.publictalk.databinding.ItemFriendListHeaderBinding
+import com.skysmyoo.publictalk.ui.home.HomeViewModel
 
 private const val TYPE_HEADER = 0
 private const val TYPE_FRIEND = 1
 
-class FriendListAdapter :
+class FriendListAdapter(private val viewModel: HomeViewModel) :
     ListAdapter<FriendListScreenData, RecyclerView.ViewHolder>(FriendListScreenDataDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -25,7 +26,7 @@ class FriendListAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_HEADER -> HeaderViewHolder.from(parent)
-            TYPE_FRIEND -> FriendViewHolder.from(parent)
+            TYPE_FRIEND -> FriendViewHolder.from(parent, viewModel)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -67,18 +68,20 @@ class FriendListAdapter :
     }
 
     class FriendViewHolder(
-        private val binding: ItemFriendListBinding
+        private val binding: ItemFriendListBinding,
+        private val viewModel: HomeViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: FriendListScreenData.Friend) {
             val friend = item.friend
             binding.user = friend
+            binding.viewModel = viewModel
         }
 
         companion object {
-            fun from(parent: ViewGroup): FriendViewHolder {
+            fun from(parent: ViewGroup, viewModel: HomeViewModel): FriendViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return FriendViewHolder(ItemFriendListBinding.inflate(inflater, parent, false))
+                return FriendViewHolder(ItemFriendListBinding.inflate(inflater, parent, false), viewModel)
             }
         }
     }

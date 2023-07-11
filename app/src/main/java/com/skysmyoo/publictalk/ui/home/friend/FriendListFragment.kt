@@ -3,6 +3,7 @@ package com.skysmyoo.publictalk.ui.home.friend
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
@@ -22,15 +23,34 @@ class FriendListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        friendListAdapter = FriendListAdapter()
+        friendListAdapter = FriendListAdapter(viewModel)
         binding.rvFriendList.adapter = friendListAdapter
         viewModel.setAdapterItemList(getString(R.string.mine), getString(R.string.friend_label))
         adapterItemListObserver()
+        friendClickEventObserver()
+        myInfoClickEventObserver()
     }
 
     private fun adapterItemListObserver() {
         viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
             friendListAdapter.submitList(it)
+        })
+    }
+
+    private fun friendClickEventObserver() {
+        viewModel.friendClickEvent.observe(viewLifecycleOwner, EventObserver {
+            val friend = viewModel.clickedFriend
+            if(friend != null) {
+                val action = FriendListFragmentDirections.actionFriendListToFriendInfo(friend)
+                findNavController().navigate(action)
+            }
+        })
+    }
+
+    private fun myInfoClickEventObserver() {
+        viewModel.myInfoClickEvent.observe(viewLifecycleOwner, EventObserver {
+            val action = FriendListFragmentDirections.actionFriendListToSetting()
+            findNavController().navigate(action)
         })
     }
 
