@@ -1,5 +1,9 @@
 package com.skysmyoo.publictalk.ui
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -37,7 +41,11 @@ class SplashFragment : BaseFragment() {
         if (email.isNullOrEmpty()) {
             navigateToLogin()
         } else {
-            viewModel.validateExistUser(email)
+            if(isNetworkAvailable()){
+                viewModel.validateExistUser(email)
+            } else {
+                viewModel.localLogin()
+            }
         }
     }
 
