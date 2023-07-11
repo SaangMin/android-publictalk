@@ -66,4 +66,5 @@
     <string name="delete_friend">Delete Friend</string>
     <string name="friend_info_profile_image">Friend info profile image</string>
     <string name="navigation_friend_info_label">Friend Info Screen</string>
+    <string name="delete_friend_msg">Deleted Friend.</string>
 </resources>

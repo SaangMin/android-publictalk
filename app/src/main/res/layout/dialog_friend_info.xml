@@ -8,6 +8,10 @@
         <variable
             name="friend"
             type="com.skysmyoo.publictalk.data.model.remote.User" />
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.home.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -70,6 +74,7 @@
             android:backgroundTint="@color/color_cancel"
             android:text="@string/delete_friend"
             android:textColor="@color/black"
+            android:onClick="@{()->viewModel.removeFriend(friend)}"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

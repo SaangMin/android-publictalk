@@ -66,4 +66,5 @@
     <string name="delete_friend">친구 삭제</string>
     <string name="friend_info_profile_image">친구 정보화면 프로필 이미지</string>
     <string name="navigation_friend_info_label">친구 정보 화면</string>
+    <string name="delete_friend_msg">친구가 삭제되었습니다.</string>
 </resources>

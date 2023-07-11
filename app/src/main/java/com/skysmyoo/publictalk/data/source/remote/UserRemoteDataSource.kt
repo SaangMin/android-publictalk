@@ -37,8 +37,7 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
             val location = "Profile images: $currentTime: $image"
             val imageRef = FirebaseData.storage.getReference(location)
             var downloadUri: Uri? = null
-            imageRef.putFile(image)
-                .await()
+            imageRef.putFile(image).await()
             imageRef.downloadUrl.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     downloadUri = task.result
@@ -94,6 +93,25 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                 val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
                 val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
                 friendList.add(friendEmail)
+                ref.setValue(friendList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w(TAG, "databaseError: $error")
+            }
+        })
+    }
+
+    suspend fun removeFriend(userEmail: String, friendEmail: String) {
+        val userDataSnapshot = getExistUser(userEmail)
+        val userUid = userDataSnapshot?.key ?: return
+        val ref = userRef.child(userUid).child(PATH_USER_FRIEND_ID_LIST)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
+                val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
+                friendList.remove(friendEmail)
                 ref.setValue(friendList)
             }
 

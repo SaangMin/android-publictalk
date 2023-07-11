@@ -34,6 +34,8 @@ class HomeViewModel @Inject constructor(
     val friendClickEvent: LiveData<Event<Unit>> = _friendClickEvent
     private val _myInfoClickEvent = MutableLiveData<Event<Unit>>()
     val myInfoClickEvent: LiveData<Event<Unit>> = _myInfoClickEvent
+    private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
+    val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -102,6 +104,14 @@ class HomeViewModel @Inject constructor(
             } else {
                 _foundChatRoom.value = Event(chatRoom)
             }
+        }
+    }
+
+    fun removeFriend(friend: User) {
+        viewModelScope.launch {
+            val myInfo = repository.getMyInfo() ?: return@launch
+            repository.removeFriend(myInfo, friend)
+            _removeFriendEvent.value = Event(Unit)
         }
     }
 

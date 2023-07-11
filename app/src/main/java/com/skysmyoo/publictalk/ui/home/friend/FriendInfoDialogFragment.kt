@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
@@ -45,8 +47,10 @@ class FriendInfoDialogFragment : DialogFragment() {
                 getChatRoom()
             }
         }
+        binding.viewModel = viewModel
         notExistChatRoomObserver()
         foundChatRoomObserver()
+        removeFriendEventObserver()
     }
 
     override fun onStart() {
@@ -80,6 +84,13 @@ class FriendInfoDialogFragment : DialogFragment() {
         viewModel.foundChatRoom.observe(viewLifecycleOwner, EventObserver {
             val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(it)
             findNavController().navigate(action)
+        })
+    }
+
+    private fun removeFriendEventObserver() {
+        viewModel.removeFriendEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.delete_friend_msg), Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
         })
     }
 

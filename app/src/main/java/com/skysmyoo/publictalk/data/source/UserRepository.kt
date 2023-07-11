@@ -116,6 +116,11 @@ class UserRepository @Inject constructor(
         userLocalDataSource.addFriend(myInfo, friend)
     }
 
+    suspend fun removeFriend(myInfo: User, friend: User) {
+        userRemoteDataSource.removeFriend(myInfo.userEmail, friend.userEmail)
+        userLocalDataSource.removeFriend(myInfo, friend)
+    }
+
     companion object {
         private const val TAG = "UserRepository"
     }
