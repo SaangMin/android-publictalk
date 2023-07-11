@@ -10,6 +10,9 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.utils.Constants
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
+import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
+import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
+import com.skysmyoo.publictalk.utils.Constants.PATH_READING
 import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -49,47 +52,28 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         })
     }
 
-    fun updateMemberListener(myEmail: String, chatRoomKey: String) {
-        val messagesRef = chatRoomRef.child(chatRoomKey).child(Constants.PATH_MESSAGES)
-        val memberRef = chatRoomRef.child(chatRoomKey).child(Constants.PATH_MEMBER)
+    fun enterChatting(roomKey: String, myIdKey: String, myEmail: String) {
+        val messageRef = chatRoomRef.child(roomKey).child(Constants.PATH_MESSAGES)
+        val myInfoRef =
+            chatRoomRef.child(roomKey).child(PATH_MEMBER).child(myIdKey)
 
-        memberRef.addChildEventListener(object : ChildEventListener {
-            var isPartnerChatting = false
-
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val memberChatting =
-                    snapshot.child(Constants.PATH_IS_CHATTING).getValue(Boolean::class.java)
-                        ?: false
-                val memberEmail =
-                    snapshot.child(Constants.PATH_USER_EMAIL).getValue(String::class.java)
-                if (memberEmail != myEmail) {
-                    isPartnerChatting = memberChatting
-                }
-                if (isPartnerChatting) {
-                    messagesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            snapshot.children.forEach { messageSnapshot ->
-                                val message = messageSnapshot.getValue(Message::class.java)
-                                if (message?.reading == false) {
-                                    messageSnapshot.ref.child(Constants.PATH_READING).setValue(true)
-                                }
-                            }
+        myInfoRef.child(PATH_IS_CHATTING).setValue(true).addOnSuccessListener {
+            messageRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { messageSnapshot ->
+                        val message = messageSnapshot.getValue(Message::class.java)
+                        if (message?.receiver == myEmail && !message.reading) {
+                            messageSnapshot.ref.child(PATH_READING).setValue(true)
                         }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Log.e(TAG, "MessageDataSnapshotCancelled: $error")
-                        }
-                    })
+                    }
                 }
-            }
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {}
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "MemberDataSnapshotCancelled: $error")
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "MessageDataSnapshotCancelled: $error")
+                }
+            })
+        }
+        myInfoRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
     }
 
     fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {

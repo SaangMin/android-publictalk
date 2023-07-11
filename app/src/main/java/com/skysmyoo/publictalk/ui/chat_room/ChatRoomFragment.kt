@@ -42,6 +42,11 @@ class ChatRoomFragment : BaseFragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.setIsNotChatting(chatRoomInfo)
+    }
+
     private fun setLayout() {
         viewModel.findFriend(chatRoomInfo)
         with(binding) {
@@ -63,7 +68,6 @@ class ChatRoomFragment : BaseFragment() {
         viewModel.chatRoomKey.observe(viewLifecycleOwner) {
             enterChatting()
             viewModel.listenForChat(chatRoomInfo, it)
-            viewModel.updateIsReadingForMessages()
         }
     }
 
@@ -92,8 +96,12 @@ class ChatRoomFragment : BaseFragment() {
     }
 
     private fun onSendMessage() {
-        viewModel.sendMessage(chatRoomInfo){
-            Toast.makeText(requireContext(), getString(R.string.empty_message_error), Toast.LENGTH_SHORT).show()
+        viewModel.sendMessage(chatRoomInfo) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.empty_message_error),
+                Toast.LENGTH_SHORT
+            ).show()
         }
         binding.etChatRoomMessage.setText("")
     }
