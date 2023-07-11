@@ -72,20 +72,14 @@ class FriendInfoDialogFragment : DialogFragment() {
             )
             val newChatRoom = ChatRoom(member = member)
             val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(newChatRoom)
-            with(findNavController()) {
-                navigate(action)
-                popBackStack()
-            }
+            findNavController().navigate(action)
         })
     }
 
     private fun foundChatRoomObserver() {
         viewModel.foundChatRoom.observe(viewLifecycleOwner, EventObserver {
             val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(it)
-            with(findNavController()) {
-                navigate(action)
-                popBackStack()
-            }
+            findNavController().navigate(action)
         })
     }
 
