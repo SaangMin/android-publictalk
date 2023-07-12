@@ -11,6 +11,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -30,6 +33,7 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment() {
@@ -144,38 +148,46 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun googleLoginObserver() {
-        viewModel.googleLoginEvent.observe(viewLifecycleOwner) {
-            if (idToken != null) {
-                val authCredential = GoogleAuthProvider.getCredential(idToken, null)
-                firebaseAuth.signInWithCredential(authCredential)
-                    .addOnCompleteListener(requireActivity()) { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(
-                                requireContext(),
-                                getString(R.string.login_success_msg),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            FirebaseData.setUserInfo()
-                            setNavigation()
-                        } else {
-                            Log.w(TAG, "signInWithCredential failed : ${task.exception}")
-                        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.googleLoginEvent.collect {
+                    if (idToken != null) {
+                        val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+                        firebaseAuth.signInWithCredential(authCredential)
+                            .addOnCompleteListener(requireActivity()) { task ->
+                                if (task.isSuccessful) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.login_success_msg),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    FirebaseData.setUserInfo()
+                                    setNavigation()
+                                } else {
+                                    Log.w(TAG, "signInWithCredential failed : ${task.exception}")
+                                }
+                            }
                     }
+                }
             }
         }
     }
 
     private fun existUserEmailObserver() {
-        viewModel.isExistUser.observe(viewLifecycleOwner) {
-            if (it) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.exist_user_info_msg),
-                    Toast.LENGTH_SHORT
-                ).show()
-                val action = LoginFragmentDirections.actionLoginToHome()
-                findNavController().navigate(action)
-                requireActivity().finish()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isExistUser.collect {
+                    if (it) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.exist_user_info_msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val action = LoginFragmentDirections.actionLoginToHome()
+                        findNavController().navigate(action)
+                        requireActivity().finish()
+                    }
+                }
             }
         }
     }
