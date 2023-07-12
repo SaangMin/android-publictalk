@@ -12,7 +12,9 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,8 +32,8 @@ class LoginViewModel @Inject constructor(
     val submitEvent: StateFlow<Unit> = _submitEvent
     private val _notRequiredEvent = MutableStateFlow(Unit)
     val notRequiredEvent: StateFlow<Unit> = _notRequiredEvent
-    private val _isExistUser = MutableStateFlow(false)
-    val isExistUser: StateFlow<Boolean> = _isExistUser
+    private val _isExistUser = MutableSharedFlow<Boolean>()
+    val isExistUser: SharedFlow<Boolean> = _isExistUser
     private val _googleLoginEvent = MutableStateFlow(Unit)
     val googleLoginEvent: StateFlow<Unit> = _googleLoginEvent
     private val _failedMessage = MutableStateFlow(Unit)
@@ -101,13 +103,13 @@ class LoginViewModel @Inject constructor(
                         repository.updateUser(it, user)
                         repository.updateFriends(user, user.userFriendIdList)
                         repository.updateChatRooms(it, user.userEmail)
-                        _isExistUser.value = true
+                        _isExistUser.emit(true)
                     }
                 }, {
                     viewModelScope.launch {
                         val originUser = repository.getMyInfo()
                         if (originUser != null) {
-                            _isExistUser.value = true
+                            _isExistUser.emit(true)
                         }
                     }
                 })
@@ -121,9 +123,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val user = repository.getMyInfo()
             if (user != null) {
-                _isExistUser.value = true
+                _isExistUser.emit(true)
             } else {
-                _isExistUser.value = false
+                _isExistUser.emit(false)
                 _googleLoginEvent.value = Unit
             }
         }
