@@ -1,7 +1,5 @@
 package com.skysmyoo.publictalk.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
@@ -10,7 +8,6 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
-import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,19 +26,17 @@ data class ChatListUiState(
     val isChatRoomClicked: Boolean = false,
 )
 
+data class FriendInfoUiState(
+    val isNotExistChatRoom: Boolean = false,
+    val isFoundChatRoom: Boolean = false,
+    val isRemovedFriend: Boolean = false,
+    val isNetworkError: Boolean = false,
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
-
-    private val _notExistChatRoom = MutableLiveData<Event<Unit>>()
-    val notExistChatRoom: LiveData<Event<Unit>> = _notExistChatRoom
-    private val _foundChatRoom = MutableLiveData<Event<ChatRoom>>()
-    val foundChatRoom: LiveData<Event<ChatRoom>> = _foundChatRoom
-    private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
-    val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
-    private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
-    val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
 
     private val _friendListUiState = MutableStateFlow(FriendListUiState())
     val friendListUiState: StateFlow<FriendListUiState> = _friendListUiState
@@ -49,8 +44,12 @@ class HomeViewModel @Inject constructor(
     private val _chatListUiState = MutableStateFlow(ChatListUiState())
     val chatListUiState: StateFlow<ChatListUiState> = _chatListUiState
 
+    private val _friendInfoUiState = MutableStateFlow(FriendInfoUiState())
+    val friendInfoUiState: StateFlow<FriendInfoUiState> = _friendInfoUiState
+
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
+    var foundChatRoom: ChatRoom? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
@@ -123,9 +122,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val chatRoom = repository.getChatRoom(member)
             if (chatRoom == null) {
-                _notExistChatRoom.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = false)
             } else {
-                _foundChatRoom.value = Event(chatRoom)
+                foundChatRoom = chatRoom
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isFoundChatRoom = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isFoundChatRoom = false)
             }
         }
     }
@@ -135,9 +137,11 @@ class HomeViewModel @Inject constructor(
             val myInfo = repository.getMyInfo() ?: return@launch
             val response = repository.removeFriend(myInfo, friend)
             if (response is ApiResultSuccess) {
-                _removeFriendEvent.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = false)
             } else {
-                _networkErrorEvent.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = false)
             }
         }
     }
