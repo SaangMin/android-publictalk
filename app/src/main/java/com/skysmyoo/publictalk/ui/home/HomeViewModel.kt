@@ -24,15 +24,16 @@ data class FriendListUiState(
     val isMyInfoClicked: Boolean = false,
 )
 
+data class ChatListUiState(
+    val chatRoomList: List<ChatRoom> = emptyList(),
+    val isChatRoomClicked: Boolean = false,
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _chatRoomClickEvent = MutableLiveData<Event<Unit>>()
-    val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
-    private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
-    val chatRoomList: LiveData<Event<List<ChatRoom>>> = _chatRoomList
     private val _notExistChatRoom = MutableLiveData<Event<Unit>>()
     val notExistChatRoom: LiveData<Event<Unit>> = _notExistChatRoom
     private val _foundChatRoom = MutableLiveData<Event<ChatRoom>>()
@@ -44,6 +45,9 @@ class HomeViewModel @Inject constructor(
 
     private val _friendListUiState = MutableStateFlow(FriendListUiState())
     val friendListUiState: StateFlow<FriendListUiState> = _friendListUiState
+
+    private val _chatListUiState = MutableStateFlow(ChatListUiState())
+    val chatListUiState: StateFlow<ChatListUiState> = _chatListUiState
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -77,18 +81,18 @@ class HomeViewModel @Inject constructor(
     fun getChatRooms() {
         viewModelScope.launch {
             val localChatRoom = repository.getChatRooms()
-            _chatRoomList.value = Event(localChatRoom)
+            _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = localChatRoom)
             val myEmail = getMyEmail()
             FirebaseData.getIdToken({
                 viewModelScope.launch {
                     val chatRoomList =
                         repository.updateChatRooms(it, myEmail)
-                    _chatRoomList.value = Event(chatRoomList)
+                    _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = chatRoomList)
                 }
             }, {
                 viewModelScope.launch {
                     val chatRoomList = repository.getChatRooms()
-                    _chatRoomList.value = Event(chatRoomList)
+                    _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = chatRoomList)
                 }
             })
         }
@@ -100,7 +104,8 @@ class HomeViewModel @Inject constructor(
 
     fun onClickChatRoom(chatRoom: ChatRoom) {
         clickedChatRoom = chatRoom
-        _chatRoomClickEvent.value = Event(Unit)
+        _chatListUiState.value = _chatListUiState.value.copy(isChatRoomClicked = true)
+        _chatListUiState.value = _chatListUiState.value.copy(isChatRoomClicked = false)
     }
 
     fun onClickFriend(friend: User) {

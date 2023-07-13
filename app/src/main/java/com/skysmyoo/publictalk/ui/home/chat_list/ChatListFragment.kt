@@ -3,13 +3,16 @@ package com.skysmyoo.publictalk.ui.home.chat_list
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentChatListBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
-import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ChatListFragment : BaseFragment() {
@@ -25,24 +28,30 @@ class ChatListFragment : BaseFragment() {
         adapter = ChatRoomListAdapter(viewModel)
         binding.rvChatList.adapter = adapter
         viewModel.getChatRooms()
-        chatRoomClickObserver()
-        chatRoomListObserver()
+        setChatListUiState()
     }
 
-    private fun chatRoomClickObserver() {
-        viewModel.chatRoomClickEvent.observe(viewLifecycleOwner, EventObserver {
-            val clickedChatRoom = viewModel.clickedChatRoom
-            if (clickedChatRoom != null) {
-                val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
-                findNavController().navigate(action)
+    private fun setChatListUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.chatListUiState.collect {
+                    if (it.chatRoomList.isNotEmpty()) {
+                        adapter.submitList(it.chatRoomList)
+                    }
+                    if (it.isChatRoomClicked) {
+                        navigateChatRoom()
+                    }
+                }
             }
-        })
+        }
     }
 
-    private fun chatRoomListObserver() {
-        viewModel.chatRoomList.observe(viewLifecycleOwner, EventObserver {
-            adapter.submitList(it)
-        })
+    private fun navigateChatRoom() {
+        val clickedChatRoom = viewModel.clickedChatRoom
+        if (clickedChatRoom != null) {
+            val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
+            findNavController().navigate(action)
+        }
     }
 
     companion object {
