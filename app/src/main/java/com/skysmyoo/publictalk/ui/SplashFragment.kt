@@ -56,8 +56,8 @@ class SplashFragment : BaseFragment() {
     private fun existUserEmailObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isExistUser.collect {
-                    if (it) {
+                viewModel.splashUiState.collect {
+                    if (it.isExist == true) {
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.exist_user_info_msg),
@@ -66,7 +66,7 @@ class SplashFragment : BaseFragment() {
                         val action = SplashFragmentDirections.actionSplashToHome()
                         findNavController().navigate(action)
                         requireActivity().finish()
-                    } else {
+                    } else if (it.isExist == false) {
                         navigateToLogin()
                     }
                 }
