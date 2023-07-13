@@ -37,7 +37,7 @@ class SplashFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         validateAlreadyLogin()
-        existUserEmailObserver()
+        setSplashUiState()
     }
 
     private fun validateAlreadyLogin() {
@@ -53,7 +53,7 @@ class SplashFragment : BaseFragment() {
         }
     }
 
-    private fun existUserEmailObserver() {
+    private fun setSplashUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.splashUiState.collect {

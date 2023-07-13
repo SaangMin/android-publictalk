@@ -44,28 +44,16 @@ class SettingInfoFragment : BaseFragment() {
         binding.email = user?.email
         binding.viewModel = viewModel
         setSpinner()
-        onProfileImageClickObserver()
-        submitRequiredObserver()
-        submitUserObserver()
-        failedMessageObserver()
+        setInfoUiState()
     }
 
-    private fun onProfileImageClickObserver() {
+    private fun setInfoUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.setInfoUiState.collect {
                     if (it.isImageClicked) {
                         pickImage.launch("image/*")
                     }
-                }
-            }
-        }
-    }
-
-    private fun failedMessageObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.setInfoUiState.collect {
                     if (it.isFailed) {
                         Snackbar.make(
                             binding.root,
@@ -73,15 +61,6 @@ class SettingInfoFragment : BaseFragment() {
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
-                }
-            }
-        }
-    }
-
-    private fun submitRequiredObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.setInfoUiState.collect {
                     if (it.isNotRequired) {
                         Snackbar.make(
                             binding.root,
@@ -89,15 +68,6 @@ class SettingInfoFragment : BaseFragment() {
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
-                }
-            }
-        }
-    }
-
-    private fun submitUserObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.setInfoUiState.collect {
                     if (it.isSubmit) {
                         viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
                             startHomeActivity()

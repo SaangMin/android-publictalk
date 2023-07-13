@@ -65,8 +65,7 @@ class LoginFragment : BaseFragment() {
         binding.btnLogin.setOnClickListener {
             beginLogin(oneTapLauncher, legacyLauncher)
         }
-        existUserEmailObserver()
-        googleLoginObserver()
+        setLoginUiState()
     }
 
     private fun setGoogleLoginService() {
@@ -147,7 +146,7 @@ class LoginFragment : BaseFragment() {
             }
     }
 
-    private fun googleLoginObserver() {
+    private fun setLoginUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.loginUiState.collect {
@@ -173,15 +172,6 @@ class LoginFragment : BaseFragment() {
                                 }
                         }
                     }
-                }
-            }
-        }
-    }
-
-    private fun existUserEmailObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loginUiState.collect {
                     if (it.isExist == true) {
                         Toast.makeText(
                             requireContext(),
