@@ -57,7 +57,6 @@ class SearchingFragment : BaseFragment() {
                             getString(R.string.already_friend_msg),
                             Snackbar.LENGTH_SHORT
                         ).show()
-                        findNavController().navigateUp()
                     }
                     if (it.isAddedFriend) {
                         Snackbar.make(
