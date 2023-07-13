@@ -182,7 +182,7 @@ class LoginFragment : BaseFragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.loginUiState.collect {
-                    if (it.isExist) {
+                    if (it.isExist == true) {
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.exist_user_info_msg),

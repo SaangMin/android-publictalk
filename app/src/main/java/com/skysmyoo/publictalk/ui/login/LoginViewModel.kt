@@ -15,6 +15,7 @@ import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +30,7 @@ data class SetInfoUiState(
 
 data class LoginUiState(
     val isGoogleLogin: Boolean = false,
-    val isExist: Boolean = false,
+    val isExist: Boolean? = null,
 )
 
 data class SplashUiState(
@@ -75,7 +76,7 @@ class LoginViewModel @Inject constructor(
         _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = true)
         val profileImageFlow = repository.uploadImage(imageUri).stateIn(viewModelScope)
         val user = User(
-            userEmail = FirebaseData.user?.email ?: "",
+            userEmail = FirebaseData.user?.email ?: return,
             userName = name.value ?: "",
             userPhoneNumber = phoneNumber.value ?: "",
             userProfileImage = profileImageFlow.value,
@@ -110,21 +111,22 @@ class LoginViewModel @Inject constructor(
             val response = repository.getExistUser(email)
             if (response is ApiResultSuccess) {
                 val user = response.data.values.first()
-                Log.d(TAG,"$user")
+                Log.d(TAG, "$user")
                 setUserInfo()
                 FirebaseData.getIdToken({
                     viewModelScope.launch {
-                        Log.d(TAG,"viewModelScope Start")
-                        repository.updateUser(it, user)
-                        repository.updateFriends(user, user.userFriendIdList)
-                        repository.updateChatRooms(it, user.userEmail)
+                        repository.updateUser(it, user).collect()
+                        repository.updateFriends(user, user.userFriendIdList).collect()
+                        repository.updateChatRooms(it, user.userEmail).collect()
                         _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                        _loginUiState.value = _loginUiState.value.copy(isExist = true)
                     }
                 }, {
                     viewModelScope.launch {
                         val originUser = repository.getMyInfo()
                         if (originUser != null) {
                             _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                            _loginUiState.value = _loginUiState.value.copy(isExist = true)
                         }
                     }
                 })
@@ -135,14 +137,15 @@ class LoginViewModel @Inject constructor(
     }
 
     fun localLogin() {
-        Log.d(TAG,"localLogin Start")
         viewModelScope.launch {
             val user = repository.getMyInfo()
             if (user != null) {
                 _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                _loginUiState.value = _loginUiState.value.copy(isExist = true)
             } else {
                 _splashUiState.value = _splashUiState.value.copy(isExist = false)
-                _loginUiState.value = _loginUiState.value.copy(isGoogleLogin = true)
+                _loginUiState.value =
+                    _loginUiState.value.copy(isGoogleLogin = true, isExist = false)
             }
         }
     }
