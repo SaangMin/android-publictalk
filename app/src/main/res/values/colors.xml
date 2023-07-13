@@ -10,4 +10,5 @@
     <color name="gray">#757373</color>
     <color name="color_submit">#6A5E2F</color>
     <color name="color_message_box">#D9D9D9</color>
+    <color name="color_loading_bg">#80000000</color>
 </resources>
