@@ -32,3 +32,12 @@ fun isReading(view: TextView, isReading: Boolean) {
         view.visibility = View.VISIBLE
     }
 }
+
+@BindingAdapter("isLoading")
+fun isLoading(view: View, isLoading: Boolean) {
+    if (isLoading) {
+        view.visibility = View.VISIBLE
+    } else {
+        view.visibility = View.GONE
+    }
+}
