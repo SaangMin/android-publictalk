@@ -117,7 +117,7 @@ class LoginViewModel @Inject constructor(
                     viewModelScope.launch {
                         repository.updateUser(it, user).collect()
                         repository.updateFriends(user, user.userFriendIdList).collect()
-                        repository.updateChatRooms(it, user.userEmail).collect()
+                        repository.updateChatRooms(it, user.userEmail)
                         _splashUiState.value = _splashUiState.value.copy(isExist = true)
                         _loginUiState.value = _loginUiState.value.copy(isExist = true)
                     }
