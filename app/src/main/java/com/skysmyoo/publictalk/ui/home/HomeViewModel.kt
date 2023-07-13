@@ -12,18 +12,24 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+
+data class FriendListUiState(
+    val adapterItemList: List<FriendListScreenData> = emptyList(),
+    val isFriendClicked: Boolean = false,
+    val isMyInfoClicked: Boolean = false,
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _adapterItemList = MutableLiveData<Event<List<FriendListScreenData>>>()
-    val adapterItemList: LiveData<Event<List<FriendListScreenData>>> = _adapterItemList
     private val _chatRoomClickEvent = MutableLiveData<Event<Unit>>()
     val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
     private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
@@ -32,14 +38,13 @@ class HomeViewModel @Inject constructor(
     val notExistChatRoom: LiveData<Event<Unit>> = _notExistChatRoom
     private val _foundChatRoom = MutableLiveData<Event<ChatRoom>>()
     val foundChatRoom: LiveData<Event<ChatRoom>> = _foundChatRoom
-    private val _friendClickEvent = MutableLiveData<Event<Unit>>()
-    val friendClickEvent: LiveData<Event<Unit>> = _friendClickEvent
-    private val _myInfoClickEvent = MutableLiveData<Event<Unit>>()
-    val myInfoClickEvent: LiveData<Event<Unit>> = _myInfoClickEvent
     private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
     val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
     private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
     val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
+
+    private val _friendListUiState = MutableStateFlow(FriendListUiState())
+    val friendListUiState: StateFlow<FriendListUiState> = _friendListUiState
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -57,9 +62,9 @@ class HomeViewModel @Inject constructor(
             if (friendList.isNotEmpty()) {
                 val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
                 itemList.addAll(friendListScreenData)
-                _adapterItemList.value = Event(itemList)
+                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
             } else {
-                _adapterItemList.value = Event(itemList)
+                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
             }
         }
     }
@@ -101,10 +106,12 @@ class HomeViewModel @Inject constructor(
 
     fun onClickFriend(friend: User) {
         if (friend.userEmail == getMyEmail()) {
-            _myInfoClickEvent.value = Event(Unit)
+            _friendListUiState.value = _friendListUiState.value.copy(isMyInfoClicked = true)
+            _friendListUiState.value = _friendListUiState.value.copy(isMyInfoClicked = false)
         } else {
             clickedFriend = friend
-            _friendClickEvent.value = Event(Unit)
+            _friendListUiState.value = _friendListUiState.value.copy(isFriendClicked = true)
+            _friendListUiState.value = _friendListUiState.value.copy(isFriendClicked = false)
         }
     }
 

@@ -3,13 +3,17 @@ package com.skysmyoo.publictalk.ui.home.friend
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.databinding.FragmentFriendListBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
-import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FriendListFragment : BaseFragment() {
@@ -26,32 +30,38 @@ class FriendListFragment : BaseFragment() {
         friendListAdapter = FriendListAdapter(viewModel)
         binding.rvFriendList.adapter = friendListAdapter
         viewModel.setAdapterItemList(getString(R.string.mine), getString(R.string.friend_label))
-        adapterItemListObserver()
-        friendClickEventObserver()
-        myInfoClickEventObserver()
+        setFriendListUiState()
     }
 
-    private fun adapterItemListObserver() {
-        viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
-            friendListAdapter.submitList(it)
-        })
-    }
-
-    private fun friendClickEventObserver() {
-        viewModel.friendClickEvent.observe(viewLifecycleOwner, EventObserver {
-            val friend = viewModel.clickedFriend
-            if(friend != null) {
-                val action = FriendListFragmentDirections.actionFriendListToFriendInfo(friend)
-                findNavController().navigate(action)
+    private fun setFriendListUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.friendListUiState.collect {
+                    if (it.isFriendClicked) {
+                        val friend = viewModel.clickedFriend
+                        if (friend != null) {
+                            showFriendInfo(friend)
+                        }
+                    }
+                    if(it.isMyInfoClicked) {
+                        showSettingFragment()
+                    }
+                    if (it.adapterItemList.isNotEmpty()) {
+                        friendListAdapter.submitList(it.adapterItemList)
+                    }
+                }
             }
-        })
+        }
     }
 
-    private fun myInfoClickEventObserver() {
-        viewModel.myInfoClickEvent.observe(viewLifecycleOwner, EventObserver {
-            val action = FriendListFragmentDirections.actionFriendListToSetting()
-            findNavController().navigate(action)
-        })
+    private fun showFriendInfo(friend: User) {
+        val action = FriendListFragmentDirections.actionFriendListToFriendInfo(friend)
+        findNavController().navigate(action)
+    }
+
+    private fun showSettingFragment() {
+        val action = FriendListFragmentDirections.actionFriendListToSetting()
+        findNavController().navigate(action)
     }
 
     companion object {
