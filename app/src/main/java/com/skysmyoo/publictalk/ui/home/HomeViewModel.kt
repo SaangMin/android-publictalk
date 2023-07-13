@@ -26,8 +26,19 @@ class HomeViewModel @Inject constructor(
     val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
     private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
     val chatRoomList: LiveData<Event<List<ChatRoom>>> = _chatRoomList
+    private val _notExistChatRoom = MutableLiveData<Event<Unit>>()
+    val notExistChatRoom: LiveData<Event<Unit>> = _notExistChatRoom
+    private val _foundChatRoom = MutableLiveData<Event<ChatRoom>>()
+    val foundChatRoom: LiveData<Event<ChatRoom>> = _foundChatRoom
+    private val _friendClickEvent = MutableLiveData<Event<Unit>>()
+    val friendClickEvent: LiveData<Event<Unit>> = _friendClickEvent
+    private val _myInfoClickEvent = MutableLiveData<Event<Unit>>()
+    val myInfoClickEvent: LiveData<Event<Unit>> = _myInfoClickEvent
+    private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
+    val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
 
     var clickedChatRoom: ChatRoom? = null
+    var clickedFriend: User? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
@@ -74,6 +85,34 @@ class HomeViewModel @Inject constructor(
     fun onClickChatRoom(chatRoom: ChatRoom) {
         clickedChatRoom = chatRoom
         _chatRoomClickEvent.value = Event(Unit)
+    }
+
+    fun onClickFriend(friend: User) {
+        if (friend.userEmail == getMyEmail()) {
+            _myInfoClickEvent.value = Event(Unit)
+        } else {
+            clickedFriend = friend
+            _friendClickEvent.value = Event(Unit)
+        }
+    }
+
+    fun getChatRoom(member: List<String>) {
+        viewModelScope.launch {
+            val chatRoom = repository.getChatRoom(member)
+            if (chatRoom == null) {
+                _notExistChatRoom.value = Event(Unit)
+            } else {
+                _foundChatRoom.value = Event(chatRoom)
+            }
+        }
+    }
+
+    fun removeFriend(friend: User) {
+        viewModelScope.launch {
+            val myInfo = repository.getMyInfo() ?: return@launch
+            repository.removeFriend(myInfo, friend)
+            _removeFriendEvent.value = Event(Unit)
+        }
     }
 
     companion object {

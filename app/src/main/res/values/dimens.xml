@@ -14,4 +14,6 @@
     <dimen name="margin_chat_room">16dp</dimen>
     <dimen name="padding_chat_room">8dp</dimen>
     <dimen name="margin_msg_box">16dp</dimen>
+    <dimen name="margin_friend_info">40dp</dimen>
+    <dimen name="margin_friend_info_button">80dp</dimen>
 </resources>

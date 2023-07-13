@@ -39,16 +39,21 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    fun updateIsReadingForMessages(chatRoomKey: String) {
-        val myEmail = localDataSource.getMyEmail()
-        remoteDataSource.updateMemberListener(myEmail, chatRoomKey)
-    }
-
     fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
         remoteDataSource.chatListener(roomKey, receiveNewMessage)
     }
 
-    fun createNewMessage(chatRoom: ChatRoom, roomKey: String, messageBody: String, sendMessage: (Message) -> Unit) {
+    fun enterChatting(roomKey: String, myIdKey: String) {
+        val email = localDataSource.getMyEmail()
+        remoteDataSource.enterChatting(roomKey, myIdKey, email)
+    }
+
+    fun createNewMessage(
+        chatRoom: ChatRoom,
+        roomKey: String,
+        messageBody: String,
+        sendMessage: (Message) -> Unit
+    ) {
         val myEmail = localDataSource.getMyEmail()
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
 

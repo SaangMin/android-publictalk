@@ -42,6 +42,17 @@ class UserRepository @Inject constructor(
         return userLocalDataSource.getMyLocale()
     }
 
+    suspend fun getChatRoom(member: List<String>): ChatRoom? {
+        val chatRoomList = chatLocalDataSource.getChatRoomList() ?: return null
+        for (chatRoom in chatRoomList) {
+            val chatRoomMember = chatRoom.member.map { it.userEmail }
+            if (member == chatRoomMember) {
+                return chatRoom
+            }
+        }
+        return null
+    }
+
     fun clearMyData() {
         return userLocalDataSource.clearMyData()
     }
@@ -103,6 +114,11 @@ class UserRepository @Inject constructor(
     suspend fun addFriend(myInfo: User, friend: User) {
         userRemoteDataSource.addFriend(myInfo.userEmail, friend.userEmail)
         userLocalDataSource.addFriend(myInfo, friend)
+    }
+
+    suspend fun removeFriend(myInfo: User, friend: User) {
+        userRemoteDataSource.removeFriend(myInfo.userEmail, friend.userEmail)
+        userLocalDataSource.removeFriend(myInfo, friend)
     }
 
     companion object {

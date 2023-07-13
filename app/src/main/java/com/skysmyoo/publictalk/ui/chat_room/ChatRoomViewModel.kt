@@ -108,11 +108,15 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun updateIsReadingForMessages() {
-        chatRepository.updateIsReadingForMessages(chatRoomKey.value.toString())
+    fun enterChatting(chatRoom: ChatRoom) {
+        val roomKey = chatRoomKey.value ?: return
+        val myIdKey =
+            chatRoom.member.indexOfFirst { member -> member.userEmail == getMyEmail() }
+                .toString()
+        chatRepository.enterChatting(roomKey, myIdKey)
     }
 
-    fun enterChatting(chatRoom: ChatRoom) {
+    fun setIsNotChatting(chatRoom: ChatRoom) {
         val roomKey = chatRoomKey.value ?: return
         val myIdKey =
             chatRoom.member.indexOfFirst { member -> member.userEmail == getMyEmail() }
@@ -121,8 +125,7 @@ class ChatRoomViewModel @Inject constructor(
             FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS).child(roomKey)
                 .child(PATH_MEMBER).child(myIdKey)
 
-        chatRoomRef.child(PATH_IS_CHATTING).setValue(true)
-        chatRoomRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
+        chatRoomRef.child(PATH_IS_CHATTING).setValue(false)
     }
 
     companion object {

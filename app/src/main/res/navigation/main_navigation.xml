@@ -9,10 +9,16 @@
         android:id="@+id/navigation_friend_list"
         android:name="com.skysmyoo.publictalk.ui.home.friend.FriendListFragment"
         android:label="@string/navigation_friend_list_label"
-        tools:layout="@layout/fragment_friend_list" >
+        tools:layout="@layout/fragment_friend_list">
         <action
             android:id="@+id/action_friend_list_to_searching"
             app:destination="@id/navigation_searching" />
+        <action
+            android:id="@+id/action_friend_list_to_friend_info"
+            app:destination="@id/navigation_friend_info" />
+        <action
+            android:id="@+id/action_friend_list_to_setting"
+            app:destination="@id/navigation_setting" />
     </fragment>
 
     <fragment
@@ -56,5 +62,17 @@
         android:name="com.skysmyoo.publictalk.ui.searching.SearchingFragment"
         android:label="@string/navigation_searching_label"
         tools:layout="@layout/fragment_searching" />
+    <dialog
+        android:id="@+id/navigation_friend_info"
+        android:name="com.skysmyoo.publictalk.ui.home.friend.FriendInfoDialogFragment"
+        android:label="@string/navigation_friend_info_label"
+        tools:layout="@layout/dialog_friend_info">
+        <argument
+            android:name="user"
+            app:argType="com.skysmyoo.publictalk.data.model.remote.User" />
+        <action
+            android:id="@+id/action_friend_info_to_chat_room"
+            app:destination="@id/navigation_chat_room" />
+    </dialog>
 
 </navigation>
