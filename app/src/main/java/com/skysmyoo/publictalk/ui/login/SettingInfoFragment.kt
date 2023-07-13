@@ -19,7 +19,6 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
-import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -32,7 +31,6 @@ class SettingInfoFragment : BaseFragment() {
     private lateinit var pickImage: ActivityResultLauncher<String>
     private var imageUri: Uri? = null
     private var userLanguage: Language? = null
-    private val loadingDialog by lazy { LoadingDialogFragment() }
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +45,6 @@ class SettingInfoFragment : BaseFragment() {
         binding.viewModel = viewModel
         setSpinner()
         onProfileImageClickObserver()
-        isLoadingObserver()
         submitRequiredObserver()
         submitUserObserver()
         failedMessageObserver()
@@ -56,23 +53,9 @@ class SettingInfoFragment : BaseFragment() {
     private fun onProfileImageClickObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.addImageEvent.collect {
-                    pickImage.launch("image/*")
-                }
-            }
-        }
-    }
-
-    private fun isLoadingObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isLoading.collect {
-                    if (it) {
-                        loadingDialog.show(parentFragmentManager, TAG)
-                    } else {
-                        if (loadingDialog.isAdded) {
-                            loadingDialog.dismiss()
-                        }
+                viewModel.setInfoUiState.collect {
+                    if (it.isImageClicked) {
+                        pickImage.launch("image/*")
                     }
                 }
             }
@@ -82,8 +65,14 @@ class SettingInfoFragment : BaseFragment() {
     private fun failedMessageObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.failedMessage.collect {
-                    Snackbar.make(binding.root, getString(R.string.join_fail_error_msg), Snackbar.LENGTH_SHORT).show()
+                viewModel.setInfoUiState.collect {
+                    if (it.isFailed) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.join_fail_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -92,12 +81,14 @@ class SettingInfoFragment : BaseFragment() {
     private fun submitRequiredObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.notRequiredEvent.collect {
-                    Snackbar.make(
-                        binding.root,
-                        getString(R.string.not_required_error_msg),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                viewModel.setInfoUiState.collect {
+                    if (it.isNotRequired) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.not_required_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -106,9 +97,11 @@ class SettingInfoFragment : BaseFragment() {
     private fun submitUserObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.submitEvent.collect {
-                    viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
-                        startHomeActivity()
+                viewModel.setInfoUiState.collect {
+                    if (it.isSubmit) {
+                        viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
+                            startHomeActivity()
+                        }
                     }
                 }
             }

@@ -12,6 +12,7 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class HomeViewModel @Inject constructor(
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
             val myInfo = repository.getMyInfo() ?: return@launch
-            val friendList = repository.getFriends()
+            val friendList = repository.getFriends().stateIn(viewModelScope).value
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),
@@ -64,24 +65,25 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getOtherUser(chatRoom: ChatRoom): User? {
-        val friendList = runBlocking { repository.getFriends() }
+        val friendList = runBlocking { repository.getFriends().stateIn(viewModelScope).value }
         val otherUserEmail = chatRoom.member.map { it.userEmail }.find { it != getMyEmail() }
         return friendList.find { it.userEmail == otherUserEmail }
     }
 
     fun getChatRooms() {
         viewModelScope.launch {
-            val localChatRoom = repository.getChatRooms()
+            val localChatRoom = repository.getChatRooms().stateIn(viewModelScope).value
             _chatRoomList.value = Event(localChatRoom)
             val myEmail = getMyEmail()
             FirebaseData.getIdToken({
                 viewModelScope.launch {
-                    val chatRoomList = repository.updateChatRooms(it, myEmail)
+                    val chatRoomList =
+                        repository.updateChatRooms(it, myEmail).stateIn(viewModelScope).value
                     _chatRoomList.value = Event(chatRoomList)
                 }
             }, {
                 viewModelScope.launch {
-                    val chatRoomList = repository.getChatRooms()
+                    val chatRoomList = repository.getChatRooms().stateIn(viewModelScope).value
                     _chatRoomList.value = Event(chatRoomList)
                 }
             })
@@ -108,7 +110,7 @@ class HomeViewModel @Inject constructor(
 
     fun getChatRoom(member: List<String>) {
         viewModelScope.launch {
-            val chatRoom = repository.getChatRoom(member)
+            val chatRoom = repository.getChatRoom(member).stateIn(viewModelScope).value
             if (chatRoom == null) {
                 _notExistChatRoom.value = Event(Unit)
             } else {

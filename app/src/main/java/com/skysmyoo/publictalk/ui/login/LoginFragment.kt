@@ -150,23 +150,28 @@ class LoginFragment : BaseFragment() {
     private fun googleLoginObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.googleLoginEvent.collect {
-                    if (idToken != null) {
-                        val authCredential = GoogleAuthProvider.getCredential(idToken, null)
-                        firebaseAuth.signInWithCredential(authCredential)
-                            .addOnCompleteListener(requireActivity()) { task ->
-                                if (task.isSuccessful) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.login_success_msg),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    FirebaseData.setUserInfo()
-                                    setNavigation()
-                                } else {
-                                    Log.w(TAG, "signInWithCredential failed : ${task.exception}")
+                viewModel.loginUiState.collect {
+                    if (it.isGoogleLogin) {
+                        if (idToken != null) {
+                            val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+                            firebaseAuth.signInWithCredential(authCredential)
+                                .addOnCompleteListener(requireActivity()) { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            getString(R.string.login_success_msg),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        FirebaseData.setUserInfo()
+                                        setNavigation()
+                                    } else {
+                                        Log.w(
+                                            TAG,
+                                            "signInWithCredential failed : ${task.exception}"
+                                        )
+                                    }
                                 }
-                            }
+                        }
                     }
                 }
             }

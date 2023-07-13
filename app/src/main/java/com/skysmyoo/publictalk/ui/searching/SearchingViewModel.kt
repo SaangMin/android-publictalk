@@ -10,6 +10,7 @@ import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,7 +58,8 @@ class SearchingViewModel @Inject constructor(
     fun addFriendButtonClick() {
         if (foundUser.value == null) return
         viewModelScope.launch {
-            val friendEmailList = repository.getFriends().map { it.userEmail }
+            val friendEmailList =
+                repository.getFriends().stateIn(viewModelScope).value.map { it.userEmail }
             if (friendEmailList.contains(searchingTargetEmail.value)) {
                 _alreadyFriendEvent.value = Event(Unit)
             } else {

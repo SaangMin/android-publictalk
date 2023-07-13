@@ -17,6 +17,7 @@ import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -62,8 +63,8 @@ class ChatRoomViewModel @Inject constructor(
         val chatMember = chatRoom.member
         val otherUserEmail = chatMember.map { it.userEmail }.find { it != getMyEmail() } ?: ""
         viewModelScope.launch {
-            val friend = userRepository.findFriend(otherUserEmail) ?: return@launch
-            _friendData.value = Event(friend)
+            val friend = userRepository.findFriend(otherUserEmail).stateIn(viewModelScope).value
+            _friendData.value = Event(friend!!)
         }
     }
 

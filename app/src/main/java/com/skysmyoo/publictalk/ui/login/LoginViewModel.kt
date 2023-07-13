@@ -16,75 +16,84 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SetInfoUiState(
+    val isLoading: Boolean = false,
+    val isFailed: Boolean = false,
+    val isImageClicked: Boolean = false,
+    val isSubmit: Boolean = false,
+    val isNotRequired: Boolean = false,
+)
+
+data class LoginUiState(
+    val isGoogleLogin: Boolean = false,
+)
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
 
-    private val _addImageEvent = MutableStateFlow(Unit)
-    val addImageEvent: StateFlow<Unit> = _addImageEvent
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-    private val _submitEvent = MutableStateFlow(Unit)
-    val submitEvent: StateFlow<Unit> = _submitEvent
-    private val _notRequiredEvent = MutableStateFlow(Unit)
-    val notRequiredEvent: StateFlow<Unit> = _notRequiredEvent
     private val _isExistUser = MutableSharedFlow<Boolean>()
     val isExistUser: SharedFlow<Boolean> = _isExistUser
-    private val _googleLoginEvent = MutableStateFlow(Unit)
-    val googleLoginEvent: StateFlow<Unit> = _googleLoginEvent
-    private val _failedMessage = MutableStateFlow(Unit)
-    val failedMessage: StateFlow<Unit> = _failedMessage
+
+    private val _setInfoUiState = MutableStateFlow(SetInfoUiState())
+    val setInfoUiState: StateFlow<SetInfoUiState> = _setInfoUiState
+
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState
 
     val name = MutableLiveData("")
     val phoneNumber = MutableLiveData("")
 
     fun onSubmitClick() {
         if (isEmptyContent()) {
-            _notRequiredEvent.value = Unit
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNotRequired = true)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNotRequired = false)
         } else {
-            _submitEvent.value = Unit
+            _setInfoUiState.value = _setInfoUiState.value.copy(isSubmit = true)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isSubmit = false)
         }
     }
 
     fun addImageClick() {
-        _addImageEvent.value = Unit
+        _setInfoUiState.value = _setInfoUiState.value.copy(isImageClicked = true)
+        _setInfoUiState.value = _setInfoUiState.value.copy(isImageClicked = false)
     }
 
-    fun submitUser(
-        imageUri: Uri?,
-        userLanguage: String,
+    suspend fun submitUser(
+        imageUri: Uri?, userLanguage: String,
         startHomeActivity: () -> Unit,
     ) {
+        _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = true)
+        val profileImageFlow = repository.uploadImage(imageUri).stateIn(viewModelScope)
+        val user = User(
+            userEmail = FirebaseData.user?.email ?: "",
+            userName = name.value ?: "",
+            userPhoneNumber = phoneNumber.value ?: "",
+            userProfileImage = profileImageFlow.value,
+            userLanguage = userLanguage,
+            userDeviceToken = token ?: "",
+            userFriendIdList = emptyList(),
+            userCreatedAt = TimeUtil.getCurrentDateString()
+        )
         FirebaseData.getIdToken({ idToken ->
             viewModelScope.launch {
-                _isLoading.value = true
-                val profileImage = repository.uploadImage(imageUri)
-                val user = User(
-                    userEmail = FirebaseData.user?.email ?: "",
-                    userName = name.value ?: "",
-                    userPhoneNumber = phoneNumber.value ?: "",
-                    userProfileImage = profileImage,
-                    userLanguage = userLanguage,
-                    userDeviceToken = token ?: "",
-                    userFriendIdList = listOf("iu@gmail.com"),
-                    userCreatedAt = TimeUtil.getCurrentDateString()
-                )
-                repository.putUser(idToken, user).run {
-                    if (this != null) {
-                        _isLoading.value = false
-                        startHomeActivity()
-                    } else {
-                        _isLoading.value = false
-                        _failedMessage.value = Unit
-                    }
+                val putUserFlow = repository.putUser(idToken, user).stateIn(viewModelScope)
+                if (putUserFlow.value != null) {
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = false)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = false)
+                    startHomeActivity()
+                } else {
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = false)
                 }
             }
         }, {
-            _failedMessage.value = Unit
+            _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
         })
     }
 
@@ -126,7 +135,7 @@ class LoginViewModel @Inject constructor(
                 _isExistUser.emit(true)
             } else {
                 _isExistUser.emit(false)
-                _googleLoginEvent.value = Unit
+                _loginUiState.value = _loginUiState.value.copy(isGoogleLogin = true)
             }
         }
     }
