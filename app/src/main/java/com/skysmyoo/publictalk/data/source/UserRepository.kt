@@ -21,8 +21,8 @@ class UserRepository @Inject constructor(
         userLocalDataSource.insertUser(user)
     }
 
-    suspend fun getMyInfo(email: String): User? {
-        return userLocalDataSource.getMyInfo(email)
+    suspend fun getMyInfo(): User? {
+        return userLocalDataSource.getMyInfo()
     }
 
     suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
@@ -54,7 +54,7 @@ class UserRepository @Inject constructor(
         return mapOf(userUid to user)
     }
 
-    private suspend fun addFriend(myInfo: User, friend: User) {
+    private suspend fun addLocalFriend(myInfo: User, friend: User) {
         userLocalDataSource.addFriend(myInfo, friend)
     }
 
@@ -68,7 +68,7 @@ class UserRepository @Inject constructor(
         userLocalDataSource.clearFriendsData()
         updatedFriendList.forEach {
             if (it != null) {
-                addFriend(myInfo, it)
+                addLocalFriend(myInfo, it)
             }
         }
         return updatedFriendList
@@ -93,6 +93,16 @@ class UserRepository @Inject constructor(
 
     suspend fun findFriend(email: String): User? {
         return userLocalDataSource.findFriend(email)
+    }
+
+    suspend fun searchFriendFromRemote(email: String): User? {
+        val userDataSnapshot = userRemoteDataSource.getExistUser(email)
+        return userDataSnapshot?.getValue(User::class.java)
+    }
+
+    suspend fun addFriend(myInfo: User, friend: User) {
+        userRemoteDataSource.addFriend(myInfo.userEmail, friend.userEmail)
+        userLocalDataSource.addFriend(myInfo, friend)
     }
 
     companion object {

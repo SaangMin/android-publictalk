@@ -21,8 +21,9 @@ class UserLocalDataSource @Inject constructor(
         setUserInfo()
     }
 
-    suspend fun getMyInfo(email: String): User? {
-        return userModelDao.getMyInfo(email)
+    suspend fun getMyInfo(): User? {
+        val myEmail = preferencesManager.getMyEmail() ?: ""
+        return userModelDao.getMyInfo(myEmail)
     }
 
     suspend fun clearUser() {

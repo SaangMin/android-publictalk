@@ -31,8 +31,7 @@ class HomeViewModel @Inject constructor(
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
-            val myEmail = repository.getMyEmail() ?: return@launch
-            val myInfo = repository.getMyInfo(myEmail) ?: return@launch
+            val myInfo = repository.getMyInfo() ?: return@launch
             val friendList = repository.getFriends()
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),

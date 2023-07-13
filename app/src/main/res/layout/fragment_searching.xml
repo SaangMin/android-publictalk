@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.searching.SearchingViewModel" />
+
+        <variable
+            name="foundUser"
+            type="com.skysmyoo.publictalk.data.model.remote.User" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,6 +26,7 @@
             android:layout_height="wrap_content"
             android:autofillHints="no"
             android:hint="@string/input_email"
+            android:text="@={viewModel.searchingTargetEmail}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -24,12 +36,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:background="@color/color_bn_background"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_searching_email">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/iv_searching_profile"
+                profileImage="@{foundUser.userProfileImage}"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_margin="@dimen/margin_friend_item"
@@ -46,12 +61,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_friend_item"
+                android:text="@{foundUser.userName}"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_searching_profile"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/friend_name_sample" />
+
+            <Button
+                android:id="@+id/btn_searching_add_friend"
+                android:backgroundTint="@color/color_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:onClick="@{()->viewModel.addFriendButtonClick()}"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/add_friend"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -60,6 +88,7 @@
             style="@style/MySearchingTextViewStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:onClick="@{()->viewModel.searchingFriend()}"
             android:text="@string/search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
