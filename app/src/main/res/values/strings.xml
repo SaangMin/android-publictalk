@@ -53,4 +53,9 @@
     <string name="chat_room_title_sample">Steve</string>
     <string name="message_box_not_reading_count">1</string>
     <string name="empty_message_error">Please enter your message.</string>
+    <string name="navigation_searching_label">SearchingFriendScreen</string>
+    <string name="searching_friend">Search Friend</string>
+    <string name="input_email">Input Email.</string>
+    <string name="search">Search</string>
+    <string name="searched_friend_profile">Searched Friend Profile Image</string>
 </resources>
