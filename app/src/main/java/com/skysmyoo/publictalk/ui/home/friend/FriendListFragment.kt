@@ -43,7 +43,7 @@ class FriendListFragment : BaseFragment() {
                             showFriendInfo(friend)
                         }
                     }
-                    if(it.isMyInfoClicked) {
+                    if (it.isMyInfoClicked) {
                         showSettingFragment()
                     }
                     if (it.adapterItemList.isNotEmpty()) {
@@ -55,13 +55,17 @@ class FriendListFragment : BaseFragment() {
     }
 
     private fun showFriendInfo(friend: User) {
-        val action = FriendListFragmentDirections.actionFriendListToFriendInfo(friend)
-        findNavController().navigate(action)
+        if (findNavController().currentDestination?.id == R.id.navigation_friend_list) {
+            val action = FriendListFragmentDirections.actionFriendListToFriendInfo(friend)
+            findNavController().navigate(action)
+        }
     }
 
     private fun showSettingFragment() {
-        val action = FriendListFragmentDirections.actionFriendListToSetting()
-        findNavController().navigate(action)
+        if (findNavController().currentDestination?.id == R.id.navigation_friend_list) {
+            val action = FriendListFragmentDirections.actionFriendListToSetting()
+            findNavController().navigate(action)
+        }
     }
 
     companion object {
