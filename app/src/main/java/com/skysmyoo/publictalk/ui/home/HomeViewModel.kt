@@ -6,11 +6,14 @@ import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -22,7 +25,6 @@ data class FriendListUiState(
 )
 
 data class ChatListUiState(
-    val chatRoomList: List<ChatRoom> = emptyList(),
     val isChatRoomClicked: Boolean = false,
 )
 
@@ -46,6 +48,12 @@ class HomeViewModel @Inject constructor(
 
     private val _friendInfoUiState = MutableStateFlow(FriendInfoUiState())
     val friendInfoUiState: StateFlow<FriendInfoUiState> = _friendInfoUiState
+
+    val chatRoomList: StateFlow<List<ChatRoom>> = transformChatList().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -71,30 +79,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun transformChatList(): Flow<List<ChatRoom>> = repository.getRemoteChatRooms().map {
+        it.sortedByDescending { chatRoom ->
+            chatRoom.messages.values.lastOrNull()?.createdAt ?: chatRoom.chatCreatedAt
+        }
+    }
+
     fun getOtherUser(chatRoom: ChatRoom): User? {
         val friendList = runBlocking { repository.getFriends() }
         val otherUserEmail = chatRoom.member.map { it.userEmail }.find { it != getMyEmail() }
         return friendList.find { it.userEmail == otherUserEmail }
-    }
-
-    fun getChatRooms() {
-        viewModelScope.launch {
-            val localChatRoom = repository.getChatRooms()
-            _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = localChatRoom)
-            val myEmail = getMyEmail()
-            FirebaseData.getIdToken({
-                viewModelScope.launch {
-                    val chatRoomList =
-                        repository.updateChatRooms(it, myEmail)
-                    _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = chatRoomList)
-                }
-            }, {
-                viewModelScope.launch {
-                    val chatRoomList = repository.getChatRooms()
-                    _chatListUiState.value = _chatListUiState.value.copy(chatRoomList = chatRoomList)
-                }
-            })
-        }
     }
 
     fun getMyEmail(): String {

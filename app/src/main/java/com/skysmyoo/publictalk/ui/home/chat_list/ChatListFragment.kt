@@ -27,19 +27,22 @@ class ChatListFragment : BaseFragment() {
 
         adapter = ChatRoomListAdapter(viewModel)
         binding.rvChatList.adapter = adapter
-        viewModel.getChatRooms()
         setChatListUiState()
     }
 
     private fun setChatListUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.chatListUiState.collect {
-                    if (it.chatRoomList.isNotEmpty()) {
-                        adapter.submitList(it.chatRoomList)
+                launch {
+                    viewModel.chatListUiState.collect {
+                        if (it.isChatRoomClicked) {
+                            navigateChatRoom()
+                        }
                     }
-                    if (it.isChatRoomClicked) {
-                        navigateChatRoom()
+                }
+                launch {
+                    viewModel.chatRoomList.collect {
+                        adapter.submitList(it)
                     }
                 }
             }

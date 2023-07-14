@@ -6,6 +6,7 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
@@ -90,6 +91,31 @@ class UserRepository @Inject constructor(
             }
 
             else -> chatLocalDataSource.getChatRoomList() ?: emptyList()
+        }
+    }
+
+    fun getRemoteChatRooms(): Flow<List<ChatRoom>> {
+        return flow {
+            emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            val authToken = FirebaseData.authToken ?: return@flow emit(
+                chatLocalDataSource.getChatRoomList() ?: emptyList()
+            )
+            val email = userLocalDataSource.getMyEmail()
+                ?: return@flow emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            when (val response = chatRemoteDataSource.getChatRooms(authToken)) {
+                is ApiResultSuccess -> {
+                    val chatRooms = response.data.filterValues {
+                        it.member.map { member -> member.userEmail }.contains(email)
+                    }
+                    chatLocalDataSource.clearChatRooms()
+                    chatRooms.values.forEach {
+                        chatLocalDataSource.insertChatRoom(it)
+                    }
+                    emit(chatRooms.values.toList())
+                }
+
+                else -> emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            }
         }
     }
 
