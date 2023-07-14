@@ -10,6 +10,8 @@ import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_MESSAGES
 import com.skysmyoo.publictalk.utils.TimeUtil
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ChatRepository @Inject constructor(
@@ -49,6 +51,27 @@ class ChatRepository @Inject constructor(
 
     fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
         remoteDataSource.chatListener(roomKey, receiveNewMessage)
+    }
+
+    fun getMessages(chatRoom: ChatRoom): Flow<Message> {
+        return flow {
+            val member = chatRoom.member.map { it.userEmail }
+            localDataSource.getChatRoomMessage(member).values.forEach {
+                emit(it)
+            }
+            when (val roomKeyResponse = remoteDataSource.getChatRoomKey(member)) {
+                is ApiResultSuccess -> {
+                    val roomKey = roomKeyResponse.data
+                    remoteDataSource.chatListenerFlow(roomKey).collect {
+                        emit(it)
+                    }
+                }
+
+                else -> localDataSource.getChatRoomMessage(member).values.forEach {
+                    emit(it)
+                }
+            }
+        }
     }
 
     fun enterChatting(roomKey: String, myIdKey: String) {

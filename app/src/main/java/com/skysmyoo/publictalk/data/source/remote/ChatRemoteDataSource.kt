@@ -16,6 +16,9 @@ import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
 import com.skysmyoo.publictalk.utils.Constants.PATH_READING
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -97,6 +100,30 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                 Log.e(TAG, "DataSnapshotCancelled: $error")
             }
         })
+    }
+
+    fun chatListenerFlow(roomKey: String): Flow<Message> = callbackFlow {
+        val messageRef = chatRoomRef.child(roomKey).child(Constants.PATH_MESSAGES)
+
+        val childEventListener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val isMessageReading =
+                    snapshot.child(Constants.PATH_READING).getValue(Boolean::class.java) ?: false
+                val message = snapshot.getValue(Message::class.java) ?: return
+                message.reading = isMessageReading
+                if (message.sender.isEmpty() || message.receiver.isEmpty()) return
+                trySend(message).isSuccess
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "DataSnapshotCancelled: $error")
+            }
+        }
+        messageRef.addChildEventListener(childEventListener)
+        awaitClose { messageRef.removeEventListener(childEventListener) }
     }
 
     fun memberStatusListener(

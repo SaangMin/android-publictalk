@@ -1,13 +1,11 @@
 package com.skysmyoo.publictalk.ui.chat_room
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
-import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
@@ -15,7 +13,6 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
-import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,33 +32,33 @@ class ChatRoomViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
-    private val _adapterItemList = MutableLiveData<Event<List<MessageBox>>>()
-    val adapterItemList: LiveData<Event<List<MessageBox>>> = _adapterItemList
-    private val _newMessage = MutableLiveData<Event<MessageBox>>()
-    val newMessage: LiveData<Event<MessageBox>> = _newMessage
+    private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
+    val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
 
     private val _chatRoomUiState = MutableStateFlow(ChatRoomUiState())
     val chatRoomUiState: StateFlow<ChatRoomUiState> = _chatRoomUiState
 
     val messageBody = MutableLiveData<String>()
     var currentChatRoomKey = ""
-    var foundFriend: User? = null
 
     fun getMyEmail(): String {
         return userRepository.getMyEmail() ?: ""
     }
 
-    fun setAdapterItemList(messageList: List<Message>) {
+    fun messageListener(chatRoom: ChatRoom) {
         val myEmail = getMyEmail()
-        val resultMessageList = mutableListOf<MessageBox>()
-        messageList.sortedBy { it.createdAt }.forEach {
-            if (it.sender == myEmail) {
-                resultMessageList.add(MessageBox.SenderMessageBox(it))
-            } else {
-                resultMessageList.add(MessageBox.ReceiverMessageBox(it))
+        viewModelScope.launch {
+            chatRepository.getMessages(chatRoom).collect { message ->
+                val messageBox = if (message.sender == myEmail) {
+                    MessageBox.SenderMessageBox(message)
+                } else {
+                    MessageBox.ReceiverMessageBox(message)
+                }
+                if (!_adapterItemList.value.contains(messageBox)) {
+                    _adapterItemList.value = _adapterItemList.value + messageBox
+                }
             }
         }
-        _adapterItemList.value = Event(resultMessageList)
     }
 
     fun findFriend(chatRoom: ChatRoom) {
@@ -69,7 +66,6 @@ class ChatRoomViewModel @Inject constructor(
         val otherUserEmail = chatMember.map { it.userEmail }.find { it != getMyEmail() } ?: ""
         viewModelScope.launch {
             val friend = userRepository.findFriend(otherUserEmail)
-            foundFriend = friend
             _chatRoomUiState.value = _chatRoomUiState.value.copy(otherUser = friend)
         }
     }
@@ -105,25 +101,6 @@ class ChatRoomViewModel @Inject constructor(
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = true)
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = false)
             }
-        }
-    }
-
-    fun listenForChat(chatRoom: ChatRoom, roomKey: String) {
-        viewModelScope.launch {
-            chatRepository.chatListener(roomKey) {
-                if (!chatRoom.messages.values.toList().contains(it)) {
-                    val newMessage = convertToMessage(it)
-                    _newMessage.value = Event(newMessage)
-                }
-            }
-        }
-    }
-
-    private fun convertToMessage(message: Message): MessageBox {
-        return if (message.sender == getMyEmail()) {
-            MessageBox.SenderMessageBox(message)
-        } else {
-            MessageBox.ReceiverMessageBox(message)
         }
     }
 

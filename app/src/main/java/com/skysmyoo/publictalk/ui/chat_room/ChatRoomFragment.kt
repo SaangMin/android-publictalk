@@ -15,7 +15,6 @@ import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.FragmentChatRoomBinding
-import com.skysmyoo.publictalk.utils.EventObserver
 import kotlinx.coroutines.launch
 
 class ChatRoomFragment : BaseFragment() {
@@ -35,10 +34,7 @@ class ChatRoomFragment : BaseFragment() {
 
         adapter = ChatRoomAdapter(viewModel)
         setLayout()
-        viewModel.setAdapterItemList(chatRoomInfo.messages.values.toList())
         viewModel.getRoomKey(chatRoomInfo)
-        messageListObserver()
-        newMessageObserver()
         setChatRoomUiState()
         binding.btnChatRoomSend.setOnClickListener {
             onSendMessage()
@@ -74,8 +70,7 @@ class ChatRoomFragment : BaseFragment() {
                     viewModel.chatRoomUiState.collect {
                         if (it.isGetChatRoomKey) {
                             viewModel.enterChatting(chatRoomInfo)
-                            val currentChatRoomKey = viewModel.currentChatRoomKey
-                            viewModel.listenForChat(chatRoomInfo, currentChatRoomKey)
+                            viewModel.messageListener(chatRoomInfo)
                         }
                         if (it.otherUser != null) {
                             binding.abChatRoom.title = it.otherUser.userName
@@ -96,22 +91,13 @@ class ChatRoomFragment : BaseFragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.adapterItemList.collect {
+                        adapter.submitList(it)
+                    }
+                }
             }
         }
-    }
-
-    private fun messageListObserver() {
-        viewModel.adapterItemList.observe(viewLifecycleOwner, EventObserver {
-            adapter.submitList(it)
-        })
-    }
-
-    private fun newMessageObserver() {
-        viewModel.newMessage.observe(viewLifecycleOwner, EventObserver {
-            val currentList = adapter.currentList.toMutableList()
-            currentList.add(it)
-            adapter.submitList(currentList)
-        })
     }
 
     private fun onSendMessage() {
