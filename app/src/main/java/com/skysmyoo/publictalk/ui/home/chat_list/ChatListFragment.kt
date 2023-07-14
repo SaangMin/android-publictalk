@@ -51,7 +51,7 @@ class ChatListFragment : BaseFragment() {
 
     private fun navigateChatRoom() {
         val clickedChatRoom = viewModel.clickedChatRoom
-        if (clickedChatRoom != null) {
+        if (clickedChatRoom != null && findNavController().currentDestination?.id == R.id.navigation_chat_list) {
             val action = ChatListFragmentDirections.actionChatListToChatRoom(clickedChatRoom)
             findNavController().navigate(action)
         }

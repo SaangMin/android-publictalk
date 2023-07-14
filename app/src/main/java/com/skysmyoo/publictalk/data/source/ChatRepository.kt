@@ -47,21 +47,6 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getChatRooms(auth: String, email: String): List<ChatRoom> {
-        return when (val response = remoteDataSource.getChatRooms(auth)) {
-            is ApiResultSuccess -> {
-                val chatRooms = response.data.filterValues {
-                    it.member.map { member -> member.userEmail }.contains(email)
-                }
-                chatRooms.values.toList()
-            }
-
-            else -> localDataSource.getChatRoomList() ?: emptyList()
-        }
-
-
-    }
-
     fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
         remoteDataSource.chatListener(roomKey, receiveNewMessage)
     }

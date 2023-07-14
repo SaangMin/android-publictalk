@@ -4,14 +4,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.FragmentChatRoomBinding
 import com.skysmyoo.publictalk.utils.EventObserver
+import kotlinx.coroutines.launch
 
 class ChatRoomFragment : BaseFragment() {
 
@@ -34,11 +39,7 @@ class ChatRoomFragment : BaseFragment() {
         viewModel.getRoomKey(chatRoomInfo)
         messageListObserver()
         newMessageObserver()
-        friendDataObserver()
-        roomKeyObserver()
-        firebaseErrorEventObserver()
-        networkErrorEventObserver()
-
+        setChatRoomUiState()
         binding.btnChatRoomSend.setOnClickListener {
             onSendMessage()
         }
@@ -66,21 +67,37 @@ class ChatRoomFragment : BaseFragment() {
         })
     }
 
-    private fun roomKeyObserver() {
-        viewModel.chatRoomKey.observe(viewLifecycleOwner) {
-            enterChatting()
-            viewModel.listenForChat(chatRoomInfo, it)
+    private fun setChatRoomUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.chatRoomUiState.collect {
+                        if (it.isGetChatRoomKey) {
+                            viewModel.enterChatting(chatRoomInfo)
+                            val currentChatRoomKey = viewModel.currentChatRoomKey
+                            viewModel.listenForChat(chatRoomInfo, currentChatRoomKey)
+                        }
+                        if (it.otherUser != null) {
+                            binding.abChatRoom.title = it.otherUser.userName
+                        }
+                        if (it.isFirebaseError) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.firebase_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                        if (it.isNetworkError) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.network_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    private fun enterChatting() {
-        viewModel.enterChatting(chatRoomInfo)
-    }
-
-    private fun friendDataObserver() {
-        viewModel.friendData.observe(viewLifecycleOwner, EventObserver {
-            binding.abChatRoom.title = it.userName
-        })
     }
 
     private fun messageListObserver() {
@@ -106,18 +123,6 @@ class ChatRoomFragment : BaseFragment() {
             ).show()
         }
         binding.etChatRoomMessage.setText("")
-    }
-
-    private fun firebaseErrorEventObserver() {
-        viewModel.firebaseErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.firebase_error_msg), Toast.LENGTH_SHORT).show()
-        })
-    }
-
-    private fun networkErrorEventObserver() {
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.network_error_msg),Toast.LENGTH_SHORT).show()
-        })
     }
 
     companion object {

@@ -42,10 +42,6 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getChatRooms(): List<ChatRoom> {
-        return chatLocalDataSource.getChatRoomList() ?: emptyList()
-    }
-
     fun uploadImage(image: Uri?): Flow<String?> {
         return flow {
             when (val response = userRemoteDataSource.uploadImage(image)) {
@@ -170,8 +166,8 @@ class UserRepository @Inject constructor(
         return userLocalDataSource.getFriendList()
     }
 
-    fun findFriend(email: String): Flow<User?> {
-        return flow { emit(userLocalDataSource.findFriend(email)) }
+    suspend fun findFriend(email: String): User? {
+        return userLocalDataSource.findFriend(email)
     }
 
     suspend fun searchFriendFromRemote(email: String): ApiResponse<User>? {
