@@ -78,4 +78,5 @@
     <string name="navigation_translate_label">번역창</string>
     <string name="remove_chat_label">대화방을\n삭제하시겠습니까?</string>
     <string name="submit">확인</string>
+    <string name="navigation_remove_chat_label">대화 삭제창</string>
 </resources>

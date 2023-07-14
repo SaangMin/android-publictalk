@@ -60,6 +60,9 @@
         <action
             android:id="@+id/action_chat_room_to_translate"
             app:destination="@id/navigation_translate" />
+        <action
+            android:id="@+id/action_chat_room_to_remove_chat"
+            app:destination="@id/navigation_remove_chat" />
     </fragment>
 
     <fragment
@@ -88,6 +91,15 @@
         <argument
             android:name="body"
             app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/navigation_remove_chat"
+        android:name="com.skysmyoo.publictalk.ui.chat_room.RemoveChatDialogFragment"
+        android:label="@string/navigation_remove_chat_label"
+        tools:layout="@layout/dialog_remove_chat">
+        <argument
+            android:name="chatRoom"
+            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
     </dialog>
 
 

@@ -53,6 +53,11 @@ class ChatRoomFragment : BaseFragment() {
             abChatRoom.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
+            abChatRoom.setOnMenuItemClickListener {
+                val action = ChatRoomFragmentDirections.actionChatRoomToRemoveChat(chatRoomInfo)
+                findNavController().navigate(action)
+                true
+            }
         }
         binding.viewModel = viewModel
 
