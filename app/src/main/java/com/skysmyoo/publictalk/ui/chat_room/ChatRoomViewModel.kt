@@ -10,6 +10,7 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
@@ -31,6 +32,11 @@ class ChatRoomViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
+
+    private val _isSuccessDeleteChat = MutableStateFlow(false)
+    val isSuccessDeleteChat: StateFlow<Boolean> = _isSuccessDeleteChat
+    private val _isFailedDeleteChat = MutableStateFlow(false)
+    val isFailedDeleteChat: StateFlow<Boolean> = _isFailedDeleteChat
 
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
@@ -56,6 +62,21 @@ class ChatRoomViewModel @Inject constructor(
                 }
                 if (!_adapterItemList.value.contains(messageBox)) {
                     _adapterItemList.value = _adapterItemList.value + messageBox
+                }
+            }
+        }
+    }
+
+    fun deleteChatRoom(chatRoom: ChatRoom) {
+        viewModelScope.launch {
+            when (chatRepository.deleteChatRoom(chatRoom)) {
+                is ApiResultSuccess -> {
+                    _isSuccessDeleteChat.value = true
+                }
+
+                else -> {
+                    _isFailedDeleteChat.value = true
+                    _isFailedDeleteChat.value = false
                 }
             }
         }

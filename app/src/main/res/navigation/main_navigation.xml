@@ -100,6 +100,11 @@
         <argument
             android:name="chatRoom"
             app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+        <action
+            android:id="@+id/action_remove_chat_to_chat_list"
+            app:destination="@id/navigation_chat_list"
+            app:popUpTo="@id/navigation_chat_list"
+            app:popUpToInclusive="true"/>
     </dialog>
 
 

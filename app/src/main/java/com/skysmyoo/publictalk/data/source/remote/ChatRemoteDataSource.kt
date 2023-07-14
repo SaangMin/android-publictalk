@@ -35,6 +35,10 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         return apiClient.getChatRooms(auth)
     }
 
+    suspend fun deleteChatRoom(auth: String, chatRoomId: String): ApiResponse<Map<String, String>> {
+        return apiClient.deleteChatRoom(chatRoomId, auth)
+    }
+
     suspend fun getChatRoomKey(member: List<String>): ApiResponse<String> =
         suspendCoroutine { continuation ->
             chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener {
