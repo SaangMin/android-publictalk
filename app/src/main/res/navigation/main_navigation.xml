@@ -20,7 +20,7 @@
             android:id="@+id/action_friend_list_to_setting"
             app:destination="@id/navigation_setting"
             app:popUpTo="@id/navigation_friend_list"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -57,6 +57,9 @@
         <argument
             android:name="chatRoom"
             app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+        <action
+            android:id="@+id/action_chat_room_to_translate"
+            app:destination="@id/navigation_translate" />
     </fragment>
 
     <fragment
@@ -76,5 +79,16 @@
             android:id="@+id/action_friend_info_to_chat_room"
             app:destination="@id/navigation_chat_room" />
     </dialog>
+
+    <dialog
+        android:id="@+id/navigation_translate"
+        android:name="com.skysmyoo.publictalk.ui.chat_room.TranslateDialogFragment"
+        android:label="@string/navigation_translate_label"
+        tools:layout="@layout/dialog_translate">
+        <argument
+            android:name="body"
+            app:argType="string" />
+    </dialog>
+
 
 </navigation>

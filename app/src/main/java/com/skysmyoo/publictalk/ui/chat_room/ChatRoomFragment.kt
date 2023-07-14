@@ -108,6 +108,11 @@ class ChatRoomFragment : BaseFragment() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+        val body = binding.etChatRoomMessage.text.toString()
+        if (body.isNotEmpty()) {
+            val action = ChatRoomFragmentDirections.actionChatRoomToTranslate(body)
+            findNavController().navigate(action)
+        }
         binding.etChatRoomMessage.setText("")
     }
 

@@ -44,9 +44,8 @@
 
         <ImageView
             android:id="@+id/iv_translate_logo"
-            android:layout_width="88dp"
-            android:layout_height="88dp"
-            android:layout_margin="12dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:contentDescription="@string/translate_logo_design_description"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_logo"
@@ -63,7 +62,7 @@
             android:backgroundTint="@color/color_submit"
             android:padding="12dp"
             android:text="@string/send"
-            app:layout_constraintBottom_toTopOf=""
+            app:layout_constraintBottom_toTopOf="@id/btn_translate_cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_translate_result" />

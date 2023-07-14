@@ -71,8 +71,9 @@
     <string name="network_error_msg">Please check your network.</string>
     <string name="add_friend_error_msg">Add friend failed. Please try again after checking the network.</string>
     <string name="firebase_error_msg">An error has occurred. Please try again after checking the network.</string>
-    <string name="translate_result">translation result</string>
+    <string name="translate_result">Translation Result</string>
     <string name="translate_result_sample">Hello.</string>
     <string name="cancel">CANCEL</string>
     <string name="translate_logo_design_description">Translate Logo Design</string>
+    <string name="navigation_translate_label">Translate Screen</string>
 </resources>
