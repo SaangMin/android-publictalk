@@ -71,22 +71,25 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun sendMessage(chatRoom: ChatRoom, showEmptyMessageToast: () -> Unit) {
-        if (messageBody.value.isNullOrEmpty()) {
-            showEmptyMessageToast()
-        } else {
-            chatRepository.createNewMessage(
-                chatRoom,
-                currentChatRoomKey,
-                messageBody.value.toString()
-            ) {
-                FirebaseData.getIdToken({ token ->
-                    viewModelScope.launch {
-                        chatRepository.sendMessage(token, it, currentChatRoomKey)
-                    }
-                }, {
-                    _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
-                    _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = false)
-                })
+        viewModelScope.launch {
+            if (messageBody.value.isNullOrEmpty()) {
+                showEmptyMessageToast()
+            } else {
+                chatRepository.createNewMessage(
+                    chatRoom,
+                    currentChatRoomKey,
+                    messageBody.value.toString()
+                ) {
+                    FirebaseData.getIdToken({ token ->
+                        viewModelScope.launch {
+                            chatRepository.sendMessage(token, it, currentChatRoomKey)
+                        }
+                    }, {
+                        _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
+                        _chatRoomUiState.value =
+                            _chatRoomUiState.value.copy(isFirebaseError = false)
+                    })
+                }
             }
         }
     }

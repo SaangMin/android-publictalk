@@ -49,10 +49,6 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
-        remoteDataSource.chatListener(roomKey, receiveNewMessage)
-    }
-
     fun getMessages(chatRoom: ChatRoom): Flow<Message> {
         return flow {
             val member = chatRoom.member.map { it.userEmail }
@@ -79,7 +75,7 @@ class ChatRepository @Inject constructor(
         remoteDataSource.enterChatting(roomKey, myIdKey, email)
     }
 
-    fun createNewMessage(
+    suspend fun createNewMessage(
         chatRoom: ChatRoom,
         roomKey: String,
         messageBody: String,
@@ -88,7 +84,7 @@ class ChatRepository @Inject constructor(
         val myEmail = localDataSource.getMyEmail()
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
 
-        remoteDataSource.memberStatusListener(myEmail, roomKey) {
+        remoteDataSource.memberStatusListenerFlow(myEmail, roomKey).collect {
             val currentTime = TimeUtil.getCurrentDateString()
             val message = Message(
                 myEmail,
