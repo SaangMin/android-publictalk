@@ -76,4 +76,6 @@
     <string name="cancel">CANCEL</string>
     <string name="translate_logo_design_description">Translate Logo Design</string>
     <string name="navigation_translate_label">Translate Screen</string>
+    <string name="remove_chat_label">Do you want to delete\nthe chat room?</string>
+    <string name="submit">YES</string>
 </resources>
