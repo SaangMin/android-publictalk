@@ -25,18 +25,22 @@ class ChatRepository @Inject constructor(
 
     suspend fun deleteChatRoom(chatRoom: ChatRoom): ApiResponse<Map<String, String>> {
         val member = chatRoom.member.map { it.userEmail }.sorted()
-        val authToken = FirebaseData.authToken ?: return ApiResultError(code = 400, message = "Not found firebase token")
+        val authToken = FirebaseData.authToken ?: return ApiResultError(
+            code = 400,
+            message = "Not found firebase token"
+        )
         return when (val roomKey = remoteDataSource.getChatRoomKey(member)) {
             is ApiResultSuccess -> {
                 remoteDataSource.deleteChatRoom(authToken, roomKey.data)
             }
+
             else -> {
                 ApiResultException(Throwable())
             }
         }
     }
 
-    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Map<String, Message>? {
+    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Message? {
         val database = FirebaseDatabase.getInstance()
         val currentTime = TimeUtil.getCurrentDateString()
 
@@ -55,7 +59,7 @@ class ChatRepository @Inject constructor(
                 val messagesRef =
                     database.getReference(PATH_CHAT_ROOMS).child(chatRoomUid).child(PATH_MESSAGES)
                 messagesRef.push().setValue(message)
-                mapOf(chatRoomUid to message)
+                message
             } else {
                 null
             }
@@ -63,7 +67,7 @@ class ChatRepository @Inject constructor(
             val messagesRef =
                 database.getReference(PATH_CHAT_ROOMS).child(chatRoomId).child(PATH_MESSAGES)
             return if (messagesRef.push().setValue(message).isSuccessful) {
-                mapOf("" to message)
+                message
             } else {
                 null
             }

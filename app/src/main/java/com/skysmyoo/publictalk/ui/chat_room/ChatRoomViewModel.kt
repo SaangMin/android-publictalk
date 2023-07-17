@@ -110,15 +110,7 @@ class ChatRoomViewModel @Inject constructor(
                 ) {
                     FirebaseData.getIdToken({ token ->
                         viewModelScope.launch {
-                            val messageMap =
-                                chatRepository.sendMessage(token, it, currentChatRoomKey)
-                            if (currentChatRoomKey.isEmpty()) {
-                                userRepository.updateChatRooms(token, getMyEmail())
-                            }
-                            if (messageMap != null && messageMap.keys.first().isNotEmpty()) {
-                                val newChatRoomKey = messageMap.keys.first()
-                                currentChatRoomKey = newChatRoomKey
-                            }
+                            chatRepository.sendMessage(token, it, currentChatRoomKey)
                         }
                     }, {
                         _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
