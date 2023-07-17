@@ -138,6 +138,24 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         awaitClose { membersRef.removeEventListener(valueEventListener) }
     }
 
+    suspend fun getChatRoom(roomKey: String): ApiResponse<ChatRoom> =
+        suspendCoroutine { continuation ->
+            chatRoomRef.child(roomKey).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val chatRoom = snapshot.getValue(ChatRoom::class.java)
+                    if (chatRoom != null) {
+                        continuation.resume(ApiResultSuccess(chatRoom))
+                    } else {
+                        continuation.resume(ApiResultError(code = 404, "ChatRoom not found"))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resume(ApiResultError(code = 500, "DatabaseError: $error"))
+                }
+            })
+        }
+
     companion object {
         private const val TAG = "ChatRemoteDataSource"
     }
