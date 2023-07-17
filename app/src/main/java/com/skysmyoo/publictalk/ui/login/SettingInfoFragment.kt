@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
@@ -17,9 +19,8 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
-import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
-import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SettingInfoFragment : BaseFragment() {
@@ -30,7 +31,6 @@ class SettingInfoFragment : BaseFragment() {
     private lateinit var pickImage: ActivityResultLauncher<String>
     private var imageUri: Uri? = null
     private var userLanguage: Language? = null
-    private val loadingDialog by lazy { LoadingDialogFragment() }
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,51 +44,36 @@ class SettingInfoFragment : BaseFragment() {
         binding.email = user?.email
         binding.viewModel = viewModel
         setSpinner()
-        onProfileImageClickObserver()
-        isLoadingObserver()
-        submitRequiredObserver()
-        submitUserObserver()
-        failedMessageObserver()
+        setInfoUiState()
     }
 
-    private fun onProfileImageClickObserver() {
-        viewModel.addImageEvent.observe(viewLifecycleOwner) {
-            pickImage.launch("image/*")
-        }
-    }
-
-    private fun isLoadingObserver() {
-        viewModel.isLoading.observe(viewLifecycleOwner) {
-            if (it) {
-                loadingDialog.show(parentFragmentManager, TAG)
-            } else {
-                if (loadingDialog.isAdded) {
-                    loadingDialog.dismiss()
+    private fun setInfoUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.setInfoUiState.collect {
+                    if (it.isImageClicked) {
+                        pickImage.launch("image/*")
+                    }
+                    if (it.isFailed) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.join_fail_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (it.isNotRequired) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.not_required_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (it.isSubmit) {
+                        viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
+                            startHomeActivity()
+                        }
+                    }
                 }
-            }
-        }
-    }
-
-    private fun failedMessageObserver() {
-        viewModel.failedMessage.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.join_fail_error_msg), Toast.LENGTH_SHORT).show()
-        })
-    }
-
-    private fun submitRequiredObserver() {
-        viewModel.notRequiredEvent.observe(viewLifecycleOwner) {
-            Snackbar.make(
-                binding.root,
-                getString(R.string.not_required_error_msg),
-                Snackbar.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-    private fun submitUserObserver() {
-        viewModel.submitEvent.observe(viewLifecycleOwner) {
-            viewModel.submitUser(imageUri, userLanguage?.code ?: "ko") {
-                startHomeActivity()
             }
         }
     }

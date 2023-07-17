@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.source.local
 
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.Message
 import javax.inject.Inject
 
 class ChatLocalDataSource @Inject constructor(
@@ -22,5 +23,14 @@ class ChatLocalDataSource @Inject constructor(
 
     suspend fun clearChatRooms() {
         chatModelDao.clearChatRooms()
+    }
+
+    suspend fun getChatRoomMessage(member: List<String>): Map<String, Message> {
+        val chatRoomList = chatModelDao.getChatRoomList() ?: return emptyMap()
+        val sortedMember = member.sorted()
+        val chatRoom = chatRoomList.find {
+            it.member.map { chattingMember -> chattingMember.userEmail }.sorted() == sortedMember
+        }
+        return chatRoom?.messages ?: emptyMap()
     }
 }

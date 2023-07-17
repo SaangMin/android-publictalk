@@ -6,10 +6,13 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
@@ -23,28 +26,31 @@ class UserRepository @Inject constructor(
         return userLocalDataSource.getMyInfo()
     }
 
-    suspend fun putUser(auth: String, user: User): Map<String, String>? {
-        return when (val response = userRemoteDataSource.putUser(auth, user)) {
-            is ApiResultSuccess -> {
-                userLocalDataSource.insertUser(user)
-                response.data
-            }
+    fun putUser(auth: String, user: User): Flow<Map<String, String>?> {
+        return flow {
+            when (val response = userRemoteDataSource.putUser(auth, user)) {
+                is ApiResultSuccess -> {
+                    userLocalDataSource.insertUser(user)
+                    userLocalDataSource.clearFriendsData()
+                    chatLocalDataSource.clearChatRooms()
+                    updateChatRooms(auth, getMyEmail() ?: "")
+                    emit(response.data)
+                }
 
-            else -> null
+                else -> emit(null)
+            }
         }
     }
 
-    suspend fun getChatRooms(): List<ChatRoom> {
-        return chatLocalDataSource.getChatRoomList() ?: emptyList()
-    }
+    fun uploadImage(image: Uri?): Flow<String?> {
+        return flow {
+            when (val response = userRemoteDataSource.uploadImage(image)) {
+                is ApiResultSuccess -> {
+                    emit(response.data)
+                }
 
-    suspend fun uploadImage(image: Uri?): String? {
-        return when (val response = userRemoteDataSource.uploadImage(image)) {
-            is ApiResultSuccess -> {
-                response.data
+                else -> emit(null)
             }
-
-            else -> null
         }
     }
 
@@ -73,10 +79,39 @@ class UserRepository @Inject constructor(
                 val chatRooms = response.data.filterValues {
                     it.member.map { member -> member.userEmail }.contains(email)
                 }
+                chatLocalDataSource.clearChatRooms()
+                chatRooms.values.forEach {
+                    chatLocalDataSource.insertChatRoom(it)
+                }
                 chatRooms.values.toList()
             }
 
-            else -> chatLocalDataSource.getChatRoomList() ?: emptyList<ChatRoom>()
+            else -> chatLocalDataSource.getChatRoomList() ?: emptyList()
+        }
+    }
+
+    fun getRemoteChatRooms(): Flow<List<ChatRoom>> {
+        return flow {
+            emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            val authToken = FirebaseData.authToken ?: return@flow emit(
+                chatLocalDataSource.getChatRoomList() ?: emptyList()
+            )
+            val email = userLocalDataSource.getMyEmail()
+                ?: return@flow emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            when (val response = chatRemoteDataSource.getChatRooms(authToken)) {
+                is ApiResultSuccess -> {
+                    val chatRooms = response.data.filterValues {
+                        it.member.map { member -> member.userEmail }.contains(email)
+                    }
+                    chatLocalDataSource.clearChatRooms()
+                    chatRooms.values.forEach {
+                        chatLocalDataSource.insertChatRoom(it)
+                    }
+                    emit(chatRooms.values.toList())
+                }
+
+                else -> emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
+            }
         }
     }
 
@@ -87,6 +122,7 @@ class UserRepository @Inject constructor(
                 val user = response.data.getValue(User::class.java) ?: return null
                 ApiResultSuccess(mapOf(userUid to user))
             }
+
             else -> null
         }
     }
@@ -95,30 +131,34 @@ class UserRepository @Inject constructor(
         userLocalDataSource.addFriend(myInfo, friend)
     }
 
-    suspend fun updateUser(auth: String, user: User): User? {
-        return when (val response = userRemoteDataSource.updateUser(auth, user)) {
-            is ApiResultSuccess -> {
-                userLocalDataSource.insertUser(user)
-                response.data
-            }
+    fun updateUser(auth: String, user: User): Flow<User?> {
+        return flow {
+            when (val response = userRemoteDataSource.updateUser(auth, user)) {
+                is ApiResultSuccess -> {
+                    userLocalDataSource.insertUser(user)
+                    emit(response.data)
+                }
 
-            else -> userLocalDataSource.getMyInfo()
+                else -> emit(userLocalDataSource.getMyInfo())
+            }
         }
     }
 
-    suspend fun updateFriends(myInfo: User, friendList: List<String>): List<User?> {
-        return when (val response = userRemoteDataSource.updateFriendsData(friendList)) {
-            is ApiResultSuccess -> {
-                userLocalDataSource.clearFriendsData()
-                response.data.forEach {
-                    if (it != null) {
-                        addLocalFriend(myInfo, it)
+    fun updateFriends(myInfo: User, friendList: List<String>): Flow<List<User?>> {
+        return flow {
+            when (val response = userRemoteDataSource.updateFriendsData(friendList)) {
+                is ApiResultSuccess -> {
+                    userLocalDataSource.clearFriendsData()
+                    response.data.forEach {
+                        if (it != null) {
+                            addLocalFriend(myInfo, it)
+                        }
                     }
+                    emit(response.data)
                 }
-                response.data
-            }
 
-            else -> userLocalDataSource.getFriendList()
+                else -> emit(userLocalDataSource.getFriendList())
+            }
         }
     }
 

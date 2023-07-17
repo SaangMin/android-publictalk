@@ -10,6 +10,8 @@ import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_MESSAGES
 import com.skysmyoo.publictalk.utils.TimeUtil
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ChatRepository @Inject constructor(
@@ -47,23 +49,25 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getChatRooms(auth: String, email: String): List<ChatRoom> {
-        return when (val response = remoteDataSource.getChatRooms(auth)) {
-            is ApiResultSuccess -> {
-                val chatRooms = response.data.filterValues {
-                    it.member.map { member -> member.userEmail }.contains(email)
-                }
-                chatRooms.values.toList()
+    fun getMessages(chatRoom: ChatRoom): Flow<Message> {
+        return flow {
+            val member = chatRoom.member.map { it.userEmail }
+            localDataSource.getChatRoomMessage(member).values.forEach {
+                emit(it)
             }
+            when (val roomKeyResponse = remoteDataSource.getChatRoomKey(member)) {
+                is ApiResultSuccess -> {
+                    val roomKey = roomKeyResponse.data
+                    remoteDataSource.chatListenerFlow(roomKey).collect {
+                        emit(it)
+                    }
+                }
 
-            else -> localDataSource.getChatRoomList() ?: emptyList()
+                else -> localDataSource.getChatRoomMessage(member).values.forEach {
+                    emit(it)
+                }
+            }
         }
-
-
-    }
-
-    fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
-        remoteDataSource.chatListener(roomKey, receiveNewMessage)
     }
 
     fun enterChatting(roomKey: String, myIdKey: String) {
@@ -71,7 +75,7 @@ class ChatRepository @Inject constructor(
         remoteDataSource.enterChatting(roomKey, myIdKey, email)
     }
 
-    fun createNewMessage(
+    suspend fun createNewMessage(
         chatRoom: ChatRoom,
         roomKey: String,
         messageBody: String,
@@ -80,7 +84,7 @@ class ChatRepository @Inject constructor(
         val myEmail = localDataSource.getMyEmail()
         val otherEmail = chatRoom.member.map { it.userEmail }.find { it != myEmail } ?: ""
 
-        remoteDataSource.memberStatusListener(myEmail, roomKey) {
+        remoteDataSource.memberStatusListenerFlow(myEmail, roomKey).collect {
             val currentTime = TimeUtil.getCurrentDateString()
             val message = Message(
                 myEmail,

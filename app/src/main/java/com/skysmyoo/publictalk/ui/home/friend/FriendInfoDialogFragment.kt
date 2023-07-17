@@ -4,19 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.databinding.DialogFriendInfoBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
-import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FriendInfoDialogFragment : DialogFragment() {
@@ -48,10 +51,7 @@ class FriendInfoDialogFragment : DialogFragment() {
             }
         }
         binding.viewModel = viewModel
-        notExistChatRoomObserver()
-        foundChatRoomObserver()
-        removeFriendEventObserver()
-        networkErrorEventObserver()
+        setFriendInfoUiState()
     }
 
     override fun onStart() {
@@ -68,37 +68,41 @@ class FriendInfoDialogFragment : DialogFragment() {
         viewModel.getChatRoom(member)
     }
 
-    private fun notExistChatRoomObserver() {
-        viewModel.notExistChatRoom.observe(viewLifecycleOwner, EventObserver {
-            val myEmail = viewModel.getMyEmail()
-            val member = listOf(
-                ChattingMember(userEmail = myEmail),
-                ChattingMember(userEmail = friendInfo.userEmail)
-            )
-            val newChatRoom = ChatRoom(member = member)
-            val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(newChatRoom)
+    private fun setFriendInfoUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.friendInfoUiState.collect {
+                    if(it.isNotExistChatRoom) {
+                        val myEmail = viewModel.getMyEmail()
+                        val member = listOf(
+                            ChattingMember(userEmail = myEmail),
+                            ChattingMember(userEmail = friendInfo.userEmail)
+                        )
+                        val newChatRoom = ChatRoom(member = member)
+                        val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(newChatRoom)
+                        findNavController().navigate(action)
+                    }
+                    if(it.isFoundChatRoom) {
+                        navigateChatRoom()
+                    }
+                    if(it.isRemovedFriend) {
+                        Snackbar.make(binding.root, getString(R.string.delete_friend_msg), Snackbar.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                    if(it.isNetworkError) {
+                        Snackbar.make(binding.root,getString(R.string.network_error_msg), Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateChatRoom() {
+        val chatRoom = viewModel.foundChatRoom
+        if(chatRoom != null) {
+            val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(chatRoom)
             findNavController().navigate(action)
-        })
-    }
-
-    private fun foundChatRoomObserver() {
-        viewModel.foundChatRoom.observe(viewLifecycleOwner, EventObserver {
-            val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(it)
-            findNavController().navigate(action)
-        })
-    }
-
-    private fun removeFriendEventObserver() {
-        viewModel.removeFriendEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.delete_friend_msg), Toast.LENGTH_SHORT).show()
-            findNavController().navigateUp()
-        })
-    }
-
-    private fun networkErrorEventObserver() {
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(),getString(R.string.network_error_msg), Toast.LENGTH_SHORT).show()
-        })
+        }
     }
 
     override fun onDestroyView() {

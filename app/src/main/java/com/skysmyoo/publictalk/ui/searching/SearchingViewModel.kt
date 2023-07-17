@@ -1,6 +1,5 @@
 package com.skysmyoo.publictalk.ui.searching
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,30 +7,32 @@ import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
-import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SearchingUiState(
+    val isNotExistUser: Boolean = false,
+    val isFoundUser: Boolean = false,
+    val isAlreadyFriend: Boolean = false,
+    val isAddedFriend: Boolean = false,
+    val isNetworkError: Boolean = false,
+    val isFailedAddFriend: Boolean = false,
+)
 
 @HiltViewModel
 class SearchingViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _notExistUserEvent = MutableLiveData<Event<Unit>>()
-    val notExistUserEvent: LiveData<Event<Unit>> = _notExistUserEvent
-    private val _foundUser = MutableLiveData<User>()
-    val foundUser: LiveData<User> = _foundUser
-    private val _alreadyFriendEvent = MutableLiveData<Event<Unit>>()
-    val alreadyFriendEvent: LiveData<Event<Unit>> = _alreadyFriendEvent
-    private val _addFriendEvent = MutableLiveData<Event<Unit>>()
-    val addFriendEvent: LiveData<Event<Unit>> = _addFriendEvent
-    private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
-    val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
-    private val _addFriendFailEvent = MutableLiveData<Event<Unit>>()
-    val addFriendFailEvent: LiveData<Event<Unit>> = _addFriendFailEvent
+    private val _searchingUiState = MutableStateFlow(SearchingUiState())
+    val searchingUiState: StateFlow<SearchingUiState> = _searchingUiState
 
     val searchingTargetEmail = MutableLiveData<String>()
+    var gettingUser: User? = null
 
     fun searchingFriend() {
         viewModelScope.launch {
@@ -39,15 +40,22 @@ class SearchingViewModel @Inject constructor(
                 when (val foundUser =
                     repository.searchFriendFromRemote(searchingTargetEmail.value ?: "")) {
                     is ApiResultSuccess -> {
-                        _foundUser.value = foundUser.data
+                        gettingUser = foundUser.data
+                        _searchingUiState.value = _searchingUiState.value.copy(isFoundUser = true)
+                        delay(1000)
+                        _searchingUiState.value = _searchingUiState.value.copy(isFoundUser = false)
                     }
 
                     is ApiResultError -> {
-                        _networkErrorEvent.value = Event(Unit)
+                        _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = true)
+                        delay(1000)
+                        _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = false)
                     }
 
                     else -> {
-                        _notExistUserEvent.value = Event(Unit)
+                        _searchingUiState.value = _searchingUiState.value.copy(isNotExistUser = true)
+                        delay(1000)
+                        _searchingUiState.value = _searchingUiState.value.copy(isNotExistUser = false)
                     }
                 }
             }
@@ -55,18 +63,22 @@ class SearchingViewModel @Inject constructor(
     }
 
     fun addFriendButtonClick() {
-        if (foundUser.value == null) return
+        if (gettingUser == null) return
         viewModelScope.launch {
-            val friendEmailList = repository.getFriends().map { it.userEmail }
-            if (friendEmailList.contains(searchingTargetEmail.value)) {
-                _alreadyFriendEvent.value = Event(Unit)
+            val friendEmailList =
+                repository.getFriends().map { it.userEmail }
+            if (friendEmailList.contains(searchingTargetEmail.value) || gettingUser?.userEmail == repository.getMyEmail()) {
+                _searchingUiState.value = _searchingUiState.value.copy(isAlreadyFriend = true)
+                _searchingUiState.value = _searchingUiState.value.copy(isAlreadyFriend = false)
             } else {
                 val myInfo = repository.getMyInfo() ?: return@launch
-                val response = repository.addFriend(myInfo, foundUser.value ?: return@launch)
+                val response = repository.addFriend(myInfo, gettingUser ?: return@launch)
                 if (response is ApiResultSuccess) {
-                    _addFriendEvent.value = Event(Unit)
+                    _searchingUiState.value = _searchingUiState.value.copy(isAddedFriend = true)
+                    _searchingUiState.value = _searchingUiState.value.copy(isAddedFriend = false)
                 } else {
-                    _addFriendFailEvent.value = Event(Unit)
+                    _searchingUiState.value = _searchingUiState.value.copy(isFailedAddFriend = true)
+                    _searchingUiState.value = _searchingUiState.value.copy(isFailedAddFriend = false)
                 }
             }
         }

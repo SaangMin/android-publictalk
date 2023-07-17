@@ -2,15 +2,18 @@ package com.skysmyoo.publictalk.ui.searching
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.FragmentSearchingBinding
-import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchingFragment : BaseFragment() {
@@ -23,64 +26,62 @@ class SearchingFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
-        notExistUserObserver()
-        foundUserObserver()
-        alreadyFriendEventObserver()
-        addFriendObserver()
-        networkErrorEventObserver()
-        addFriendFailEventObserver()
+        setSearchingUiState()
     }
 
-    private fun notExistUserObserver() {
-        viewModel.notExistUserEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.not_exist_user_error_msg),
-                Toast.LENGTH_SHORT
-            ).show()
-            binding.clSearchingFriend.isVisible = false
-        })
-    }
-
-    private fun foundUserObserver() {
-        viewModel.foundUser.observe(viewLifecycleOwner) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.find_success_user_msg),
-                Toast.LENGTH_SHORT
-            ).show()
-            binding.clSearchingFriend.isVisible = true
-            binding.foundUser = it
+    private fun setSearchingUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.searchingUiState.collect {
+                    if (it.isNotExistUser) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.not_exist_user_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        binding.clSearchingFriend.isVisible = false
+                    }
+                    if (it.isFoundUser) {
+                        val user = viewModel.gettingUser
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.find_success_user_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        binding.clSearchingFriend.isVisible = true
+                        binding.foundUser = user
+                    }
+                    if (it.isAlreadyFriend) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.already_friend_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (it.isAddedFriend) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.add_friend_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        findNavController().navigateUp()
+                    }
+                    if (it.isNetworkError) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.network_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    if(it.isFailedAddFriend) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.add_friend_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
-    }
-
-    private fun alreadyFriendEventObserver() {
-        viewModel.alreadyFriendEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.already_friend_msg),
-                Toast.LENGTH_SHORT
-            ).show()
-            findNavController().navigateUp()
-        })
-    }
-
-    private fun addFriendObserver() {
-        viewModel.addFriendEvent.observe(viewLifecycleOwner, EventObserver{
-            Toast.makeText(requireContext(),getString(R.string.add_friend_msg), Toast.LENGTH_SHORT).show()
-            findNavController().navigateUp()
-        })
-    }
-
-    private fun networkErrorEventObserver() {
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(),getString(R.string.network_error_msg), Toast.LENGTH_SHORT).show()
-        })
-    }
-
-    private fun addFriendFailEventObserver() {
-        viewModel.addFriendFailEvent.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.add_friend_error_msg), Toast.LENGTH_SHORT).show()
-        })
     }
 }

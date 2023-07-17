@@ -16,6 +16,9 @@ import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
 import com.skysmyoo.publictalk.utils.Constants.PATH_READING
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -77,17 +80,17 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         myInfoRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
     }
 
-    fun chatListener(roomKey: String, receiveNewMessage: (Message) -> Unit) {
+    fun chatListenerFlow(roomKey: String): Flow<Message> = callbackFlow {
         val messageRef = chatRoomRef.child(roomKey).child(Constants.PATH_MESSAGES)
 
-        messageRef.addChildEventListener(object : ChildEventListener {
+        val childEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val isMessageReading =
                     snapshot.child(Constants.PATH_READING).getValue(Boolean::class.java) ?: false
                 val message = snapshot.getValue(Message::class.java) ?: return
                 message.reading = isMessageReading
                 if (message.sender.isEmpty() || message.receiver.isEmpty()) return
-                receiveNewMessage(message)
+                trySend(message).isSuccess
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -96,17 +99,18 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "DataSnapshotCancelled: $error")
             }
-        })
+        }
+        messageRef.addChildEventListener(childEventListener)
+        awaitClose { messageRef.removeEventListener(childEventListener) }
     }
 
-    fun memberStatusListener(
+    fun memberStatusListenerFlow(
         myEmail: String,
-        roomKey: String,
-        memberStatusMethod: (Boolean) -> Unit
-    ) {
+        roomKey: String
+    ): Flow<Boolean> = callbackFlow {
         val membersRef = chatRoomRef.child(roomKey).child(Constants.PATH_MEMBER)
 
-        membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        val valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var isPartnerChatting = false
                 snapshot.children.forEach { memberSnapshot ->
@@ -119,13 +123,15 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                         return@forEach
                     }
                 }
-                memberStatusMethod(isPartnerChatting)
+                trySend(isPartnerChatting).isSuccess
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "DataSnapshotCancelled: $error")
             }
-        })
+        }
+        membersRef.addListenerForSingleValueEvent(valueEventListener)
+        awaitClose { membersRef.removeEventListener(valueEventListener) }
     }
 
     companion object {

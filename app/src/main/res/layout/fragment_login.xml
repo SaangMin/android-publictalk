@@ -17,11 +17,11 @@
 
         <ImageView
             android:id="@+id/iv_login_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
             android:contentDescription="@string/logo_icon_description"
             android:scaleType="centerCrop"
-            android:src="@drawable/icon_logo"
+            android:src="@drawable/icon_logo_title"
             app:layout_constraintBottom_toTopOf="@id/btn_login"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

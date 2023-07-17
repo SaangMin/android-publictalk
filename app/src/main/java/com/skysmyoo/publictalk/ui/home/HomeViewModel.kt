@@ -1,52 +1,68 @@
 package com.skysmyoo.publictalk.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
-import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
-import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+
+data class FriendListUiState(
+    val adapterItemList: List<FriendListScreenData> = emptyList(),
+    val isFriendClicked: Boolean = false,
+    val isMyInfoClicked: Boolean = false,
+)
+
+data class ChatListUiState(
+    val isChatRoomClicked: Boolean = false,
+)
+
+data class FriendInfoUiState(
+    val isNotExistChatRoom: Boolean = false,
+    val isFoundChatRoom: Boolean = false,
+    val isRemovedFriend: Boolean = false,
+    val isNetworkError: Boolean = false,
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _adapterItemList = MutableLiveData<Event<List<FriendListScreenData>>>()
-    val adapterItemList: LiveData<Event<List<FriendListScreenData>>> = _adapterItemList
-    private val _chatRoomClickEvent = MutableLiveData<Event<Unit>>()
-    val chatRoomClickEvent: LiveData<Event<Unit>> = _chatRoomClickEvent
-    private val _chatRoomList = MutableLiveData<Event<List<ChatRoom>>>()
-    val chatRoomList: LiveData<Event<List<ChatRoom>>> = _chatRoomList
-    private val _notExistChatRoom = MutableLiveData<Event<Unit>>()
-    val notExistChatRoom: LiveData<Event<Unit>> = _notExistChatRoom
-    private val _foundChatRoom = MutableLiveData<Event<ChatRoom>>()
-    val foundChatRoom: LiveData<Event<ChatRoom>> = _foundChatRoom
-    private val _friendClickEvent = MutableLiveData<Event<Unit>>()
-    val friendClickEvent: LiveData<Event<Unit>> = _friendClickEvent
-    private val _myInfoClickEvent = MutableLiveData<Event<Unit>>()
-    val myInfoClickEvent: LiveData<Event<Unit>> = _myInfoClickEvent
-    private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
-    val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
-    private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
-    val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
+    private val _friendListUiState = MutableStateFlow(FriendListUiState())
+    val friendListUiState: StateFlow<FriendListUiState> = _friendListUiState
+
+    private val _chatListUiState = MutableStateFlow(ChatListUiState())
+    val chatListUiState: StateFlow<ChatListUiState> = _chatListUiState
+
+    private val _friendInfoUiState = MutableStateFlow(FriendInfoUiState())
+    val friendInfoUiState: StateFlow<FriendInfoUiState> = _friendInfoUiState
+
+    val chatRoomList: StateFlow<List<ChatRoom>> = transformChatList().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
+    var foundChatRoom: ChatRoom? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
             val myInfo = repository.getMyInfo() ?: return@launch
-            val friendList = repository.getFriends()
+            val friendList = repository.getFriends().sortedByDescending { it.userName }
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),
@@ -56,10 +72,16 @@ class HomeViewModel @Inject constructor(
             if (friendList.isNotEmpty()) {
                 val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
                 itemList.addAll(friendListScreenData)
-                _adapterItemList.value = Event(itemList)
+                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
             } else {
-                _adapterItemList.value = Event(itemList)
+                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
             }
+        }
+    }
+
+    private fun transformChatList(): Flow<List<ChatRoom>> = repository.getRemoteChatRooms().map {
+        it.sortedByDescending { chatRoom ->
+            chatRoom.messages.values.lastOrNull()?.createdAt ?: chatRoom.chatCreatedAt
         }
     }
 
@@ -69,40 +91,24 @@ class HomeViewModel @Inject constructor(
         return friendList.find { it.userEmail == otherUserEmail }
     }
 
-    fun getChatRooms() {
-        viewModelScope.launch {
-            val localChatRoom = repository.getChatRooms()
-            _chatRoomList.value = Event(localChatRoom)
-            val myEmail = getMyEmail()
-            FirebaseData.getIdToken({
-                viewModelScope.launch {
-                    val chatRoomList = repository.updateChatRooms(it, myEmail)
-                    _chatRoomList.value = Event(chatRoomList)
-                }
-            }, {
-                viewModelScope.launch {
-                    val chatRoomList = repository.getChatRooms()
-                    _chatRoomList.value = Event(chatRoomList)
-                }
-            })
-        }
-    }
-
     fun getMyEmail(): String {
         return repository.getMyEmail() ?: ""
     }
 
     fun onClickChatRoom(chatRoom: ChatRoom) {
         clickedChatRoom = chatRoom
-        _chatRoomClickEvent.value = Event(Unit)
+        _chatListUiState.value = _chatListUiState.value.copy(isChatRoomClicked = true)
+        _chatListUiState.value = _chatListUiState.value.copy(isChatRoomClicked = false)
     }
 
     fun onClickFriend(friend: User) {
         if (friend.userEmail == getMyEmail()) {
-            _myInfoClickEvent.value = Event(Unit)
+            _friendListUiState.value = _friendListUiState.value.copy(isMyInfoClicked = true)
+            _friendListUiState.value = _friendListUiState.value.copy(isMyInfoClicked = false)
         } else {
             clickedFriend = friend
-            _friendClickEvent.value = Event(Unit)
+            _friendListUiState.value = _friendListUiState.value.copy(isFriendClicked = true)
+            _friendListUiState.value = _friendListUiState.value.copy(isFriendClicked = false)
         }
     }
 
@@ -110,9 +116,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val chatRoom = repository.getChatRoom(member)
             if (chatRoom == null) {
-                _notExistChatRoom.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = false)
             } else {
-                _foundChatRoom.value = Event(chatRoom)
+                foundChatRoom = chatRoom
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isFoundChatRoom = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isFoundChatRoom = false)
             }
         }
     }
@@ -122,9 +131,11 @@ class HomeViewModel @Inject constructor(
             val myInfo = repository.getMyInfo() ?: return@launch
             val response = repository.removeFriend(myInfo, friend)
             if (response is ApiResultSuccess) {
-                _removeFriendEvent.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = false)
             } else {
-                _networkErrorEvent.value = Event(Unit)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = true)
+                _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = false)
             }
         }
     }

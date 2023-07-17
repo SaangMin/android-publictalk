@@ -13,6 +13,7 @@ object FirebaseData {
     var user: FirebaseUser? = null
     val storage = Firebase.storage
     var token: String? = null
+    var authToken: String? = null
 
     fun setUserInfo() {
         user = FirebaseAuth.getInstance().currentUser
@@ -33,6 +34,7 @@ object FirebaseData {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val idToken = task.result.token
+                        authToken = idToken
                         if (idToken != null) {
                             successResult(idToken)
                         } else {

@@ -1,7 +1,7 @@
 package com.skysmyoo.publictalk.ui.login
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,78 +11,94 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
-import com.skysmyoo.publictalk.utils.Event
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SetInfoUiState(
+    val isLoading: Boolean = false,
+    val isFailed: Boolean = false,
+    val isImageClicked: Boolean = false,
+    val isSubmit: Boolean = false,
+    val isNotRequired: Boolean = false,
+)
+
+data class LoginUiState(
+    val isGoogleLogin: Boolean = false,
+    val isExist: Boolean? = null,
+)
+
+data class SplashUiState(
+    val isExist: Boolean? = null,
+)
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
 
-    private val _addImageEvent = MutableLiveData<Unit>()
-    val addImageEvent: LiveData<Unit> = _addImageEvent
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
-    private val _submitEvent = MutableLiveData<Unit>()
-    val submitEvent: LiveData<Unit> = _submitEvent
-    private val _notRequiredEvent = MutableLiveData<Unit>()
-    val notRequiredEvent: LiveData<Unit> = _notRequiredEvent
-    private val _isExistUser = MutableLiveData<Boolean>()
-    val isExistUser: LiveData<Boolean> = _isExistUser
-    private val _googleLoginEvent = MutableLiveData(Unit)
-    val googleLoginEvent: LiveData<Unit> = _googleLoginEvent
-    private val _failedMessage = MutableLiveData<Event<Unit>>()
-    val failedMessage: LiveData<Event<Unit>> = _failedMessage
+    private val _splashUiState = MutableStateFlow(SplashUiState())
+    val splashUiState: StateFlow<SplashUiState> = _splashUiState
 
-    val name = MutableLiveData<String>()
-    val phoneNumber = MutableLiveData<String>()
+    private val _setInfoUiState = MutableStateFlow(SetInfoUiState())
+    val setInfoUiState: StateFlow<SetInfoUiState> = _setInfoUiState
+
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState
+
+    val name = MutableLiveData("")
+    val phoneNumber = MutableLiveData("")
 
     fun onSubmitClick() {
         if (isEmptyContent()) {
-            _notRequiredEvent.value = Unit
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNotRequired = true)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNotRequired = false)
         } else {
-            _submitEvent.value = Unit
+            _setInfoUiState.value = _setInfoUiState.value.copy(isSubmit = true)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isSubmit = false)
         }
     }
 
     fun addImageClick() {
-        _addImageEvent.value = Unit
+        _setInfoUiState.value = _setInfoUiState.value.copy(isImageClicked = true)
+        _setInfoUiState.value = _setInfoUiState.value.copy(isImageClicked = false)
     }
 
-    fun submitUser(
-        imageUri: Uri?,
-        userLanguage: String,
+    suspend fun submitUser(
+        imageUri: Uri?, userLanguage: String,
         startHomeActivity: () -> Unit,
     ) {
+        _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = true)
+        val profileImageFlow = repository.uploadImage(imageUri).stateIn(viewModelScope)
+        val user = User(
+            userEmail = FirebaseData.user?.email ?: return,
+            userName = name.value ?: "",
+            userPhoneNumber = phoneNumber.value ?: "",
+            userProfileImage = profileImageFlow.value,
+            userLanguage = userLanguage,
+            userDeviceToken = token ?: "",
+            userFriendIdList = emptyList(),
+            userCreatedAt = TimeUtil.getCurrentDateString()
+        )
         FirebaseData.getIdToken({ idToken ->
             viewModelScope.launch {
-                _isLoading.value = true
-                val profileImage = repository.uploadImage(imageUri)
-                val user = User(
-                    userEmail = FirebaseData.user?.email ?: "",
-                    userName = name.value ?: "",
-                    userPhoneNumber = phoneNumber.value ?: "",
-                    userProfileImage = profileImage,
-                    userLanguage = userLanguage,
-                    userDeviceToken = token ?: "",
-                    userFriendIdList = listOf("iu@gmail.com"),
-                    userCreatedAt = TimeUtil.getCurrentDateString()
-                )
-                repository.putUser(idToken, user).run {
-                    if (this != null) {
-                        _isLoading.value = false
-                        startHomeActivity()
-                    } else {
-                        _isLoading.value = false
-                        _failedMessage.value = Event(Unit)
-                    }
+                val putUserFlow = repository.putUser(idToken, user).stateIn(viewModelScope)
+                if (putUserFlow.value != null) {
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = false)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = false)
+                    startHomeActivity()
+                } else {
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = false)
                 }
             }
         }, {
-            _failedMessage.value = Event(Unit)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
         })
     }
 
@@ -95,19 +111,22 @@ class LoginViewModel @Inject constructor(
             val response = repository.getExistUser(email)
             if (response is ApiResultSuccess) {
                 val user = response.data.values.first()
+                Log.d(TAG, "$user")
                 setUserInfo()
                 FirebaseData.getIdToken({
                     viewModelScope.launch {
-                        repository.updateUser(it, user)
-                        repository.updateFriends(user, user.userFriendIdList)
+                        repository.updateUser(it, user).collect()
+                        repository.updateFriends(user, user.userFriendIdList).collect()
                         repository.updateChatRooms(it, user.userEmail)
-                        _isExistUser.value = true
+                        _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                        _loginUiState.value = _loginUiState.value.copy(isExist = true)
                     }
                 }, {
                     viewModelScope.launch {
                         val originUser = repository.getMyInfo()
                         if (originUser != null) {
-                            _isExistUser.value = true
+                            _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                            _loginUiState.value = _loginUiState.value.copy(isExist = true)
                         }
                     }
                 })
@@ -121,10 +140,12 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val user = repository.getMyInfo()
             if (user != null) {
-                _isExistUser.value = true
+                _splashUiState.value = _splashUiState.value.copy(isExist = true)
+                _loginUiState.value = _loginUiState.value.copy(isExist = true)
             } else {
-                _isExistUser.value = false
-                _googleLoginEvent.value = Unit
+                _splashUiState.value = _splashUiState.value.copy(isExist = false)
+                _loginUiState.value =
+                    _loginUiState.value.copy(isGoogleLogin = true, isExist = false)
             }
         }
     }

@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
@@ -15,6 +18,7 @@ import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentSplashBinding
 import com.skysmyoo.publictalk.ui.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SplashFragment : BaseFragment() {
@@ -33,7 +37,7 @@ class SplashFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         validateAlreadyLogin()
-        existUserEmailObserver()
+        setSplashUiState()
     }
 
     private fun validateAlreadyLogin() {
@@ -41,7 +45,7 @@ class SplashFragment : BaseFragment() {
         if (email.isNullOrEmpty()) {
             navigateToLogin()
         } else {
-            if(isNetworkAvailable()){
+            if (isNetworkAvailable()) {
                 viewModel.validateExistUser(email)
             } else {
                 viewModel.localLogin()
@@ -49,29 +53,35 @@ class SplashFragment : BaseFragment() {
         }
     }
 
-    private fun existUserEmailObserver() {
-        viewModel.isExistUser.observe(viewLifecycleOwner) {
-            if (it) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.exist_user_info_msg),
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                val action = SplashFragmentDirections.actionSplashToHome()
-                findNavController().navigate(action)
-                requireActivity().finish()
-            } else {
-                navigateToLogin()
+    private fun setSplashUiState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.splashUiState.collect {
+                    if (it.isExist == true) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.exist_user_info_msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val action = SplashFragmentDirections.actionSplashToHome()
+                        findNavController().navigate(action)
+                        requireActivity().finish()
+                    } else if (it.isExist == false) {
+                        navigateToLogin()
+                    }
+                }
             }
         }
     }
 
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+                    ?: return false
             return when {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
