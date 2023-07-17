@@ -114,8 +114,9 @@ class ChatRoomFragment : BaseFragment() {
                         if (it) {
                             val translatedBody = viewModel.translatedText
                             val action =
-                                ChatRoomFragmentDirections.actionChatRoomToTranslate(translatedBody)
+                                ChatRoomFragmentDirections.actionChatRoomToTranslate(translatedBody, chatRoomInfo)
                             findNavController().navigate(action)
+                            binding.etChatRoomMessage.setText("")
                         }
                     }
                 }
