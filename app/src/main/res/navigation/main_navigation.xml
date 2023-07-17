@@ -56,7 +56,9 @@
         tools:layout="@layout/fragment_chat_room">
         <argument
             android:name="chatRoom"
-            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom"
+            app:popUpTo="@id/navigation_chat_room"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_chat_room_to_translate"
             app:destination="@id/navigation_translate" />
@@ -104,7 +106,7 @@
             android:id="@+id/action_remove_chat_to_chat_list"
             app:destination="@id/navigation_chat_list"
             app:popUpTo="@id/navigation_chat_list"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </dialog>
 
 
