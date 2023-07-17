@@ -40,11 +40,11 @@ class ChatRepository @Inject constructor(
         val database = FirebaseDatabase.getInstance()
         val currentTime = TimeUtil.getCurrentDateString()
 
-        if (chatRoomId == null) {
+        if (chatRoomId.isNullOrEmpty()) {
             val senderMember = ChattingMember(userEmail = message.sender)
             val receiverMember = ChattingMember(userEmail = message.receiver)
             val chattingMember = listOf(senderMember, receiverMember)
-            val chatRoom = ChatRoom(member = chattingMember, chatCreatedAt = currentTime)
+            val chatRoom = ChatRoom(member = chattingMember, chatCreatedAt = currentTime, messages = emptyMap())
             val createRoomResponse = remoteDataSource.createChatRoom(auth, chatRoom)
             return if (createRoomResponse is ApiResultSuccess) {
                 val chatRoomUid = createRoomResponse.data.values.first()
