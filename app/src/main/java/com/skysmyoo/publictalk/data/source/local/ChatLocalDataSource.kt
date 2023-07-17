@@ -9,6 +9,10 @@ class ChatLocalDataSource @Inject constructor(
     private val preferencesManager: SharedPreferencesManager
 ) {
 
+    fun getMyLocale(): String {
+        return preferencesManager.getLocale()
+    }
+
     fun getMyEmail(): String {
         return preferencesManager.getMyEmail() ?: ""
     }
