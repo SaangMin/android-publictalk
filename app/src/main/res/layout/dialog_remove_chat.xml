@@ -4,6 +4,13 @@
 
     <data>
 
+        <variable
+            name="chatRoom"
+            type="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.chat_room.ChatRoomViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_remove_chat"
             android:backgroundTint="@color/color_cancel"
+            android:onClick="@{()-> viewModel.deleteChatRoom(chatRoom)}"
             android:text="@string/submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_remove_chat"
             android:backgroundTint="@color/color_submit"
+            android:onClick="@{()->viewModel.onCancelClick()}"
             android:text="@string/cancel"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
