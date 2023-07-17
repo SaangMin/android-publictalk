@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.Snackbar
+import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.DialogTranslateBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,6 +74,17 @@ class TranslateDialogFragment : DialogFragment() {
                     viewModel.isSent.collect {
                         if (it) {
                             findNavController().navigateUp()
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isFirebaseError.collect {
+                        if (it) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.firebase_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }

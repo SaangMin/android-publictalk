@@ -24,7 +24,6 @@ import javax.inject.Inject
 data class ChatRoomUiState(
     val isGetChatRoomKey: Boolean = false,
     val otherUser: User? = null,
-    val isFirebaseError: Boolean = false,
     val isNetworkError: Boolean = false,
 )
 
@@ -48,6 +47,8 @@ class ChatRoomViewModel @Inject constructor(
     val isSent: StateFlow<Boolean> = _isSent
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+    private val _isFirebaseError = MutableStateFlow(false)
+    val isFirebaseError: StateFlow<Boolean> = _isFirebaseError
 
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
@@ -125,9 +126,8 @@ class ChatRoomViewModel @Inject constructor(
                         _isLoading.value = false
                     }
                 }, {
-                    _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
-                    _chatRoomUiState.value =
-                        _chatRoomUiState.value.copy(isFirebaseError = false)
+                    _isFirebaseError.value = true
+                    _isFirebaseError.value = false
                 })
             }
         }

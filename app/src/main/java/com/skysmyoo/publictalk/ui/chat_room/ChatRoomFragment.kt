@@ -77,13 +77,6 @@ class ChatRoomFragment : BaseFragment() {
                         if (it.otherUser != null) {
                             binding.abChatRoom.title = it.otherUser.userName
                         }
-                        if (it.isFirebaseError) {
-                            Snackbar.make(
-                                binding.root,
-                                getString(R.string.firebase_error_msg),
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
                         if (it.isNetworkError) {
                             Snackbar.make(
                                 binding.root,
@@ -114,16 +107,30 @@ class ChatRoomFragment : BaseFragment() {
                         if (it) {
                             val translatedBody = viewModel.translatedText
                             val action =
-                                ChatRoomFragmentDirections.actionChatRoomToTranslate(translatedBody, chatRoomInfo)
+                                ChatRoomFragmentDirections.actionChatRoomToTranslate(
+                                    translatedBody,
+                                    chatRoomInfo
+                                )
                             findNavController().navigate(action)
                             binding.etChatRoomMessage.setText("")
                         }
                     }
                 }
                 launch {
-                    viewModel.isSent.collect{
-                        if(it) {
+                    viewModel.isSent.collect {
+                        if (it) {
                             binding.etChatRoomMessage.setText("")
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isFirebaseError.collect {
+                        if (it) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.firebase_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
