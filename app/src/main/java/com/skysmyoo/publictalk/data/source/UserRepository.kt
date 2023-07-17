@@ -22,6 +22,26 @@ class UserRepository @Inject constructor(
     private val chatRemoteDataSource: ChatRemoteDataSource,
 ) {
 
+    suspend fun createChatRoom(chatRoom: ChatRoom): ChatRoom? {
+        val auth = FirebaseData.authToken ?: return null
+        val createRoomResponse = chatRemoteDataSource.createChatRoom(auth, chatRoom)
+        return if (createRoomResponse is ApiResultSuccess) {
+            val chatRoomUid = createRoomResponse.data.values.first()
+            when (val newChatRoomResponse = chatRemoteDataSource.getChatRoom(chatRoomUid)) {
+                is ApiResultSuccess -> {
+                    updateChatRooms(auth, getMyEmail() ?: "")
+                    return newChatRoomResponse.data
+                }
+
+                else -> {
+                    return null
+                }
+            }
+        } else {
+            null
+        }
+    }
+
     suspend fun getMyInfo(): User? {
         return userLocalDataSource.getMyInfo()
     }
@@ -61,8 +81,8 @@ class UserRepository @Inject constructor(
     suspend fun getChatRoom(member: List<String>): ChatRoom? {
         val chatRoomList = chatLocalDataSource.getChatRoomList() ?: return null
         for (chatRoom in chatRoomList) {
-            val chatRoomMember = chatRoom.member.map { it.userEmail }
-            if (member == chatRoomMember) {
+            val chatRoomMember = chatRoom.member.map { it.userEmail }.sorted()
+            if (member.sorted() == chatRoomMember) {
                 return chatRoom
             }
         }

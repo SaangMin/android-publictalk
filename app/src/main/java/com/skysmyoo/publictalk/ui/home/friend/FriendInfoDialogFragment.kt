@@ -13,8 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.R
-import com.skysmyoo.publictalk.data.model.remote.ChatRoom
-import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.databinding.DialogFriendInfoBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
@@ -72,25 +70,33 @@ class FriendInfoDialogFragment : DialogFragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.friendInfoUiState.collect {
-                    if(it.isNotExistChatRoom) {
-                        val myEmail = viewModel.getMyEmail()
-                        val member = listOf(
-                            ChattingMember(userEmail = myEmail),
-                            ChattingMember(userEmail = friendInfo.userEmail)
-                        )
-                        val newChatRoom = ChatRoom(member = member)
-                        val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(newChatRoom)
-                        findNavController().navigate(action)
+                    if (it.isNotExistChatRoom) {
+                        val newChatRoom = viewModel.createdNewChatRoom
+                        if (newChatRoom != null) {
+                            val action =
+                                FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(
+                                    newChatRoom
+                                )
+                            findNavController().navigate(action)
+                        }
                     }
-                    if(it.isFoundChatRoom) {
+                    if (it.isFoundChatRoom) {
                         navigateChatRoom()
                     }
-                    if(it.isRemovedFriend) {
-                        Snackbar.make(binding.root, getString(R.string.delete_friend_msg), Snackbar.LENGTH_SHORT).show()
+                    if (it.isRemovedFriend) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.delete_friend_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                         findNavController().navigateUp()
                     }
-                    if(it.isNetworkError) {
-                        Snackbar.make(binding.root,getString(R.string.network_error_msg), Snackbar.LENGTH_SHORT).show()
+                    if (it.isNetworkError) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.network_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -99,7 +105,7 @@ class FriendInfoDialogFragment : DialogFragment() {
 
     private fun navigateChatRoom() {
         val chatRoom = viewModel.foundChatRoom
-        if(chatRoom != null) {
+        if (chatRoom != null) {
             val action = FriendInfoDialogFragmentDirections.actionFriendInfoToChatRoom(chatRoom)
             findNavController().navigate(action)
         }

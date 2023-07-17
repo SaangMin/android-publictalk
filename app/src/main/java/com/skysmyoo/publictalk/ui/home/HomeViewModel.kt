@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
+import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,6 +61,7 @@ class HomeViewModel @Inject constructor(
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
     var foundChatRoom: ChatRoom? = null
+    var createdNewChatRoom: ChatRoom? = null
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
@@ -116,7 +120,19 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val chatRoom = repository.getChatRoom(member)
             if (chatRoom == null) {
+                val friendEmail = member.find { it != getMyEmail() } ?: ""
+                val chatRoomMember = listOf(
+                    ChattingMember(userEmail = getMyEmail()),
+                    ChattingMember(userEmail = friendEmail)
+                )
+                val newChatRoom = ChatRoom(
+                    member = chatRoomMember,
+                    chatCreatedAt = TimeUtil.getCurrentDateString()
+                )
+                val createdChatRoom = repository.createChatRoom(newChatRoom)
+                createdNewChatRoom = createdChatRoom
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = true)
+                delay(1000)
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNotExistChatRoom = false)
             } else {
                 foundChatRoom = chatRoom

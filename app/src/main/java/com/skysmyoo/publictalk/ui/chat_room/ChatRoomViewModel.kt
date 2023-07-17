@@ -3,6 +3,7 @@ package com.skysmyoo.publictalk.ui.chat_room
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
@@ -32,6 +33,13 @@ class ChatRoomViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
+    private val _isSuccessDeleteChat = MutableStateFlow(false)
+    val isSuccessDeleteChat: StateFlow<Boolean> = _isSuccessDeleteChat
+    private val _isFailedDeleteChat = MutableStateFlow(false)
+    val isFailedDeleteChat: StateFlow<Boolean> = _isFailedDeleteChat
+    private val _isCancelClick = MutableStateFlow(false)
+    val isCancelClick: StateFlow<Boolean> = _isCancelClick
+
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
 
@@ -59,6 +67,26 @@ class ChatRoomViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun deleteChatRoom(chatRoom: ChatRoom) {
+        viewModelScope.launch {
+            when (chatRepository.deleteChatRoom(chatRoom)) {
+                is ApiException -> {
+                    _isFailedDeleteChat.value = true
+                    _isFailedDeleteChat.value = false
+                }
+
+                else -> {
+                    _isSuccessDeleteChat.value = true
+                }
+            }
+        }
+    }
+
+    fun onCancelClick() {
+        _isCancelClick.value = true
+        _isCancelClick.value = false
     }
 
     fun findFriend(chatRoom: ChatRoom) {
@@ -124,7 +152,7 @@ class ChatRoomViewModel @Inject constructor(
             FirebaseDatabase.getInstance().getReference(PATH_CHAT_ROOMS).child(roomKey)
                 .child(PATH_MEMBER).child(myIdKey)
 
-        chatRoomRef.child(PATH_IS_CHATTING).setValue(false)
+        chatRoomRef.child(PATH_IS_CHATTING).removeValue()
     }
 
     companion object {

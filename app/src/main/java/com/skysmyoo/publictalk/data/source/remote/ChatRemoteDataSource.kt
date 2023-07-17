@@ -35,6 +35,10 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         return apiClient.getChatRooms(auth)
     }
 
+    suspend fun deleteChatRoom(auth: String, chatRoomId: String): ApiResponse<Map<String, String>> {
+        return apiClient.deleteChatRoom(chatRoomId, auth)
+    }
+
     suspend fun getChatRoomKey(member: List<String>): ApiResponse<String> =
         suspendCoroutine { continuation ->
             chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -77,7 +81,7 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                 }
             })
         }
-        myInfoRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
+        myInfoRef.child(PATH_IS_CHATTING).onDisconnect().removeValue()
     }
 
     fun chatListenerFlow(roomKey: String): Flow<Message> = callbackFlow {
@@ -133,6 +137,24 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         membersRef.addListenerForSingleValueEvent(valueEventListener)
         awaitClose { membersRef.removeEventListener(valueEventListener) }
     }
+
+    suspend fun getChatRoom(roomKey: String): ApiResponse<ChatRoom> =
+        suspendCoroutine { continuation ->
+            chatRoomRef.child(roomKey).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val chatRoom = snapshot.getValue(ChatRoom::class.java)
+                    if (chatRoom != null) {
+                        continuation.resume(ApiResultSuccess(chatRoom))
+                    } else {
+                        continuation.resume(ApiResultError(code = 404, "ChatRoom not found"))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resume(ApiResultError(code = 500, "DatabaseError: $error"))
+                }
+            })
+        }
 
     companion object {
         private const val TAG = "ChatRemoteDataSource"

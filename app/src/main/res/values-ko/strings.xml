@@ -76,4 +76,9 @@
     <string name="cancel">취소</string>
     <string name="translate_logo_design_description">번역창 로고 디자인</string>
     <string name="navigation_translate_label">번역창</string>
+    <string name="remove_chat_label">대화방을\n삭제하시겠습니까?</string>
+    <string name="submit">확인</string>
+    <string name="navigation_remove_chat_label">대화 삭제창</string>
+    <string name="success_remove_chat_msg">채팅방이 삭제되었습니다.</string>
+    <string name="failure_remove_chat_msg">삭제에 실패했습니다. 잠시후 다시 시도해주세요.</string>
 </resources>
