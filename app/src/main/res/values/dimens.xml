@@ -16,4 +16,6 @@
     <dimen name="margin_msg_box">16dp</dimen>
     <dimen name="margin_friend_info">40dp</dimen>
     <dimen name="margin_friend_info_button">80dp</dimen>
+    <dimen name="margin_translate">16dp</dimen>
+    <dimen name="margin_translate_btn">72dp</dimen>
 </resources>
