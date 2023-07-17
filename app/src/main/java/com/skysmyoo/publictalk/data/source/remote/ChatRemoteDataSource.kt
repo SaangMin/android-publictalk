@@ -81,7 +81,7 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                 }
             })
         }
-        myInfoRef.child(PATH_IS_CHATTING).onDisconnect().setValue(false)
+        myInfoRef.child(PATH_IS_CHATTING).onDisconnect().removeValue()
     }
 
     fun chatListenerFlow(roomKey: String): Flow<Message> = callbackFlow {

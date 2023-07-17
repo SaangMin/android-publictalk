@@ -42,9 +42,8 @@ class RemoveChatDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setRemoveChatObserver()
-        binding.btnRemoveChatCancel.setOnClickListener {
-            dismiss()
-        }
+        binding.viewModel = viewModel
+        binding.chatRoom = chatRoom
     }
 
     private fun setRemoveChatObserver() {
@@ -66,6 +65,13 @@ class RemoveChatDialogFragment : DialogFragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.isCancelClick.collect {
+                        if(it) {
+                            dismiss()
+                        }
+                    }
+                }
             }
         }
     }
@@ -81,5 +87,9 @@ class RemoveChatDialogFragment : DialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val TAG = "RemoveChatDialogFragment"
     }
 }
