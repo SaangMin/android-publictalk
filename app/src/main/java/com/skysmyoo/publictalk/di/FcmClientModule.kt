@@ -2,6 +2,7 @@ package com.skysmyoo.publictalk.di
 
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
+import com.skysmyoo.publictalk.data.source.remote.response.ApiCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +40,7 @@ object FcmClientModule {
             .baseUrl(BuildConfig.FCM_BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create())
+            .addCallAdapterFactory(ApiCallAdapterFactory.create())
             .build()
     }
 

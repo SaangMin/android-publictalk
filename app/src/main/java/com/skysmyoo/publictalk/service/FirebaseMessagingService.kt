@@ -9,6 +9,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.Token
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,10 +30,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     private fun sendRegistrationToServer(token: String?) {
         CoroutineScope(Dispatchers.IO).launch {
             val response = fcmClient.registerToken(Token(token))
-            if (response.isSuccessful) {
+            if (response is ApiResultSuccess) {
                 Log.d(TAG, "Token registered successfully")
             } else {
-                Log.e(TAG, "Failed to register token: ${response.errorBody()}")
+                Log.e(TAG, "Failed to register token")
             }
         }
     }

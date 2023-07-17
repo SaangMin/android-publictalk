@@ -27,7 +27,7 @@ object FirebaseData {
         })
     }
 
-    fun getIdToken(successResult: (idToken: String) -> Unit) {
+    fun getIdToken(successResult: (idToken: String) -> Unit, failureResult: () -> Unit) {
         user?.let {
             it.getIdToken(true)
                 .addOnCompleteListener { task ->
@@ -41,6 +41,9 @@ object FirebaseData {
                     } else {
                         Log.e("FirebaseData", "get user error")
                     }
+                }
+                .addOnFailureListener {
+                    failureResult()
                 }
         }
     }

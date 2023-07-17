@@ -7,7 +7,9 @@ import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.local.UserLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
-import retrofit2.Response
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
@@ -17,29 +19,37 @@ class UserRepository @Inject constructor(
     private val chatRemoteDataSource: ChatRemoteDataSource,
 ) {
 
-    suspend fun insertUser(user: User) {
-        userLocalDataSource.insertUser(user)
-    }
-
     suspend fun getMyInfo(): User? {
         return userLocalDataSource.getMyInfo()
     }
 
-    suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
-        userLocalDataSource.insertUser(user)
-        return userRemoteDataSource.putUser(auth, user)
+    suspend fun putUser(auth: String, user: User): Map<String, String>? {
+        return when (val response = userRemoteDataSource.putUser(auth, user)) {
+            is ApiResultSuccess -> {
+                userLocalDataSource.insertUser(user)
+                response.data
+            }
+
+            else -> null
+        }
+    }
+
+    suspend fun getChatRooms(): List<ChatRoom> {
+        return chatLocalDataSource.getChatRoomList() ?: emptyList()
     }
 
     suspend fun uploadImage(image: Uri?): String? {
-        return userRemoteDataSource.uploadImage(image)
+        return when (val response = userRemoteDataSource.uploadImage(image)) {
+            is ApiResultSuccess -> {
+                response.data
+            }
+
+            else -> null
+        }
     }
 
     fun getMyEmail(): String? {
         return userLocalDataSource.getMyEmail()
-    }
-
-    fun getMyLocale(): String {
-        return userLocalDataSource.getMyLocale()
     }
 
     suspend fun getChatRoom(member: List<String>): ChatRoom? {
@@ -57,68 +67,106 @@ class UserRepository @Inject constructor(
         return userLocalDataSource.clearMyData()
     }
 
-    suspend fun getExistUser(email: String?): Map<String, User>? {
-        val userDataSnapshot = userRemoteDataSource.getExistUser(email)
-        val userUid = userDataSnapshot?.key ?: return null
-        val user = userDataSnapshot.getValue(User::class.java) ?: return null
+    suspend fun updateChatRooms(auth: String, email: String): List<ChatRoom> {
+        return when (val response = chatRemoteDataSource.getChatRooms(auth)) {
+            is ApiResultSuccess -> {
+                val chatRooms = response.data.filterValues {
+                    it.member.map { member -> member.userEmail }.contains(email)
+                }
+                chatRooms.values.toList()
+            }
 
-        return mapOf(userUid to user)
+            else -> chatLocalDataSource.getChatRoomList() ?: emptyList<ChatRoom>()
+        }
+    }
+
+    suspend fun getExistUser(email: String?): ApiResponse<Map<String, User>>? {
+        return when (val response = userRemoteDataSource.getExistUser(email)) {
+            is ApiResultSuccess -> {
+                val userUid = response.data.key ?: return null
+                val user = response.data.getValue(User::class.java) ?: return null
+                ApiResultSuccess(mapOf(userUid to user))
+            }
+            else -> null
+        }
     }
 
     private suspend fun addLocalFriend(myInfo: User, friend: User) {
         userLocalDataSource.addFriend(myInfo, friend)
     }
 
-    suspend fun updateUser(auth: String, user: User): Response<User>? {
-        userLocalDataSource.insertUser(user)
-        return userRemoteDataSource.updateUser(auth, user)
+    suspend fun updateUser(auth: String, user: User): User? {
+        return when (val response = userRemoteDataSource.updateUser(auth, user)) {
+            is ApiResultSuccess -> {
+                userLocalDataSource.insertUser(user)
+                response.data
+            }
+
+            else -> userLocalDataSource.getMyInfo()
+        }
     }
 
     suspend fun updateFriends(myInfo: User, friendList: List<String>): List<User?> {
-        val updatedFriendList = userRemoteDataSource.updateFriendsData(friendList)
-        userLocalDataSource.clearFriendsData()
-        updatedFriendList.forEach {
-            if (it != null) {
-                addLocalFriend(myInfo, it)
+        return when (val response = userRemoteDataSource.updateFriendsData(friendList)) {
+            is ApiResultSuccess -> {
+                userLocalDataSource.clearFriendsData()
+                response.data.forEach {
+                    if (it != null) {
+                        addLocalFriend(myInfo, it)
+                    }
+                }
+                response.data
             }
+
+            else -> userLocalDataSource.getFriendList()
         }
-        return updatedFriendList
     }
 
     suspend fun getFriends(): List<User> {
         return userLocalDataSource.getFriendList()
     }
 
-    suspend fun getChatRooms(): List<ChatRoom>? {
-        return chatLocalDataSource.getChatRoomList()
-    }
-
-    suspend fun updateChatRoom(auth: String, myEmail: String): List<ChatRoom> {
-        val chatRoomList = chatRemoteDataSource.getChatRooms(auth, myEmail)
-        chatLocalDataSource.clearChatRooms()
-        chatRoomList.forEach {
-            chatLocalDataSource.insertChatRoom(it)
-        }
-        return chatRoomList
-    }
-
     suspend fun findFriend(email: String): User? {
         return userLocalDataSource.findFriend(email)
     }
 
-    suspend fun searchFriendFromRemote(email: String): User? {
-        val userDataSnapshot = userRemoteDataSource.getExistUser(email)
-        return userDataSnapshot?.getValue(User::class.java)
+    suspend fun searchFriendFromRemote(email: String): ApiResponse<User>? {
+        return when (val response = userRemoteDataSource.getExistUser(email)) {
+            is ApiResultSuccess -> {
+                val user = response.data.getValue(User::class.java) ?: return null
+                ApiResultSuccess(user)
+            }
+
+            is ApiResultError -> {
+                ApiResultError(code = 400, "Network Error!")
+            }
+
+            else -> null
+        }
     }
 
-    suspend fun addFriend(myInfo: User, friend: User) {
-        userRemoteDataSource.addFriend(myInfo.userEmail, friend.userEmail)
-        userLocalDataSource.addFriend(myInfo, friend)
+    suspend fun addFriend(myInfo: User, friend: User): ApiResponse<Unit> {
+        return when (val response =
+            userRemoteDataSource.addFriend(myInfo.userEmail, friend.userEmail)) {
+            is ApiResultSuccess -> {
+                userLocalDataSource.addFriend(myInfo, friend)
+                response
+            }
+
+            else -> response
+        }
     }
 
-    suspend fun removeFriend(myInfo: User, friend: User) {
-        userRemoteDataSource.removeFriend(myInfo.userEmail, friend.userEmail)
-        userLocalDataSource.removeFriend(myInfo, friend)
+    suspend fun removeFriend(myInfo: User, friend: User): ApiResponse<Unit> {
+        return when (val response =
+            userRemoteDataSource.removeFriend(myInfo.userEmail, friend.userEmail)) {
+            is ApiResultSuccess -> {
+                userLocalDataSource.removeFriend(myInfo, friend)
+                response
+            }
+
+            else -> response
+        }
     }
 
     companion object {

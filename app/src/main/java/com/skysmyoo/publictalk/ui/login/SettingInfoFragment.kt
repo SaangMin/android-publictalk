@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -17,6 +18,7 @@ import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.user
 import com.skysmyoo.publictalk.databinding.FragmentSettingInfoBinding
 import com.skysmyoo.publictalk.ui.loading.LoadingDialogFragment
+import com.skysmyoo.publictalk.utils.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,6 +48,7 @@ class SettingInfoFragment : BaseFragment() {
         isLoadingObserver()
         submitRequiredObserver()
         submitUserObserver()
+        failedMessageObserver()
     }
 
     private fun onProfileImageClickObserver() {
@@ -64,6 +67,12 @@ class SettingInfoFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun failedMessageObserver() {
+        viewModel.failedMessage.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.join_fail_error_msg), Toast.LENGTH_SHORT).show()
+        })
     }
 
     private fun submitRequiredObserver() {

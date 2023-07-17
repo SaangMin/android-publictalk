@@ -51,6 +51,7 @@ class FriendInfoDialogFragment : DialogFragment() {
         notExistChatRoomObserver()
         foundChatRoomObserver()
         removeFriendEventObserver()
+        networkErrorEventObserver()
     }
 
     override fun onStart() {
@@ -91,6 +92,12 @@ class FriendInfoDialogFragment : DialogFragment() {
         viewModel.removeFriendEvent.observe(viewLifecycleOwner, EventObserver {
             Toast.makeText(requireContext(), getString(R.string.delete_friend_msg), Toast.LENGTH_SHORT).show()
             findNavController().navigateUp()
+        })
+    }
+
+    private fun networkErrorEventObserver() {
+        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(),getString(R.string.network_error_msg), Toast.LENGTH_SHORT).show()
         })
     }
 

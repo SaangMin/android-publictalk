@@ -9,6 +9,7 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -36,6 +37,8 @@ class HomeViewModel @Inject constructor(
     val myInfoClickEvent: LiveData<Event<Unit>> = _myInfoClickEvent
     private val _removeFriendEvent = MutableLiveData<Event<Unit>>()
     val removeFriendEvent: LiveData<Event<Unit>> = _removeFriendEvent
+    private val _networkErrorEvent = MutableLiveData<Event<Unit>>()
+    val networkErrorEvent: LiveData<Event<Unit>> = _networkErrorEvent
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -68,13 +71,20 @@ class HomeViewModel @Inject constructor(
 
     fun getChatRooms() {
         viewModelScope.launch {
+            val localChatRoom = repository.getChatRooms()
+            _chatRoomList.value = Event(localChatRoom)
             val myEmail = getMyEmail()
-            FirebaseData.getIdToken {
+            FirebaseData.getIdToken({
                 viewModelScope.launch {
-                    val chatRoomList = repository.updateChatRoom(it, myEmail)
+                    val chatRoomList = repository.updateChatRooms(it, myEmail)
                     _chatRoomList.value = Event(chatRoomList)
                 }
-            }
+            }, {
+                viewModelScope.launch {
+                    val chatRoomList = repository.getChatRooms()
+                    _chatRoomList.value = Event(chatRoomList)
+                }
+            })
         }
     }
 
@@ -110,8 +120,12 @@ class HomeViewModel @Inject constructor(
     fun removeFriend(friend: User) {
         viewModelScope.launch {
             val myInfo = repository.getMyInfo() ?: return@launch
-            repository.removeFriend(myInfo, friend)
-            _removeFriendEvent.value = Event(Unit)
+            val response = repository.removeFriend(myInfo, friend)
+            if (response is ApiResultSuccess) {
+                _removeFriendEvent.value = Event(Unit)
+            } else {
+                _networkErrorEvent.value = Event(Unit)
+            }
         }
     }
 

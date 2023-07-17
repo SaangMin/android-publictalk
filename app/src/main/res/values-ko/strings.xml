@@ -67,4 +67,8 @@
     <string name="friend_info_profile_image">친구 정보화면 프로필 이미지</string>
     <string name="navigation_friend_info_label">친구 정보 화면</string>
     <string name="delete_friend_msg">친구가 삭제되었습니다.</string>
+    <string name="join_fail_error_msg">회원가입이 실패했습니다. 네트워크를 확인해주세요.</string>
+    <string name="network_error_msg">네트워크를 확인해주세요.</string>
+    <string name="add_friend_error_msg">친구 추가 실패했습니다. 네트워크 확인 후 다시 시도해주세요.</string>
+    <string name="firebase_error_msg">오류가 발생했습니다. 네트워크 확인 후 다시 시도해주세요.</string>
 </resources>

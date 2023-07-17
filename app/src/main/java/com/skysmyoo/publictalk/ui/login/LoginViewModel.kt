@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.ui.login
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +10,8 @@ import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.setUserInfo
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData.token
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
+import com.skysmyoo.publictalk.utils.Event
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -33,6 +34,8 @@ class LoginViewModel @Inject constructor(
     val isExistUser: LiveData<Boolean> = _isExistUser
     private val _googleLoginEvent = MutableLiveData(Unit)
     val googleLoginEvent: LiveData<Unit> = _googleLoginEvent
+    private val _failedMessage = MutableLiveData<Event<Unit>>()
+    val failedMessage: LiveData<Event<Unit>> = _failedMessage
 
     val name = MutableLiveData<String>()
     val phoneNumber = MutableLiveData<String>()
@@ -54,7 +57,7 @@ class LoginViewModel @Inject constructor(
         userLanguage: String,
         startHomeActivity: () -> Unit,
     ) {
-        FirebaseData.getIdToken { idToken ->
+        FirebaseData.getIdToken({ idToken ->
             viewModelScope.launch {
                 _isLoading.value = true
                 val profileImage = repository.uploadImage(imageUri)
@@ -69,15 +72,18 @@ class LoginViewModel @Inject constructor(
                     userCreatedAt = TimeUtil.getCurrentDateString()
                 )
                 repository.putUser(idToken, user).run {
-                    if (this.isSuccessful) {
+                    if (this != null) {
                         _isLoading.value = false
                         startHomeActivity()
                     } else {
-                        Log.e(TAG, "put user error!: ${errorBody()}")
+                        _isLoading.value = false
+                        _failedMessage.value = Event(Unit)
                     }
                 }
             }
-        }
+        }, {
+            _failedMessage.value = Event(Unit)
+        })
     }
 
     private fun isEmptyContent(): Boolean {
@@ -86,17 +92,36 @@ class LoginViewModel @Inject constructor(
 
     fun validateExistUser(email: String?) {
         viewModelScope.launch {
-            val user = repository.getExistUser(email)?.values?.firstOrNull()
-            if (user != null) {
+            val response = repository.getExistUser(email)
+            if (response is ApiResultSuccess) {
+                val user = response.data.values.first()
                 setUserInfo()
-                FirebaseData.getIdToken { idToken ->
+                FirebaseData.getIdToken({
                     viewModelScope.launch {
-                        repository.updateUser(idToken, user)
+                        repository.updateUser(it, user)
                         repository.updateFriends(user, user.userFriendIdList)
-                        repository.updateChatRoom(idToken, user.userEmail)
+                        repository.updateChatRooms(it, user.userEmail)
                         _isExistUser.value = true
                     }
-                }
+                }, {
+                    viewModelScope.launch {
+                        val originUser = repository.getMyInfo()
+                        if (originUser != null) {
+                            _isExistUser.value = true
+                        }
+                    }
+                })
+            } else {
+                localLogin()
+            }
+        }
+    }
+
+    fun localLogin() {
+        viewModelScope.launch {
+            val user = repository.getMyInfo()
+            if (user != null) {
+                _isExistUser.value = true
             } else {
                 _isExistUser.value = false
                 _googleLoginEvent.value = Unit

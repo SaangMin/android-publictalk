@@ -18,7 +18,9 @@
             app:destination="@id/navigation_friend_info" />
         <action
             android:id="@+id/action_friend_list_to_setting"
-            app:destination="@id/navigation_setting" />
+            app:destination="@id/navigation_setting"
+            app:popUpTo="@id/navigation_friend_list"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment

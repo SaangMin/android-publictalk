@@ -10,13 +10,16 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.remote.User
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultException
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Constants.PATH_USERS
 import com.skysmyoo.publictalk.utils.Constants.PATH_USER_EMAIL
 import com.skysmyoo.publictalk.utils.Constants.PATH_USER_FRIEND_ID_LIST
 import com.skysmyoo.publictalk.utils.TimeUtil
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
-import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -25,11 +28,11 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
 
     private val userRef = Firebase.database(BuildConfig.BASE_URL).getReference(PATH_USERS)
 
-    suspend fun putUser(auth: String, user: User): Response<Map<String, String>> {
+    suspend fun putUser(auth: String, user: User): ApiResponse<Map<String, String>> {
         return apiClient.putUser(auth, user)
     }
 
-    suspend fun uploadImage(image: Uri?): String? {
+    suspend fun uploadImage(image: Uri?): ApiResponse<String>? {
 
         val currentTime = TimeUtil.getCurrentDateString()
 
@@ -41,85 +44,112 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
             imageRef.downloadUrl.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     downloadUri = task.result
+                } else {
+                    ApiResultError<String>(code = 500, "Task Fail!")
                 }
             }.await()
-            downloadUri.toString()
+            ApiResultSuccess(downloadUri.toString())
         } else {
             null
         }
     }
 
-    suspend fun getExistUser(email: String?): DataSnapshot? = suspendCoroutine { continuation ->
-        userRef.orderByChild(PATH_USER_EMAIL).equalTo(email)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val userData = snapshot.children.firstOrNull() ?: return
-                        continuation.resume(userData)
-                    } else {
-                        continuation.resume(null)
+    suspend fun getExistUser(email: String?): ApiResponse<DataSnapshot>? =
+        suspendCoroutine { continuation ->
+            userRef.orderByChild(PATH_USER_EMAIL).equalTo(email)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            val userData = snapshot.children.firstOrNull() ?: return
+                            continuation.resume(ApiResultSuccess(userData))
+                        } else {
+                            continuation.resume(null)
+                        }
                     }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        continuation.resume(
+                            ApiResultError(
+                                code = 500,
+                                message = "Database error: $error"
+                            )
+                        )
+                    }
+                })
+        }
+
+    suspend fun updateUser(auth: String, user: User): ApiResponse<User> {
+        val userEmail = user.userEmail
+        val userUid = getExistUser(userEmail)
+        if (userUid is ApiResultSuccess) {
+            val key = userUid.data.key ?: return ApiResultError(code = 400, "Doesn't have key.")
+            user.userDeviceToken =
+                FirebaseData.token ?: return ApiResultError(code = 400, "User Token not exist.")
+            return apiClient.updateUser(key, auth, user)
+        } else {
+            return ApiResultException(Throwable())
+        }
+    }
+
+    suspend fun updateFriendsData(friendList: List<String>): ApiResponse<List<User?>> =
+        coroutineScope {
+            ApiResultSuccess(friendList.map {
+                val dataSnapshot = getExistUser(it)
+                if (dataSnapshot is ApiResultSuccess) {
+                    val updatedUser = dataSnapshot.data.getValue(User::class.java)
+                    updatedUser
+                } else {
+                    return@coroutineScope ApiResultError(code = 400, "User not exist.")
+                }
+            })
+        }
+
+    suspend fun addFriend(userEmail: String, friendEmail: String): ApiResponse<Unit> {
+        val userDataSnapshot = getExistUser(userEmail)
+        if (userDataSnapshot is ApiResultSuccess) {
+            val key =
+                userDataSnapshot.data.key ?: return ApiResultError(code = 400, "Doesn't have key.")
+            val ref = userRef.child(key).child(PATH_USER_FRIEND_ID_LIST)
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
+                    val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
+                    friendList.add(friendEmail)
+                    ref.setValue(friendList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    continuation.resume(null)
+                    Log.w(TAG, "databaseError: $error")
                 }
             })
-    }
-
-    suspend fun updateUser(auth: String, user: User): Response<User>? {
-        val userEmail = user.userEmail
-        val userUid = getExistUser(userEmail)?.key ?: return null
-        user.userDeviceToken = FirebaseData.token ?: return null
-        return apiClient.updateUser(userUid, auth, user)
-    }
-
-    suspend fun updateFriendsData(friendList: List<String>): List<User?> =
-        coroutineScope {
-            friendList.map {
-                val dataSnapshot = getExistUser(it)
-                val updatedUser = dataSnapshot?.getValue(User::class.java)
-                updatedUser
-            }
+            return ApiResultSuccess(Unit)
+        } else {
+            return ApiResultError(code = 400, "Not exist User.")
         }
-
-    suspend fun addFriend(userEmail: String, friendEmail: String) {
-        val userDataSnapshot = getExistUser(userEmail)
-        val userUid = userDataSnapshot?.key ?: return
-        val ref = userRef.child(userUid).child(PATH_USER_FRIEND_ID_LIST)
-
-        ref.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
-                val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
-                friendList.add(friendEmail)
-                ref.setValue(friendList)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w(TAG, "databaseError: $error")
-            }
-        })
     }
 
-    suspend fun removeFriend(userEmail: String, friendEmail: String) {
+    suspend fun removeFriend(userEmail: String, friendEmail: String): ApiResponse<Unit> {
         val userDataSnapshot = getExistUser(userEmail)
-        val userUid = userDataSnapshot?.key ?: return
-        val ref = userRef.child(userUid).child(PATH_USER_FRIEND_ID_LIST)
+        if (userDataSnapshot is ApiResultSuccess) {
+            val key =
+                userDataSnapshot.data.key ?: return ApiResultError(code = 400, "Doesn't have key.")
+            val ref = userRef.child(key).child(PATH_USER_FRIEND_ID_LIST)
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
+                    val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
+                    friendList.remove(friendEmail)
+                    ref.setValue(friendList)
+                }
 
-        ref.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val friendListType = object : GenericTypeIndicator<MutableList<String>>() {}
-                val friendList = snapshot.getValue(friendListType) ?: mutableListOf()
-                friendList.remove(friendEmail)
-                ref.setValue(friendList)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w(TAG, "databaseError: $error")
-            }
-
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(TAG, "databaseError: $error")
+                }
+            })
+            return ApiResultSuccess(Unit)
+        } else {
+            return ApiResultError(code = 400, "Not exist User.")
+        }
     }
 
     companion object {

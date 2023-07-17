@@ -36,6 +36,8 @@ class ChatRoomFragment : BaseFragment() {
         newMessageObserver()
         friendDataObserver()
         roomKeyObserver()
+        firebaseErrorEventObserver()
+        networkErrorEventObserver()
 
         binding.btnChatRoomSend.setOnClickListener {
             onSendMessage()
@@ -104,6 +106,18 @@ class ChatRoomFragment : BaseFragment() {
             ).show()
         }
         binding.etChatRoomMessage.setText("")
+    }
+
+    private fun firebaseErrorEventObserver() {
+        viewModel.firebaseErrorEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.firebase_error_msg), Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun networkErrorEventObserver() {
+        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.network_error_msg),Toast.LENGTH_SHORT).show()
+        })
     }
 
     companion object {

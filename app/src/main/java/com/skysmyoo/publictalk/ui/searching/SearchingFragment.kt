@@ -27,6 +27,8 @@ class SearchingFragment : BaseFragment() {
         foundUserObserver()
         alreadyFriendEventObserver()
         addFriendObserver()
+        networkErrorEventObserver()
+        addFriendFailEventObserver()
     }
 
     private fun notExistUserObserver() {
@@ -67,6 +69,18 @@ class SearchingFragment : BaseFragment() {
         viewModel.addFriendEvent.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(),getString(R.string.add_friend_msg), Toast.LENGTH_SHORT).show()
             findNavController().navigateUp()
+        })
+    }
+
+    private fun networkErrorEventObserver() {
+        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(),getString(R.string.network_error_msg), Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun addFriendFailEventObserver() {
+        viewModel.addFriendFailEvent.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.add_friend_error_msg), Toast.LENGTH_SHORT).show()
         })
     }
 }
