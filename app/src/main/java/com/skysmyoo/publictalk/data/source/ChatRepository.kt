@@ -36,7 +36,7 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Message? {
+    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Map<String, Message>? {
         val database = FirebaseDatabase.getInstance()
         val currentTime = TimeUtil.getCurrentDateString()
 
@@ -44,14 +44,18 @@ class ChatRepository @Inject constructor(
             val senderMember = ChattingMember(userEmail = message.sender)
             val receiverMember = ChattingMember(userEmail = message.receiver)
             val chattingMember = listOf(senderMember, receiverMember)
-            val chatRoom = ChatRoom(member = chattingMember, chatCreatedAt = currentTime, messages = emptyMap())
+            val chatRoom = ChatRoom(
+                member = chattingMember,
+                chatCreatedAt = currentTime,
+                messages = emptyMap()
+            )
             val createRoomResponse = remoteDataSource.createChatRoom(auth, chatRoom)
             return if (createRoomResponse is ApiResultSuccess) {
                 val chatRoomUid = createRoomResponse.data.values.first()
                 val messagesRef =
                     database.getReference(PATH_CHAT_ROOMS).child(chatRoomUid).child(PATH_MESSAGES)
                 messagesRef.push().setValue(message)
-                message
+                mapOf(chatRoomUid to message)
             } else {
                 null
             }
@@ -59,7 +63,7 @@ class ChatRepository @Inject constructor(
             val messagesRef =
                 database.getReference(PATH_CHAT_ROOMS).child(chatRoomId).child(PATH_MESSAGES)
             return if (messagesRef.push().setValue(message).isSuccessful) {
-                message
+                mapOf("" to message)
             } else {
                 null
             }
@@ -88,6 +92,7 @@ class ChatRepository @Inject constructor(
     }
 
     fun enterChatting(roomKey: String, myIdKey: String) {
+        if (roomKey.isEmpty()) return
         val email = localDataSource.getMyEmail()
         remoteDataSource.enterChatting(roomKey, myIdKey, email)
     }
