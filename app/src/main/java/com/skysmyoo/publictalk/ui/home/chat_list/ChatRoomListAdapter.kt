@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.ItemChatRoomBinding
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
+import com.skysmyoo.publictalk.utils.TimeUtil
 
 class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
     ListAdapter<ChatRoom, ChatRoomListAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
@@ -38,6 +39,7 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
                     messageList.filter {
                         !it.reading && it.receiver == myEmail
                     }.size
+                time = TimeUtil.convertDateTime(messageList.lastOrNull()?.createdAt ?: "")
             }
             binding.viewModel = viewModel
         }

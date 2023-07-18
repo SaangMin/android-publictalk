@@ -24,7 +24,6 @@ import javax.inject.Inject
 data class ChatRoomUiState(
     val isGetChatRoomKey: Boolean = false,
     val otherUser: User? = null,
-    val isFirebaseError: Boolean = false,
     val isNetworkError: Boolean = false,
 )
 
@@ -46,6 +45,10 @@ class ChatRoomViewModel @Inject constructor(
     val isEmptyMessage: StateFlow<Boolean> = _isEmptyMessage
     private val _isSent = MutableStateFlow(false)
     val isSent: StateFlow<Boolean> = _isSent
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _isFirebaseError = MutableStateFlow(false)
+    val isFirebaseError: StateFlow<Boolean> = _isFirebaseError
 
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
@@ -107,6 +110,7 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun sendMessage(chatRoom: ChatRoom, textBody: String) {
+        _isLoading.value = true
         viewModelScope.launch {
             chatRepository.createNewMessage(
                 chatRoom,
@@ -119,11 +123,11 @@ class ChatRoomViewModel @Inject constructor(
                         _isSent.value = true
                         delay(1000)
                         _isSent.value = false
+                        _isLoading.value = false
                     }
                 }, {
-                    _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
-                    _chatRoomUiState.value =
-                        _chatRoomUiState.value.copy(isFirebaseError = false)
+                    _isFirebaseError.value = true
+                    _isFirebaseError.value = false
                 })
             }
         }
