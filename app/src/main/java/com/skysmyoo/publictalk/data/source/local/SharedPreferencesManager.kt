@@ -18,6 +18,14 @@ class SharedPreferencesManager @Inject constructor(context: Context) {
         return sharedPreferences.getString(Constants.KEY_MY_EMAIL, null)
     }
 
+    fun setNotification(isAgree: Boolean) {
+        sharedPreferences.edit().putBoolean(Constants.KEY_NOTIFICATION_PERMISSION, isAgree).apply()
+    }
+
+    fun getNotification(): Boolean {
+        return sharedPreferences.getBoolean(Constants.KEY_NOTIFICATION_PERMISSION, false)
+    }
+
     fun setLocale(locale: String) {
         sharedPreferences.edit().putString(KEY_USER_LANGUAGE, setLanguage(locale)).apply()
     }

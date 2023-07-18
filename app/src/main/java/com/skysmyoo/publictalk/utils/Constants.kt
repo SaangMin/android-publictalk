@@ -12,4 +12,6 @@ object Constants {
     const val PATH_MESSAGES = "messages"
     const val PATH_USERS = "users"
     const val PATH_USER_FRIEND_ID_LIST = "userFriendIdList"
+    const val CHANNEL_ID = "messaging notification channel"
+    const val KEY_NOTIFICATION_PERMISSION = "key_notification_permission"
 }
