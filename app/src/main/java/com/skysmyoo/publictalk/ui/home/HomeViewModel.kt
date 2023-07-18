@@ -1,8 +1,10 @@
 package com.skysmyoo.publictalk.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
+import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
@@ -31,6 +33,12 @@ data class ChatListUiState(
     val isChatRoomClicked: Boolean = false,
 )
 
+data class SettingUiState(
+    val isGettingMyInfo: Boolean = false,
+    val language: Language? = null,
+    val isLogoutClick: Boolean = false,
+)
+
 data class FriendInfoUiState(
     val isNotExistChatRoom: Boolean = false,
     val isFoundChatRoom: Boolean = false,
@@ -52,6 +60,9 @@ class HomeViewModel @Inject constructor(
     private val _friendInfoUiState = MutableStateFlow(FriendInfoUiState())
     val friendInfoUiState: StateFlow<FriendInfoUiState> = _friendInfoUiState
 
+    private val _settingUiState = MutableStateFlow(SettingUiState())
+    val settingUiState: StateFlow<SettingUiState> = _settingUiState
+
     val chatRoomList: StateFlow<List<ChatRoom>> = transformChatList().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -62,6 +73,27 @@ class HomeViewModel @Inject constructor(
     var clickedFriend: User? = null
     var foundChatRoom: ChatRoom? = null
     var createdNewChatRoom: ChatRoom? = null
+    var myInfo: User? = null
+
+    fun getMyInfo() {
+        viewModelScope.launch {
+            val user = repository.getMyInfo()
+            myInfo = user
+            _settingUiState.value = _settingUiState.value.copy(isGettingMyInfo = true)
+            _settingUiState.value = _settingUiState.value.copy(
+                language = Language.fromCode(
+                    myInfo?.userLanguage ?: "ko"
+                )
+            )
+        }
+    }
+
+    fun logout() {
+        repository.clearMyData()
+        Log.d(TAG,"logout")
+        _settingUiState.value = _settingUiState.value.copy(isLogoutClick = true)
+        Log.d(TAG,"${_settingUiState.value.isLogoutClick}")
+    }
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
