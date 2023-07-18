@@ -31,6 +31,7 @@ android {
         buildConfigField "String", "PAPAGO_BASE_URL", properties["papago_base_url"]
         buildConfigField "String", "PAPAGO_CLIENT_ID", properties["papago_client_id"]
         buildConfigField "String", "PAPAGO_CLIENT_SECRET", properties["papago_client_secret"]
+        buildConfigField "String", "FCM_SERVER_KEY", properties["fcm_server_key"]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

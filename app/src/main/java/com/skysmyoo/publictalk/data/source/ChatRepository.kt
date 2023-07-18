@@ -3,9 +3,11 @@ package com.skysmyoo.publictalk.data.source
 import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
+import com.skysmyoo.publictalk.data.model.remote.FcmNotification
 import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
+import com.skysmyoo.publictalk.data.source.remote.FcmDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.TranslateDataSource
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
@@ -23,6 +25,7 @@ class ChatRepository @Inject constructor(
     private val localDataSource: ChatLocalDataSource,
     private val remoteDataSource: ChatRemoteDataSource,
     private val papagoDataSource: TranslateDataSource,
+    private val fcmDataSource: FcmDataSource,
 ) {
 
     suspend fun deleteChatRoom(chatRoom: ChatRoom): ApiResponse<Map<String, String>> {
@@ -57,7 +60,11 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun sendMessage(auth: String, message: Message, chatRoomId: String?): Message? {
+    suspend fun sendMessage(
+        auth: String,
+        message: Message,
+        chatRoomId: String?
+    ): ApiResponse<Message> {
         val database = FirebaseDatabase.getInstance()
         val currentTime = TimeUtil.getCurrentDateString()
 
@@ -76,18 +83,15 @@ class ChatRepository @Inject constructor(
                 val messagesRef =
                     database.getReference(PATH_CHAT_ROOMS).child(chatRoomUid).child(PATH_MESSAGES)
                 messagesRef.push().setValue(message)
-                message
+                ApiResultSuccess(message)
             } else {
-                null
+                ApiResultError(code = 400, "Message send failed")
             }
         } else {
             val messagesRef =
                 database.getReference(PATH_CHAT_ROOMS).child(chatRoomId).child(PATH_MESSAGES)
-            return if (messagesRef.push().setValue(message).isSuccessful) {
-                message
-            } else {
-                null
-            }
+            messagesRef.push().setValue(message)
+            return ApiResultSuccess(message)
         }
     }
 
@@ -148,6 +152,13 @@ class ChatRepository @Inject constructor(
 
             else -> null
         }
+    }
+
+    suspend fun sendNotification(
+        serverKey: String,
+        notification: FcmNotification
+    ): ApiResponse<Unit> {
+        return fcmDataSource.sendNotification(serverKey, notification)
     }
 
     companion object {

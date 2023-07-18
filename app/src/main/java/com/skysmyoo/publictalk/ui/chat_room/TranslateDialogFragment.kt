@@ -88,6 +88,17 @@ class TranslateDialogFragment : DialogFragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.isSendFailed.collect{
+                        if(it) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.message_send_failed_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
             }
         }
     }
