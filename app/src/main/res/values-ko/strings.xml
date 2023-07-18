@@ -82,4 +82,5 @@
     <string name="success_remove_chat_msg">채팅방이 삭제되었습니다.</string>
     <string name="failure_remove_chat_msg">삭제에 실패했습니다. 잠시후 다시 시도해주세요.</string>
     <string name="message_send_failed_msg">전송에 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="new_message_receive_msg">새로운 메세지가 도착했습니다.</string>
 </resources>

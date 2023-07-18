@@ -1,7 +1,9 @@
 package com.skysmyoo.publictalk.ui
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,7 +16,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.databinding.ActivityHomeBinding
+import com.skysmyoo.publictalk.receiver.MyBroadcastReceiver
 import com.skysmyoo.publictalk.ui.home.friend.FriendListFragmentDirections
+import com.skysmyoo.publictalk.utils.Constants
 import com.skysmyoo.publictalk.utils.LanguageContextWrapper
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,12 +26,15 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var receiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        receiver = MyBroadcastReceiver()
+        registerReceiver(receiver, IntentFilter(Constants.MY_NOTIFICATION))
         binding.lifecycleOwner = this
         setNavigation()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -100,7 +107,6 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setNotificationPermission() {
         val permissionLauncher =
@@ -120,5 +126,10 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(receiver)
+        super.onDestroy()
     }
 }
