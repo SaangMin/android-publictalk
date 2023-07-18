@@ -47,9 +47,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title: String?, body: String?) {
-
         val notificationBuilder = NotificationCompat.Builder(this, "channel_id")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.icon_logo_min)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
