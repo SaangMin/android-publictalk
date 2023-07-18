@@ -30,6 +30,7 @@ object TimeUtil {
     }
 
     fun convertDateTime(dateTimeString: String): String {
+        if(dateTimeString.isEmpty()) return ""
         val date = dateTimeString.toDate(DATE_YEAR_MONTH_DAY_TIME_PATTERN)
         val converterPattern = if (date.isToday()) TIME_PATTERN else DATE_AND_TIME_PATTERN
         val dateFormat = SimpleDateFormat(converterPattern, currentLocale)

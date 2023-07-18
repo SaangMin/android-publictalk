@@ -28,7 +28,8 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatRoom) {
-            val messageList = item.messages.values.toList()
+            val messageList =
+                if (item.messages.isEmpty()) emptyList() else item.messages.values.toList()
             val otherUser = viewModel.getOtherUser(item)
             val myEmail = viewModel.getMyEmail()
             with(binding) {
