@@ -3,10 +3,168 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="user"
+            type="com.skysmyoo.publictalk.data.model.remote.User" />
+
+        <variable
+            name="viewModel"
+            type="com.skysmyoo.publictalk.ui.home.HomeViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.home.setting.SettingFragment">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_setting_my_profile"
+            profileImage="@{user.userProfileImage}"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="@id/gl_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/MyShapeImageStyle"
+            app:strokeWidth="4dp"
+            tools:src="@drawable/icon_profile_image" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_vertical_mid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <TextView
+            android:id="@+id/tv_setting_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@string/my_name_label"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_email_label"
+            app:layout_constraintEnd_toStartOf="@id/gl_vertical_mid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_top" />
+
+        <TextView
+            android:id="@+id/tv_setting_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@{user.userName}"
+            android:textAlignment="textEnd"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_email"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_top"
+            tools:text="@string/me_sample" />
+
+        <TextView
+            android:id="@+id/tv_setting_email_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@string/my_email_label"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_language_label"
+            app:layout_constraintEnd_toStartOf="@id/gl_vertical_mid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_name_label" />
+
+        <TextView
+            android:id="@+id/tv_setting_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@{user.userEmail}"
+            android:textAlignment="textEnd"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/sp_setting_language"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_name"
+            tools:text="@string/email_sample" />
+
+        <TextView
+            android:id="@+id/tv_setting_language_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@string/my_language_label"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_setting_notification_label"
+            app:layout_constraintEnd_toStartOf="@id/gl_vertical_mid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_email_label" />
+
+        <Spinner
+            android:id="@+id/sp_setting_language"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_setting"
+            android:layout_marginEnd="@dimen/margin_setting"
+            android:padding="4dp"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@id/sw_setting_notification"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_email" />
+
+        <TextView
+            android:id="@+id/tv_setting_notification_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_setting"
+            android:text="@string/notification_label"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_setting_edit"
+            app:layout_constraintEnd_toStartOf="@id/gl_vertical_mid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_setting_language_label" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/sw_setting_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_setting"
+            app:layout_constraintBottom_toTopOf="@id/btn_setting_edit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sp_setting_language" />
+
+        <Button
+            android:id="@+id/btn_setting_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/color_submit"
+            android:gravity="center"
+            android:text="@string/edit"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_setting_logout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sw_setting_notification" />
 
         <Button
             android:id="@+id/btn_setting_logout"
@@ -14,13 +172,14 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/color_cancel"
             android:gravity="center"
+            android:onClick="@{()->viewModel.logout()}"
             android:text="@string/logout"
             android:textAlignment="center"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/btn_setting_edit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
