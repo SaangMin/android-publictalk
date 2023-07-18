@@ -39,7 +39,7 @@
             android:textAlignment="center"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/btn_translate_send"
+            app:layout_constraintBottom_toTopOf="@id/tv_none_translate_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_translate_label"
@@ -55,6 +55,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_translate_label" />
 
+        <TextView
+            android:id="@+id/tv_none_translate_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_translate_hint"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@id/btn_translate_send"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_translate_result" />
+
         <Button
             android:id="@+id/btn_translate_send"
             android:layout_width="0dp"
@@ -68,7 +79,7 @@
             app:layout_constraintBottom_toTopOf="@id/btn_translate_cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_translate_result" />
+            app:layout_constraintTop_toBottomOf="@id/tv_none_translate_hint" />
 
         <Button
             android:id="@+id/btn_translate_cancel"
