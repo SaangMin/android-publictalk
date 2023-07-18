@@ -47,8 +47,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             showNotification(it.title, it.body)
             Intent().also { intent ->
                 intent.action = Constants.MY_NOTIFICATION
-                intent.putExtra(Constants.KEY_MESSAGE_TITLE, it.title)
-                intent.putExtra(Constants.KEY_MESSAGE_BODY, it.body)
                 sendBroadcast(intent)
             }
         }
