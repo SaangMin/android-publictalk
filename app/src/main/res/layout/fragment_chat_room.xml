@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="chatRoom"
+            type="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+
+        <variable
             name="viewModel"
             type="com.skysmyoo.publictalk.ui.chat_room.ChatRoomViewModel" />
     </data>
@@ -71,6 +75,7 @@
                 style="@style/MyChatRoomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="@{()->viewModel.startTranslate(chatRoom)}"
                 android:text="@string/send"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

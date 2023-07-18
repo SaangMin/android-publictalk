@@ -2,7 +2,6 @@ package com.skysmyoo.publictalk.ui.chat_room
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,9 +35,6 @@ class ChatRoomFragment : BaseFragment() {
         setLayout()
         viewModel.getRoomKey(chatRoomInfo)
         setChatRoomUiState()
-        binding.btnChatRoomSend.setOnClickListener {
-            onSendMessage()
-        }
     }
 
     override fun onStop() {
@@ -60,6 +56,7 @@ class ChatRoomFragment : BaseFragment() {
             }
         }
         binding.viewModel = viewModel
+        binding.chatRoom = chatRoomInfo
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -101,24 +98,36 @@ class ChatRoomFragment : BaseFragment() {
                         adapter.submitList(it)
                     }
                 }
+                launch {
+                    viewModel.isEmptyMessage.collect {
+                        if (it) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.empty_message_error),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isTranslated.collect {
+                        if (it) {
+                            val translatedBody = viewModel.translatedText
+                            val action =
+                                ChatRoomFragmentDirections.actionChatRoomToTranslate(translatedBody)
+                            findNavController().navigate(action)
+                        }
+                    }
+                }
+                launch {
+                    viewModel.isSent.collect{
+                        if(it) {
+                            binding.etChatRoomMessage.setText("")
+                        }
+                    }
+                }
             }
         }
-    }
-
-    private fun onSendMessage() {
-        viewModel.sendMessage(chatRoomInfo) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.empty_message_error),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        val body = binding.etChatRoomMessage.text.toString()
-        if (body.isNotEmpty()) {
-            val action = ChatRoomFragmentDirections.actionChatRoomToTranslate(body)
-            findNavController().navigate(action)
-        }
-        binding.etChatRoomMessage.setText("")
     }
 
     companion object {

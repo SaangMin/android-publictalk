@@ -28,6 +28,9 @@ android {
         buildConfigField "String", "GOOGLE_CLIENT_ID", properties["google_client_id"]
         buildConfigField "String", "BASE_URL", properties["base_url"]
         buildConfigField "String", "FCM_BASE_URL", properties["fcm_base_url"]
+        buildConfigField "String", "PAPAGO_BASE_URL", properties["papago_base_url"]
+        buildConfigField "String", "PAPAGO_CLIENT_ID", properties["papago_client_id"]
+        buildConfigField "String", "PAPAGO_CLIENT_SECRET", properties["papago_client_secret"]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

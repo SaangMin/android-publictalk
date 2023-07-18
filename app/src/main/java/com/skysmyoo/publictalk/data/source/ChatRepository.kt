@@ -7,6 +7,7 @@ import com.skysmyoo.publictalk.data.model.remote.Message
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
 import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.TranslateDataSource
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultException
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class ChatRepository @Inject constructor(
     private val localDataSource: ChatLocalDataSource,
     private val remoteDataSource: ChatRemoteDataSource,
+    private val papagoDataSource: TranslateDataSource,
 ) {
 
     suspend fun deleteChatRoom(chatRoom: ChatRoom): ApiResponse<Map<String, String>> {
@@ -36,6 +38,21 @@ class ChatRepository @Inject constructor(
 
             else -> {
                 ApiResultException(Throwable())
+            }
+        }
+    }
+
+    suspend fun translateText(targetLanguage: String, body: String): String {
+        val sourceLanguage = localDataSource.getMyLocale()
+        return when (val response =
+            papagoDataSource.translateText(sourceLanguage, targetLanguage, body)) {
+            is ApiResultSuccess -> {
+                val translatedBody = response.data.message.result.translatedText
+                translatedBody
+            }
+
+            else -> {
+                body
             }
         }
     }

@@ -15,6 +15,7 @@ import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,6 +40,12 @@ class ChatRoomViewModel @Inject constructor(
     val isFailedDeleteChat: StateFlow<Boolean> = _isFailedDeleteChat
     private val _isCancelClick = MutableStateFlow(false)
     val isCancelClick: StateFlow<Boolean> = _isCancelClick
+    private val _isTranslated = MutableStateFlow(false)
+    val isTranslated: StateFlow<Boolean> = _isTranslated
+    private val _isEmptyMessage = MutableStateFlow(false)
+    val isEmptyMessage: StateFlow<Boolean> = _isEmptyMessage
+    private val _isSent = MutableStateFlow(false)
+    val isSent: StateFlow<Boolean> = _isSent
 
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
@@ -48,6 +55,7 @@ class ChatRoomViewModel @Inject constructor(
 
     val messageBody = MutableLiveData<String>()
     var currentChatRoomKey = ""
+    var translatedText = ""
 
     fun getMyEmail(): String {
         return userRepository.getMyEmail() ?: ""
@@ -98,26 +106,25 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(chatRoom: ChatRoom, showEmptyMessageToast: () -> Unit) {
+    fun sendMessage(chatRoom: ChatRoom, textBody: String) {
         viewModelScope.launch {
-            if (messageBody.value.isNullOrEmpty()) {
-                showEmptyMessageToast()
-            } else {
-                chatRepository.createNewMessage(
-                    chatRoom,
-                    currentChatRoomKey,
-                    messageBody.value.toString()
-                ) {
-                    FirebaseData.getIdToken({ token ->
-                        viewModelScope.launch {
-                            chatRepository.sendMessage(token, it, currentChatRoomKey)
-                        }
-                    }, {
-                        _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
-                        _chatRoomUiState.value =
-                            _chatRoomUiState.value.copy(isFirebaseError = false)
-                    })
-                }
+            chatRepository.createNewMessage(
+                chatRoom,
+                currentChatRoomKey,
+                textBody
+            ) {
+                FirebaseData.getIdToken({ token ->
+                    viewModelScope.launch {
+                        chatRepository.sendMessage(token, it, currentChatRoomKey)
+                        _isSent.value = true
+                        delay(1000)
+                        _isSent.value = false
+                    }
+                }, {
+                    _chatRoomUiState.value = _chatRoomUiState.value.copy(isFirebaseError = true)
+                    _chatRoomUiState.value =
+                        _chatRoomUiState.value.copy(isFirebaseError = false)
+                })
             }
         }
     }
@@ -131,6 +138,27 @@ class ChatRoomViewModel @Inject constructor(
             } else {
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = true)
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = false)
+            }
+        }
+    }
+
+    fun startTranslate(chatRoom: ChatRoom) {
+        val myLocale = userRepository.getMyLocale()
+        val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
+        viewModelScope.launch {
+            if (!messageBody.value.isNullOrEmpty()) {
+                if (myLocale == targetLanguage) {
+                    sendMessage(chatRoom, messageBody.value ?: "")
+                    return@launch
+                }
+                val translatedBody =
+                    chatRepository.translateText(targetLanguage, messageBody.value ?: "")
+                translatedText = translatedBody
+                _isTranslated.value = true
+                _isTranslated.value = false
+            } else {
+                _isEmptyMessage.value = true
+                _isEmptyMessage.value = false
             }
         }
     }
