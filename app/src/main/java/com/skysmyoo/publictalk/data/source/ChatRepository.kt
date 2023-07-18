@@ -10,6 +10,7 @@ import com.skysmyoo.publictalk.data.source.remote.ChatRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.FcmDataSource
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.TranslateDataSource
+import com.skysmyoo.publictalk.data.source.remote.UserRemoteDataSource
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResponse
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultError
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultException
@@ -26,6 +27,7 @@ class ChatRepository @Inject constructor(
     private val remoteDataSource: ChatRemoteDataSource,
     private val papagoDataSource: TranslateDataSource,
     private val fcmDataSource: FcmDataSource,
+    private val userRemoteDataSource: UserRemoteDataSource,
 ) {
 
     suspend fun deleteChatRoom(chatRoom: ChatRoom): ApiResponse<Map<String, String>> {
@@ -126,6 +128,7 @@ class ChatRepository @Inject constructor(
         chatRoom: ChatRoom,
         roomKey: String,
         messageBody: String,
+        translatedText: String,
         sendMessage: (Message) -> Unit
     ) {
         val myEmail = localDataSource.getMyEmail()
@@ -137,6 +140,7 @@ class ChatRepository @Inject constructor(
                 myEmail,
                 otherEmail,
                 messageBody,
+                translatedText,
                 it,
                 currentTime
             )
