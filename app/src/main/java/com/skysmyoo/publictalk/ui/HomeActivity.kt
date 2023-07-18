@@ -1,8 +1,13 @@
 package com.skysmyoo.publictalk.ui
 
+import android.Manifest
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -25,6 +30,9 @@ class HomeActivity : AppCompatActivity() {
 
         binding.lifecycleOwner = this
         setNavigation()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            setNotificationPermission()
+        }
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -90,5 +98,27 @@ class HomeActivity : AppCompatActivity() {
             navController?.navigate(action)
             true
         }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun setNotificationPermission() {
+        val permissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    preferencesManager.setNotification(true)
+                } else {
+                    val shouldShowRational = ActivityCompat.shouldShowRequestPermissionRationale(
+                        this@HomeActivity,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                    if (shouldShowRational) {
+                        preferencesManager.setNotification(true)
+                    } else {
+                        preferencesManager.setNotification(false)
+                    }
+                }
+            }
+        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 }
