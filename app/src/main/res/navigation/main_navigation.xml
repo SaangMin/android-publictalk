@@ -91,11 +91,14 @@
         android:label="@string/navigation_translate_label"
         tools:layout="@layout/dialog_translate">
         <argument
+            android:name="chatRoom"
+            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+        <argument
             android:name="body"
             app:argType="string" />
         <argument
-            android:name="chatRoom"
-            app:argType="com.skysmyoo.publictalk.data.model.remote.ChatRoom" />
+            android:name="translatedText"
+            app:argType="string" />
     </dialog>
     <dialog
         android:id="@+id/navigation_remove_chat"

@@ -26,7 +26,7 @@
             android:background="@drawable/bg_receiver_message_box"
             android:maxWidth="300dp"
             android:padding="@dimen/margin_msg_box"
-            android:text="@{message.body}"
+            android:text="@{message.translatedText}"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
