@@ -15,6 +15,9 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.utils.Constants
 
 class MyBroadcastReceiver : BroadcastReceiver() {
+
+    private var onChatRoomListUpdate: (() -> Unit)? = null
+
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Constants.MY_NOTIFICATION) {
             val title = intent.getStringExtra(Constants.KEY_MESSAGE_TITLE)
@@ -44,6 +47,10 @@ class MyBroadcastReceiver : BroadcastReceiver() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
+        if (intent.action == Constants.REFRESH_CHAT_ROOM_LIST) {
+            onChatRoomListUpdate?.invoke()
+        }
     }
 
     private fun showNotification(context: Context, title: String?, body: String?) {
@@ -56,6 +63,10 @@ class MyBroadcastReceiver : BroadcastReceiver() {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(0, notificationBuilder.build())
+    }
+
+    fun setOnChatRoomListUpdate(callback: () -> Unit) {
+        onChatRoomListUpdate = callback
     }
 
     companion object {

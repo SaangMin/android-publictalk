@@ -15,12 +15,9 @@ import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -34,6 +31,7 @@ data class FriendListUiState(
 
 data class ChatListUiState(
     val isChatRoomClicked: Boolean = false,
+    val isChatListUpdated: Boolean = false,
 )
 
 data class SettingUiState(
@@ -70,11 +68,8 @@ class HomeViewModel @Inject constructor(
     private val _settingUiState = MutableStateFlow(SettingUiState())
     val settingUiState: StateFlow<SettingUiState> = _settingUiState
 
-    val chatRoomList: StateFlow<List<ChatRoom>> = transformChatList().stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
-    )
+    private val _chatRoomList = MutableStateFlow<List<ChatRoom>>(emptyList())
+    var chatRoomList: StateFlow<List<ChatRoom>> = _chatRoomList
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -149,9 +144,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun transformChatList(): Flow<List<ChatRoom>> = repository.getRemoteChatRooms().map {
-        it.sortedByDescending { chatRoom ->
-            chatRoom.messages.values.lastOrNull()?.createdAt ?: chatRoom.chatCreatedAt
+    fun refreshChatRoomList() {
+        viewModelScope.launch {
+            val newChatRoomList = repository.getRemoteChatRooms().stateIn(viewModelScope)
+            _chatRoomList.value = newChatRoomList.value
+            _chatListUiState.value = _chatListUiState.value.copy(isChatListUpdated = true)
+            delay(1000)
+            _chatListUiState.value = _chatListUiState.value.copy(isChatListUpdated = false)
         }
     }
 

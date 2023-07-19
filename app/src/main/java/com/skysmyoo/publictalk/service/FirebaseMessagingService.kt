@@ -40,7 +40,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        if(preferencesManager.getNotification()) {
+        if (preferencesManager.getNotification()) {
             message.notification?.let {
                 Intent().also { intent ->
                     intent.action = Constants.MY_NOTIFICATION
@@ -49,6 +49,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                     sendBroadcast(intent)
                 }
             }
+        }
+        Intent().also { intent ->
+            intent.action = Constants.REFRESH_CHAT_ROOM_LIST
+            sendBroadcast(intent)
         }
     }
 
