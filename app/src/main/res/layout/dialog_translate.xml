@@ -97,7 +97,7 @@
             app:layout_constraintTop_toBottomOf="@id/btn_translate_send" />
 
         <com.skysmyoo.publictalk.ui.loading.LoadingView
-            android:id="@+id/lv_setting_info"
+            android:id="@+id/lv_translate"
             isLoading="@{viewModel.loading}"
             android:layout_width="0dp"
             android:layout_height="0dp"
