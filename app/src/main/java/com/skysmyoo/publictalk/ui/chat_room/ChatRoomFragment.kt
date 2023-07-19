@@ -32,6 +32,7 @@ class ChatRoomFragment : BaseFragment() {
         chatRoomInfo = args.chatRoom
 
         adapter = ChatRoomAdapter(viewModel)
+        viewModel.messageListener(chatRoomInfo)
         setLayout()
         viewModel.getRoomKey(chatRoomInfo)
         setChatRoomUiState()
@@ -72,7 +73,6 @@ class ChatRoomFragment : BaseFragment() {
                     viewModel.chatRoomUiState.collect {
                         if (it.isGetChatRoomKey) {
                             viewModel.enterChatting(chatRoomInfo)
-                            viewModel.messageListener(chatRoomInfo)
                         }
                         if (it.otherUser != null) {
                             binding.abChatRoom.title = it.otherUser.userName
