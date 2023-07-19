@@ -83,8 +83,6 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         val userUid = getExistUser(userEmail)
         if (userUid is ApiResultSuccess) {
             val key = userUid.data.key ?: return ApiResultError(code = 400, "Doesn't have key.")
-            user.userDeviceToken =
-                FirebaseData.token ?: return ApiResultError(code = 400, "User Token not exist.")
             return apiClient.updateUser(key, auth, user)
         } else {
             return ApiResultException(Throwable())
