@@ -212,6 +212,7 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     private fun sendFcm(message: Message) {
+        _isLoading.value = true
         viewModelScope.launch {
             val fcmServerKey = BuildConfig.FCM_SERVER_KEY
             val senderResponse = userRepository.searchFriendFromRemote(message.sender)
@@ -231,11 +232,13 @@ class ChatRoomViewModel @Inject constructor(
                         _isSent.value = true
                         delay(1000)
                         _isSent.value = false
+                        _isLoading.value = false
                     }
 
                     else -> {
                         _isSendFailed.value = true
                         _isSendFailed.value = false
+                        _isLoading.value = false
                     }
                 }
             }

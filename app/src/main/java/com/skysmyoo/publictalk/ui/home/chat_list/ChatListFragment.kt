@@ -36,6 +36,7 @@ class ChatListFragment : BaseFragment() {
         requireActivity().registerReceiver(receiver, IntentFilter(Constants.REFRESH_CHAT_ROOM_LIST))
         return super.onCreateView(inflater, container, savedInstanceState)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,8 +57,8 @@ class ChatListFragment : BaseFragment() {
                         if (it.isChatRoomClicked) {
                             navigateChatRoom()
                         }
-                        if(it.isChatListUpdated) {
-                            adapter.submitList(viewModel.chatRoomList?.value)
+                        if (it.isChatListUpdated) {
+                            adapter.submitList(viewModel.chatRoomList.value.sortedByDescending { chatRoom -> chatRoom.messages.values.lastOrNull()?.createdAt ?: chatRoom.chatCreatedAt })
                         }
                     }
                 }
