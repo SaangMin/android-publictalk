@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.data.source
 
+import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
@@ -100,6 +101,7 @@ class ChatRepository @Inject constructor(
     fun getMessages(chatRoom: ChatRoom): Flow<Message> {
         return flow {
             val member = chatRoom.member.map { it.userEmail }
+            Log.d(TAG,"$member")
             localDataSource.getChatRoomMessage(member).values.forEach {
                 emit(it)
             }
@@ -154,7 +156,10 @@ class ChatRepository @Inject constructor(
                 response.data
             }
 
-            else -> null
+            else -> {
+                Log.d(TAG,"roomkey is null")
+                null
+            }
         }
     }
 

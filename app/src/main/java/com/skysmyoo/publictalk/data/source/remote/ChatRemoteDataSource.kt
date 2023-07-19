@@ -58,6 +58,7 @@ class ChatRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
                     continuation.resume(ApiResultError(code = 500, "DatabaseError: $error"))
                 }
             })
+            continuation.resume(ApiResultError(code = 400, "Network error"))
         }
 
     fun enterChatting(roomKey: String, myIdKey: String, myEmail: String) {
