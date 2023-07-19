@@ -87,6 +87,6 @@
     <string name="my_name_label">Name</string>
     <string name="my_email_label">Email</string>
     <string name="my_language_label">Language</string>
-    <string name="notification_label">Notification</string>
+    <string name="notification_label">Notification\nin Application</string>
     <string name="edit">Edit</string>
 </resources>

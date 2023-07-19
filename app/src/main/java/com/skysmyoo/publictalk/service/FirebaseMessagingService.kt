@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.Token
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
@@ -39,12 +40,14 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        message.notification?.let {
-            Intent().also { intent ->
-                intent.action = Constants.MY_NOTIFICATION
-                intent.putExtra(Constants.KEY_MESSAGE_TITLE, it.title)
-                intent.putExtra(Constants.KEY_MESSAGE_BODY, it.body)
-                sendBroadcast(intent)
+        if(preferencesManager.getNotification()) {
+            message.notification?.let {
+                Intent().also { intent ->
+                    intent.action = Constants.MY_NOTIFICATION
+                    intent.putExtra(Constants.KEY_MESSAGE_TITLE, it.title)
+                    intent.putExtra(Constants.KEY_MESSAGE_BODY, it.body)
+                    sendBroadcast(intent)
+                }
             }
         }
     }
