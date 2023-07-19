@@ -89,4 +89,6 @@
     <string name="my_language_label">Language</string>
     <string name="notification_label">Notification\nin Application</string>
     <string name="edit">Edit</string>
+    <string name="notification_on_msg">In-app notifications turned on.</string>
+    <string name="notification_off_msg">In-app notifications turned off..</string>
 </resources>

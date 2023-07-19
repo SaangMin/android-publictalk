@@ -32,9 +32,8 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         receiver = MyBroadcastReceiver()
-        registerReceiver(receiver, IntentFilter(Constants.MY_NOTIFICATION))
+        registerNotification()
         binding.lifecycleOwner = this
         setNavigation()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -111,16 +110,12 @@ class HomeActivity : AppCompatActivity() {
     private fun setNotificationPermission() {
         val permissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    preferencesManager.setNotification(true)
-                } else {
+                if (!isGranted) {
                     val shouldShowRational = ActivityCompat.shouldShowRequestPermissionRationale(
                         this@HomeActivity,
                         Manifest.permission.POST_NOTIFICATIONS
                     )
-                    if (shouldShowRational) {
-                        preferencesManager.setNotification(true)
-                    } else {
+                    if (!shouldShowRational) {
                         preferencesManager.setNotification(false)
                     }
                 }
@@ -128,8 +123,20 @@ class HomeActivity : AppCompatActivity() {
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
-    override fun onDestroy() {
+    fun registerNotification() {
+        registerReceiver(receiver, IntentFilter(Constants.MY_NOTIFICATION))
+    }
+
+    fun unregisterNotification() {
         unregisterReceiver(receiver)
+    }
+
+    override fun onDestroy() {
+        unregisterNotification()
         super.onDestroy()
+    }
+
+    companion object {
+        private const val TAG = "HomeActivity"
     }
 }

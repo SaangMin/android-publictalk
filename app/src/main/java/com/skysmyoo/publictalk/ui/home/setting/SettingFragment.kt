@@ -15,6 +15,7 @@ import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManage
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.databinding.FragmentSettingBinding
+import com.skysmyoo.publictalk.ui.HomeActivity
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -95,5 +96,18 @@ class SettingFragment : BaseFragment() {
     private fun setNotificationSwitch() {
         val isAlarm = preferencesManager.getNotification()
         binding.swSettingNotification.isChecked = isAlarm
+
+        binding.swSettingNotification.setOnCheckedChangeListener{ _, isChecked ->
+            val activity = requireActivity() as HomeActivity
+            if(isChecked) {
+                activity.registerNotification()
+                preferencesManager.setNotification(true)
+                Snackbar.make(binding.root,getString(R.string.notification_on_msg), Snackbar.LENGTH_SHORT).show()
+            } else {
+                activity.unregisterNotification()
+                preferencesManager.setNotification(false)
+                Snackbar.make(binding.root,getString(R.string.notification_off_msg), Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 }
