@@ -10,6 +10,14 @@
             type="com.skysmyoo.publictalk.data.model.remote.User" />
 
         <variable
+            name="language"
+            type="String" />
+
+        <variable
+            name="imageUri"
+            type="android.net.Uri" />
+
+        <variable
             name="viewModel"
             type="com.skysmyoo.publictalk.ui.home.HomeViewModel" />
     </data>
@@ -24,6 +32,7 @@
             profileImage="@{user.userProfileImage}"
             android:layout_width="120dp"
             android:layout_height="120dp"
+            android:onClick="@{()->viewModel.addImageClick()}"
             android:padding="5dp"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@id/gl_top"
@@ -158,6 +167,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/color_submit"
             android:gravity="center"
+            android:onClick="@{()->viewModel.editUser(user,imageUri,language)}"
             android:text="@string/edit"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -181,6 +191,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_setting_edit" />
+
+        <com.skysmyoo.publictalk.ui.loading.LoadingView
+            android:id="@+id/lv_setting"
+            isLoading="@{viewModel.settingUiState.loading}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

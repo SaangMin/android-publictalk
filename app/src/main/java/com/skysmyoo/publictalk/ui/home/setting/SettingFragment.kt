@@ -1,9 +1,13 @@
 package com.skysmyoo.publictalk.ui.home.setting
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,8 +30,14 @@ class SettingFragment : BaseFragment() {
     override val binding get() = _binding!! as FragmentSettingBinding
     override val layoutId: Int get() = R.layout.fragment_setting
 
-    val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private var userLanguage: Language? = null
+    private lateinit var pickImage: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setPickImage()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,6 +63,19 @@ class SettingFragment : BaseFragment() {
                             val action = SettingFragmentDirections.actionSettingToStartActivity()
                             findNavController().navigate(action)
                             requireActivity().finish()
+                        }
+                        if (it.isImageClicked) {
+                            pickImage.launch("image/*")
+                        }
+                        if (it.isEdit) {
+
+                        }
+                        if (it.isFailed) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.edit_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -80,6 +103,7 @@ class SettingFragment : BaseFragment() {
                     id: Long
                 ) {
                     userLanguage = Language.fromPosition(position)
+                    binding.language = userLanguage?.code ?: preferencesManager.getLocale()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -97,17 +121,43 @@ class SettingFragment : BaseFragment() {
         val isAlarm = preferencesManager.getNotification()
         binding.swSettingNotification.isChecked = isAlarm
 
-        binding.swSettingNotification.setOnCheckedChangeListener{ _, isChecked ->
+        binding.swSettingNotification.setOnCheckedChangeListener { _, isChecked ->
             val activity = requireActivity() as HomeActivity
-            if(isChecked) {
+            if (isChecked) {
                 activity.registerNotification()
                 preferencesManager.setNotification(true)
-                Snackbar.make(binding.root,getString(R.string.notification_on_msg), Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    binding.root,
+                    getString(R.string.notification_on_msg),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             } else {
                 activity.unregisterNotification()
                 preferencesManager.setNotification(false)
-                Snackbar.make(binding.root,getString(R.string.notification_off_msg), Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    binding.root,
+                    getString(R.string.notification_off_msg),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
+    }
+
+    private fun setPickImage() {
+        pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                requireActivity().contentResolver.query(it, null, null, null, null)?.use { cursor ->
+                    cursor.moveToFirst()
+                    binding.ivSettingMyProfile.setImageURI(it)
+                    binding.imageUri = it
+                }
+            } ?: run {
+                Log.d(TAG, "No media selected")
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "SettingFragment"
     }
 }

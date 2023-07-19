@@ -91,4 +91,5 @@
     <string name="edit">수정</string>
     <string name="notification_on_msg">앱 내 알림이 설정되었습니다.</string>
     <string name="notification_off_msg">앱 내 알림이 해제되었습니다.</string>
+    <string name="edit_error_msg">잠시 후 다시 시도해주세요.</string>
 </resources>

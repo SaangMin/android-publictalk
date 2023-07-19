@@ -91,4 +91,5 @@
     <string name="edit">Edit</string>
     <string name="notification_on_msg">In-app notifications turned on.</string>
     <string name="notification_off_msg">In-app notifications turned off..</string>
+    <string name="edit_error_msg">Please try again in a few minutes.</string>
 </resources>
