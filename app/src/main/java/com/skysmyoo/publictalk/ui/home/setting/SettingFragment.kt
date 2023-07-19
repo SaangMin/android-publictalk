@@ -60,15 +60,13 @@ class SettingFragment : BaseFragment() {
                             setSpinner()
                         }
                         if (it.isLogoutClick) {
-                            val action = SettingFragmentDirections.actionSettingToStartActivity()
-                            findNavController().navigate(action)
-                            requireActivity().finish()
+                            restartApp()
                         }
                         if (it.isImageClicked) {
                             pickImage.launch("image/*")
                         }
                         if (it.isEdit) {
-
+                            restartHome()
                         }
                         if (it.isFailed) {
                             Snackbar.make(
@@ -115,6 +113,18 @@ class SettingFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun restartHome() {
+        val action = SettingFragmentDirections.actionSettingToHome()
+        findNavController().navigate(action)
+        requireActivity().finish()
+    }
+
+    private fun restartApp() {
+        val action = SettingFragmentDirections.actionSettingToStartActivity()
+        findNavController().navigate(action)
+        requireActivity().finish()
     }
 
     private fun setNotificationSwitch() {

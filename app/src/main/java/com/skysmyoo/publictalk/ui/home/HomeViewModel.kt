@@ -112,6 +112,7 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch {
                     repository.updateUser(it, editedUser).collect()
                     _settingUiState.value = _settingUiState.value.copy(isLoading = false)
+                    _settingUiState.value = _settingUiState.value.copy(isEdit = true)
                 }
             }, {
                 Log.e(TAG, "Get token failed!")
