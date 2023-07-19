@@ -150,12 +150,14 @@ class ChatRoomViewModel @Inject constructor(
 
     fun getRoomKey(chatRoom: ChatRoom) {
         viewModelScope.launch {
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isGetChatRoomKey = true)
+            delay(1000)
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isGetChatRoomKey = false)
             val chatRoomKey = chatRepository.getRoomKey(chatRoom.member.map { it.userEmail })
             if (chatRoomKey != null) {
                 currentChatRoomKey = chatRoomKey
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isGetChatRoomKey = true)
             } else {
-                _chatRoomUiState.value = _chatRoomUiState.value.copy(isGetChatRoomKey = true)
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = true)
                 _chatRoomUiState.value = _chatRoomUiState.value.copy(isNetworkError = false)
             }
