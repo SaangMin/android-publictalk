@@ -30,6 +30,7 @@ data class ChatRoomUiState(
     val isGetChatRoomKey: Boolean = false,
     val otherUser: User? = null,
     val isNetworkError: Boolean = false,
+    val isNotFoundUser: Boolean = false,
 )
 
 @HiltViewModel
@@ -162,6 +163,11 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun startTranslate(chatRoom: ChatRoom) {
+        if (_chatRoomUiState.value.otherUser == null) {
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = true)
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = false)
+            return
+        }
         viewModelScope.launch {
             val myLocale = userRepository.getMyInfo()?.userLanguage
             val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"

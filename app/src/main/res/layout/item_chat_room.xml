@@ -28,6 +28,10 @@
         <variable
             name="viewModel"
             type="com.skysmyoo.publictalk.ui.home.HomeViewModel" />
+
+        <variable
+            name="userName"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_chat_list_text"
-            android:text="@{other.userName}"
+            android:text="@{userName}"
             android:textColor="@color/color_text"
             android:textSize="20sp"
             android:textStyle="bold"

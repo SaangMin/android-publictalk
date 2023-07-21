@@ -35,6 +35,12 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
             with(binding) {
                 chatRoom = item
                 this.other = otherUser
+                if (other != null) {
+                    this.userName = otherUser?.userName
+                } else {
+                    val otherUserEmail = item.member.map { it.userEmail }.find { it != myEmail }
+                    this.userName = otherUserEmail
+                }
                 lastMessage = messageList.lastOrNull()
                 unreadMessage =
                     messageList.filter {
