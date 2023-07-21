@@ -127,7 +127,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val myInfo = repository.getMyInfo() ?: return@launch
             val friendList = repository.getFriends().sortedByDescending { it.userName }
-            Log.d(TAG, "$friendList")
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),

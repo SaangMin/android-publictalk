@@ -3,7 +3,7 @@ package com.skysmyoo.publictalk.data.model.local
 enum class Language(val code: String) {
     KOREA("ko"),
     ENGLISH("en"),
-    CHINESE("zh_CN"),
+    CHINESE("zh-CN"),
     JAPANESE("ja");
 
     fun toPosition(): Int {
@@ -29,7 +29,7 @@ enum class Language(val code: String) {
             return when (code) {
                 "ko" -> KOREA
                 "en" -> ENGLISH
-                "zh_CN" -> CHINESE
+                "zh-CN" -> CHINESE
                 "ja" -> JAPANESE
                 else -> ENGLISH
             }

@@ -162,9 +162,9 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun startTranslate(chatRoom: ChatRoom) {
-        val myLocale = userRepository.getMyLocale()
-        val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
         viewModelScope.launch {
+            val myLocale = userRepository.getMyInfo()?.userLanguage
+            val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
             _isLoading.value = true
             if (!messageBody.value.isNullOrEmpty()) {
                 if (messageBody.value!!.first() == '*') {
