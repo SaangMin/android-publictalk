@@ -24,6 +24,7 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0.0"
+        setProperty("archivesBaseName", "${applicationId}-v${versionName}")
 
         buildConfigField "String", "GOOGLE_CLIENT_ID", properties["google_client_id"]
         buildConfigField "String", "BASE_URL", properties["base_url"]
@@ -41,10 +42,12 @@ android {
             minifyEnabled false
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            versionNameSuffix "-release"
         }
 
         debug {
             debuggable true
+            versionNameSuffix "-debug"
         }
     }
     compileOptions {
