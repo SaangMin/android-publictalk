@@ -116,7 +116,6 @@ class UserRepository @Inject constructor(
 
     fun getRemoteChatRooms(): Flow<List<ChatRoom>> {
         return flow {
-            emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
             val authToken = FirebaseData.authToken ?: return@flow emit(
                 chatLocalDataSource.getChatRoomList() ?: emptyList()
             )
@@ -133,7 +132,6 @@ class UserRepository @Inject constructor(
                     }
                     emit(chatRooms.values.toList())
                 }
-
                 else -> emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
             }
         }

@@ -162,9 +162,9 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun startTranslate(chatRoom: ChatRoom) {
-        val myLocale = userRepository.getMyLocale()
-        val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
         viewModelScope.launch {
+            val myLocale = userRepository.getMyInfo()?.userLanguage
+            val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
             _isLoading.value = true
             if (!messageBody.value.isNullOrEmpty()) {
                 if (messageBody.value!!.first() == '*') {
@@ -212,6 +212,7 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     private fun sendFcm(message: Message) {
+        _isLoading.value = true
         viewModelScope.launch {
             val fcmServerKey = BuildConfig.FCM_SERVER_KEY
             val senderResponse = userRepository.searchFriendFromRemote(message.sender)
@@ -231,11 +232,13 @@ class ChatRoomViewModel @Inject constructor(
                         _isSent.value = true
                         delay(1000)
                         _isSent.value = false
+                        _isLoading.value = false
                     }
 
                     else -> {
                         _isSendFailed.value = true
                         _isSendFailed.value = false
+                        _isLoading.value = false
                     }
                 }
             }
