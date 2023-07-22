@@ -19,4 +19,5 @@
     <dimen name="margin_translate">16dp</dimen>
     <dimen name="margin_translate_btn">72dp</dimen>
     <dimen name="margin_remove_chat">24dp</dimen>
+    <dimen name="margin_setting">18dp</dimen>
 </resources>
