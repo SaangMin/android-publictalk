@@ -116,13 +116,14 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(chatRoom: ChatRoom, textBody: String) {
+    fun sendMessage(chatRoom: ChatRoom, textBody: String, translatedText: String) {
         _isLoading.value = true
         viewModelScope.launch {
             chatRepository.createNewMessage(
                 chatRoom,
                 currentChatRoomKey,
-                textBody
+                textBody,
+                translatedText
             ) {
                 FirebaseData.getIdToken({ token ->
                     viewModelScope.launch {
@@ -165,8 +166,12 @@ class ChatRoomViewModel @Inject constructor(
         val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
         viewModelScope.launch {
             if (!messageBody.value.isNullOrEmpty()) {
+                if (messageBody.value!!.first() == '*') {
+                    sendMessage(chatRoom, messageBody.value ?: "", messageBody.value ?: "")
+                    return@launch
+                }
                 if (myLocale == targetLanguage) {
-                    sendMessage(chatRoom, messageBody.value ?: "")
+                    sendMessage(chatRoom, messageBody.value ?: "", messageBody.value ?: "")
                     return@launch
                 }
                 val translatedBody =

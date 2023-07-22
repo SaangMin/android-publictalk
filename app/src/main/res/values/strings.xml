@@ -83,4 +83,5 @@
     <string name="failure_remove_chat_msg">Deletion failed. Please try again in a few minutes.</string>
     <string name="message_send_failed_msg">Transmission failed. Please try again in a few minutes.</string>
     <string name="new_message_receive_msg">A new message has arrived.</string>
+    <string name="not_translate_hint">Sentences starting with \'*\' are not translated.</string>
 </resources>

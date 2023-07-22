@@ -10,6 +10,7 @@ data class Message(
     @PropertyName("sender") val sender: String = "",
     @PropertyName("receiver") val receiver: String = "",
     @PropertyName("body") val body: String = "",
+    @PropertyName("translatedText") val translatedText: String = "",
     @PropertyName("isReading") var reading: Boolean = false,
     @PropertyName("createdAt") val createdAt: String = TimeUtil.getCurrentDateString(),
 ) : Serializable

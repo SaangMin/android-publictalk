@@ -27,6 +27,7 @@ class TranslateDialogFragment : DialogFragment() {
     private val viewModel: ChatRoomViewModel by viewModels()
     private val args: TranslateDialogFragmentArgs by navArgs()
     private lateinit var body: String
+    private lateinit var translatedText: String
     private lateinit var chatRoom: ChatRoom
 
     override fun onCreateView(
@@ -36,6 +37,7 @@ class TranslateDialogFragment : DialogFragment() {
     ): View {
         _binding = DialogTranslateBinding.inflate(inflater, container, false)
         body = args.body
+        translatedText = args.translatedText
         chatRoom = args.chatRoom
         return binding.root
     }
@@ -43,7 +45,7 @@ class TranslateDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvTranslateResult.text = body
+        binding.tvTranslateResult.text = translatedText
         setLayout()
     }
 
@@ -59,7 +61,7 @@ class TranslateDialogFragment : DialogFragment() {
         viewModel.getRoomKey(chatRoom)
 
         binding.btnTranslateSend.setOnClickListener {
-            viewModel.sendMessage(chatRoom, body)
+            viewModel.sendMessage(chatRoom, body, translatedText)
         }
         binding.btnTranslateCancel.setOnClickListener {
             findNavController().navigateUp()
@@ -89,8 +91,8 @@ class TranslateDialogFragment : DialogFragment() {
                     }
                 }
                 launch {
-                    viewModel.isSendFailed.collect{
-                        if(it) {
+                    viewModel.isSendFailed.collect {
+                        if (it) {
                             Snackbar.make(
                                 binding.root,
                                 getString(R.string.message_send_failed_msg),

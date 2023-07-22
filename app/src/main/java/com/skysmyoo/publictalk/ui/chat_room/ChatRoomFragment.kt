@@ -108,8 +108,9 @@ class ChatRoomFragment : BaseFragment() {
                             val translatedBody = viewModel.translatedText
                             val action =
                                 ChatRoomFragmentDirections.actionChatRoomToTranslate(
+                                    chatRoomInfo,
+                                    viewModel.messageBody.value ?: "",
                                     translatedBody,
-                                    chatRoomInfo
                                 )
                             findNavController().navigate(action)
                             binding.etChatRoomMessage.setText("")
