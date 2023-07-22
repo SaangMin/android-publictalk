@@ -5,12 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.database.FirebaseDatabase
+import com.skysmyoo.publictalk.BuildConfig
 import com.skysmyoo.publictalk.data.model.local.MessageBox
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
+import com.skysmyoo.publictalk.data.model.remote.FcmNotification
+import com.skysmyoo.publictalk.data.model.remote.Message
+import com.skysmyoo.publictalk.data.model.remote.NotificationData
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.ChatRepository
 import com.skysmyoo.publictalk.data.source.UserRepository
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
+import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.Constants.PATH_CHAT_ROOMS
 import com.skysmyoo.publictalk.utils.Constants.PATH_IS_CHATTING
 import com.skysmyoo.publictalk.utils.Constants.PATH_MEMBER
@@ -49,6 +54,8 @@ class ChatRoomViewModel @Inject constructor(
     val isLoading: StateFlow<Boolean> = _isLoading
     private val _isFirebaseError = MutableStateFlow(false)
     val isFirebaseError: StateFlow<Boolean> = _isFirebaseError
+    private val _isSendFailed = MutableStateFlow(false)
+    val isSendFailed: StateFlow<Boolean> = _isSendFailed
 
     private val _adapterItemList = MutableStateFlow<List<MessageBox>>(emptyList())
     val adapterItemList: StateFlow<List<MessageBox>> = _adapterItemList
@@ -119,10 +126,17 @@ class ChatRoomViewModel @Inject constructor(
             ) {
                 FirebaseData.getIdToken({ token ->
                     viewModelScope.launch {
-                        chatRepository.sendMessage(token, it, currentChatRoomKey)
-                        _isSent.value = true
-                        delay(1000)
-                        _isSent.value = false
+                        when (val response =
+                            chatRepository.sendMessage(token, it, currentChatRoomKey)) {
+                            is ApiResultSuccess -> {
+                                sendFcm(response.data)
+                            }
+
+                            else -> {
+                                _isSendFailed.value = true
+                                _isSendFailed.value = false
+                            }
+                        }
                         _isLoading.value = false
                     }
                 }, {
@@ -185,6 +199,37 @@ class ChatRoomViewModel @Inject constructor(
                 .child(PATH_MEMBER).child(myIdKey)
 
         chatRoomRef.child(PATH_IS_CHATTING).removeValue()
+    }
+
+    private fun sendFcm(message: Message) {
+        viewModelScope.launch {
+            val fcmServerKey = BuildConfig.FCM_SERVER_KEY
+            val senderResponse = userRepository.searchFriendFromRemote(message.sender)
+            val receiverResponse = userRepository.searchFriendFromRemote(message.receiver)
+            if (senderResponse is ApiResultSuccess && receiverResponse is ApiResultSuccess) {
+                val sender = senderResponse.data
+                val receiver = receiverResponse.data
+                val notification = FcmNotification(
+                    to = receiver.userDeviceToken,
+                    notification = NotificationData(
+                        title = sender.userName,
+                        body = message.body
+                    )
+                )
+                when (chatRepository.sendNotification("key=$fcmServerKey", notification)) {
+                    is ApiResultSuccess -> {
+                        _isSent.value = true
+                        delay(1000)
+                        _isSent.value = false
+                    }
+
+                    else -> {
+                        _isSendFailed.value = true
+                        _isSendFailed.value = false
+                    }
+                }
+            }
+        }
     }
 
     companion object {

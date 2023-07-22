@@ -2,6 +2,7 @@ package com.skysmyoo.publictalk.service
 
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -10,6 +11,7 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.Token
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
+import com.skysmyoo.publictalk.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,13 +45,16 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(message)
         message.notification?.let {
             showNotification(it.title, it.body)
+            Intent().also { intent ->
+                intent.action = Constants.MY_NOTIFICATION
+                sendBroadcast(intent)
+            }
         }
     }
 
     private fun showNotification(title: String?, body: String?) {
-
         val notificationBuilder = NotificationCompat.Builder(this, "channel_id")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.icon_logo_min)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)

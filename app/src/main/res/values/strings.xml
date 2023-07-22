@@ -18,7 +18,7 @@
     <string name="navigation_setting_info_label">setting information screen</string>
     <string name="nothing_select_language_msg">Please select language.</string>
     <string name="not_required_error_msg">Please enter without spaces.</string>
-    <string name="channel_name">public talk notification channel</string>
+    <string name="channel_name">messaging notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
     <string name="friend_list">Friends</string>
@@ -81,4 +81,6 @@
     <string name="navigation_remove_chat_label">Remove Chat Screen</string>
     <string name="success_remove_chat_msg">The chat room was successfully deleted.</string>
     <string name="failure_remove_chat_msg">Deletion failed. Please try again in a few minutes.</string>
+    <string name="message_send_failed_msg">Transmission failed. Please try again in a few minutes.</string>
+    <string name="new_message_receive_msg">A new message has arrived.</string>
 </resources>

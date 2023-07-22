@@ -18,7 +18,7 @@
     <string name="navigation_setting_info_label">정보 입력 화면</string>
     <string name="nothing_select_language_msg">언어를 선택해주세요.</string>
     <string name="not_required_error_msg">빈 칸 없이 입력해주세요.</string>
-    <string name="channel_name">public talk notification channel</string>
+    <string name="channel_name">messaging notification channel</string>
     <string name="channel_description">퍼블릭 톡 알림 채널</string>
     <string name="default_notification_channel_id">public talk notification channel</string>
     <string name="friend_list">친구 목록</string>
@@ -81,4 +81,6 @@
     <string name="navigation_remove_chat_label">대화 삭제창</string>
     <string name="success_remove_chat_msg">채팅방이 삭제되었습니다.</string>
     <string name="failure_remove_chat_msg">삭제에 실패했습니다. 잠시후 다시 시도해주세요.</string>
+    <string name="message_send_failed_msg">전송에 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="new_message_receive_msg">새로운 메세지가 도착했습니다.</string>
 </resources>
