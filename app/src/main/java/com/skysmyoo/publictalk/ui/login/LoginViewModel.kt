@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.ui.login
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -111,13 +110,13 @@ class LoginViewModel @Inject constructor(
             val response = repository.getExistUser(email)
             if (response is ApiResultSuccess) {
                 val user = response.data.values.first()
-                Log.d(TAG, "$user")
                 setUserInfo()
                 FirebaseData.getIdToken({
                     viewModelScope.launch {
-                        repository.updateUser(it, user).collect()
-                        repository.updateFriends(user, user.userFriendIdList).collect()
-                        repository.updateChatRooms(it, user.userEmail)
+                        val updatedUser = user.copy(userDeviceToken = token ?: "")
+                        repository.updateUser(it, updatedUser).collect()
+                        repository.updateFriends(updatedUser, updatedUser.userFriendIdList).collect()
+                        repository.updateChatRooms(it, updatedUser.userEmail)
                         _splashUiState.value = _splashUiState.value.copy(isExist = true)
                         _loginUiState.value = _loginUiState.value.copy(isExist = true)
                     }

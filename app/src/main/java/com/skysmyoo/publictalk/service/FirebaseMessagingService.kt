@@ -1,13 +1,10 @@
 package com.skysmyoo.publictalk.service
 
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.skysmyoo.publictalk.R
+import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
 import com.skysmyoo.publictalk.data.model.remote.Token
 import com.skysmyoo.publictalk.data.source.remote.FcmClient
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
@@ -43,25 +40,16 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        message.notification?.let {
-            showNotification(it.title, it.body)
-            Intent().also { intent ->
-                intent.action = Constants.MY_NOTIFICATION
-                sendBroadcast(intent)
+        if(preferencesManager.getNotification()) {
+            message.notification?.let {
+                Intent().also { intent ->
+                    intent.action = Constants.MY_NOTIFICATION
+                    intent.putExtra(Constants.KEY_MESSAGE_TITLE, it.title)
+                    intent.putExtra(Constants.KEY_MESSAGE_BODY, it.body)
+                    sendBroadcast(intent)
+                }
             }
         }
-    }
-
-    private fun showNotification(title: String?, body: String?) {
-        val notificationBuilder = NotificationCompat.Builder(this, "channel_id")
-            .setSmallIcon(R.drawable.icon_logo_min)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setAutoCancel(true)
-
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(0, notificationBuilder.build())
     }
 
     companion object {

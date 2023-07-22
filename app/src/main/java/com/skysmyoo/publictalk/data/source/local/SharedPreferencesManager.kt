@@ -23,7 +23,7 @@ class SharedPreferencesManager @Inject constructor(context: Context) {
     }
 
     fun getNotification(): Boolean {
-        return sharedPreferences.getBoolean(Constants.KEY_NOTIFICATION_PERMISSION, false)
+        return sharedPreferences.getBoolean(Constants.KEY_NOTIFICATION_PERMISSION, true)
     }
 
     fun setLocale(locale: String) {

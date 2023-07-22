@@ -51,9 +51,11 @@ class UserLocalDataSource @Inject constructor(
     }
 
     suspend fun addFriend(myInfo: User, friend: User) {
-        val updatedFriendList = myInfo.userFriendIdList.toMutableList()
-        updatedFriendList.add(friend.userEmail)
         friendModelDao.insertFriend(SavedFriend(userEmail = friend.userEmail, friendData = friend))
+        val updatedFriendList = myInfo.userFriendIdList.toMutableList()
+        if(!updatedFriendList.contains(friend.userEmail)){
+            updatedFriendList.add(friend.userEmail)
+        }
 
         myInfo.userFriendIdList = updatedFriendList
         userModelDao.updateUser(myInfo)

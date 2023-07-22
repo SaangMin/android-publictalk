@@ -1,5 +1,6 @@
 package com.skysmyoo.publictalk.ui.home
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.ChattingMember
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.UserRepository
+import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.data.source.remote.response.ApiResultSuccess
 import com.skysmyoo.publictalk.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,6 +40,10 @@ data class SettingUiState(
     val isGettingMyInfo: Boolean = false,
     val language: Language? = null,
     val isLogoutClick: Boolean = false,
+    val isImageClicked: Boolean = false,
+    val isEdit: Boolean = false,
+    val isLoading: Boolean = false,
+    val isFailed: Boolean = false,
 )
 
 data class FriendInfoUiState(
@@ -88,17 +95,44 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun addImageClick() {
+        _settingUiState.value = _settingUiState.value.copy(isImageClicked = true)
+        _settingUiState.value = _settingUiState.value.copy(isImageClicked = false)
+    }
+
+    fun editUser(user: User, imageUri: Uri?, userLanguage: String) {
+        viewModelScope.launch {
+            _settingUiState.value = _settingUiState.value.copy(isLoading = true)
+            val profileImageFlow = repository.uploadImage(imageUri).stateIn(viewModelScope)
+            val editedUser = user.copy(
+                userProfileImage = profileImageFlow.value ?: user.userProfileImage,
+                userLanguage = userLanguage
+            )
+            FirebaseData.getIdToken({
+                viewModelScope.launch {
+                    repository.updateUser(it, editedUser).collect()
+                    _settingUiState.value = _settingUiState.value.copy(isLoading = false)
+                    _settingUiState.value = _settingUiState.value.copy(isEdit = true)
+                }
+            }, {
+                Log.e(TAG, "Get token failed!")
+                _settingUiState.value = _settingUiState.value.copy(isFailed = true)
+                _settingUiState.value = _settingUiState.value.copy(isLoading = false)
+                _settingUiState.value = _settingUiState.value.copy(isFailed = false)
+            })
+        }
+    }
+
     fun logout() {
         repository.clearMyData()
-        Log.d(TAG,"logout")
         _settingUiState.value = _settingUiState.value.copy(isLogoutClick = true)
-        Log.d(TAG,"${_settingUiState.value.isLogoutClick}")
     }
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
             val myInfo = repository.getMyInfo() ?: return@launch
             val friendList = repository.getFriends().sortedByDescending { it.userName }
+            Log.d(TAG, "$friendList")
             val itemList = mutableListOf(
                 FriendListScreenData.Header(textOfMe),
                 FriendListScreenData.Friend(myInfo),
