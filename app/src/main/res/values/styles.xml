@@ -3,6 +3,7 @@
 
     <style name="MySettingInfoLabel" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:layout_marginTop">@dimen/margin_setting_info</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -13,6 +14,7 @@
         <item name="android:padding">4dp</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:textAlignment">textEnd</item>
+        <item name="hintTextColor">@color/gray</item>
         <item name="android:textColor">@color/color_text</item>
         <item name="android:inputType">text</item>
     </style>
@@ -56,6 +58,7 @@
         <item name="android:inputType">text</item>
         <item name="android:padding">@dimen/padding_chat_room</item>
         <item name="android:textColor">@color/black</item>
+        <item name="hintTextColor">@color/gray</item>
         <item name="android:textSize">12sp</item>
     </style>
 
