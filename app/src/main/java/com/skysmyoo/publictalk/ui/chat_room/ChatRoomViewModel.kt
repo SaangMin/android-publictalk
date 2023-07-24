@@ -165,6 +165,11 @@ class ChatRoomViewModel @Inject constructor(
 
     fun startTranslate(chatRoom: ChatRoom) {
         _isLoading.value = true
+        viewModelScope.launch {
+            val myInfo = userRepository.getMyInfo() ?: return@launch
+            userRepository.updateFriends(myInfo, myInfo.userFriendIdList)
+            findFriend(chatRoom)
+        }
         inputBody = messageBody.value ?: ""
         _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = true)
         _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = false)
