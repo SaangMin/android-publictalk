@@ -92,4 +92,5 @@
     <string name="notification_on_msg">In-app notifications turned on.</string>
     <string name="notification_off_msg">In-app notifications turned off..</string>
     <string name="edit_error_msg">Please try again in a few minutes.</string>
+    <string name="other_user_not_friend_msg">You must add the person as a friend before you can send them a message.</string>
 </resources>

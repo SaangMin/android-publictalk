@@ -15,7 +15,9 @@
             app:destination="@id/navigation_setting_info" />
         <action
             android:id="@+id/action_login_to_home"
-            app:destination="@id/navigation_home_activity" />
+            app:destination="@id/navigation_home_activity"
+            app:popUpTo="@id/navigation_login"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment

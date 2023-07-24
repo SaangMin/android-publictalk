@@ -76,11 +76,22 @@ class ChatRoomFragment : BaseFragment() {
                         }
                         if (it.otherUser != null) {
                             binding.abChatRoom.title = it.otherUser.userName
+                        } else {
+                            val otherEmail = chatRoomInfo.member.map { member -> member.userEmail }
+                                .find { email -> email != viewModel.getMyEmail() }
+                            binding.abChatRoom.title = otherEmail
                         }
                         if (it.isNetworkError) {
                             Snackbar.make(
                                 binding.root,
                                 getString(R.string.network_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                        if (it.isNotFoundUser) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.other_user_not_friend_msg),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
