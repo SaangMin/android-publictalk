@@ -169,17 +169,15 @@ class ChatRoomViewModel @Inject constructor(
             val myInfo = userRepository.getMyInfo() ?: return@launch
             userRepository.updateFriends(myInfo, myInfo.userFriendIdList)
             findFriend(chatRoom)
-        }
-        inputBody = messageBody.value ?: ""
-        _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = true)
-        _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = false)
-        if (_chatRoomUiState.value.otherUser == null) {
-            _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = true)
-            _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = false)
-            _isLoading.value = false
-            return
-        }
-        viewModelScope.launch {
+            inputBody = messageBody.value ?: ""
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = true)
+            _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = false)
+            if (_chatRoomUiState.value.otherUser == null) {
+                _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = true)
+                _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = false)
+                _isLoading.value = false
+                return@launch
+            }
             val myLocale = userRepository.getMyInfo()?.userLanguage
             val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
             if (inputBody.isNotEmpty()) {
