@@ -98,9 +98,4 @@ class SplashFragment : BaseFragment() {
         val action = SplashFragmentDirections.actionSplashToLogin()
         findNavController().navigate(action)
     }
-
-    companion object {
-        private const val TAG = "SplashFragment"
-    }
-
 }

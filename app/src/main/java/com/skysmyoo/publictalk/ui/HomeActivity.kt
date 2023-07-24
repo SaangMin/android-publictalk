@@ -135,8 +135,4 @@ class HomeActivity : AppCompatActivity() {
         unregisterNotification()
         super.onDestroy()
     }
-
-    companion object {
-        private const val TAG = "HomeActivity"
-    }
 }

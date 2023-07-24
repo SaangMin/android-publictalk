@@ -78,8 +78,4 @@ class ChatListFragment : BaseFragment() {
         super.onDestroyView()
         requireActivity().unregisterReceiver(receiver)
     }
-
-    companion object {
-        private const val TAG = "ChatListFragment"
-    }
 }

@@ -65,7 +65,7 @@ class ChatRoomViewModel @Inject constructor(
     val chatRoomUiState: StateFlow<ChatRoomUiState> = _chatRoomUiState
 
     val messageBody = MutableLiveData<String>()
-    var currentChatRoomKey = ""
+    private var currentChatRoomKey = ""
     var translatedText = ""
 
     fun getMyEmail(): String {
@@ -248,9 +248,5 @@ class ChatRoomViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        private const val TAG = "ChatViewModel"
     }
 }

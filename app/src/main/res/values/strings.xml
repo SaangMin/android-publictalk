@@ -35,7 +35,6 @@
     <string name="friend_name_sample">Steve</string>
     <string name="mine">Me</string>
     <string name="friend_label">Friends</string>
-    <string name="load_my_info_error">An unknown error has occurred. Please restart the app after closing it.</string>
     <string name="exist_user_info_msg">Log in with your existing information.</string>
     <string name="icon_logo_image">logo image</string>
     <string name="navigation_splash_label">start loading Screen</string>

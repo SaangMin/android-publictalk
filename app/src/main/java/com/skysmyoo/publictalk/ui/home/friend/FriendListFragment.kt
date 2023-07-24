@@ -67,8 +67,4 @@ class FriendListFragment : BaseFragment() {
             findNavController().navigate(action)
         }
     }
-
-    companion object {
-        private const val TAG = "FriendListFragment"
-    }
 }

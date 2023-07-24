@@ -162,8 +162,4 @@ class LoginViewModel @Inject constructor(
     fun getMyEmail(): String? {
         return repository.getMyEmail()
     }
-
-    companion object {
-        private const val TAG = "LoginViewModel"
-    }
 }

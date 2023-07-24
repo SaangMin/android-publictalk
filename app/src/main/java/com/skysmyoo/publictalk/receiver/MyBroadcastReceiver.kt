@@ -68,8 +68,4 @@ class MyBroadcastReceiver : BroadcastReceiver() {
     fun setOnChatRoomListUpdate(callback: () -> Unit) {
         onChatRoomListUpdate = callback
     }
-
-    companion object {
-        private const val TAG = "MyBroadcastReceiver"
-    }
 }
