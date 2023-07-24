@@ -1,7 +1,6 @@
 package com.skysmyoo.publictalk.utils
 
 import android.content.res.Resources
-import android.os.Build
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -14,11 +13,7 @@ object TimeUtil {
 
     private val currentLocale: Locale
         get() {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Resources.getSystem().configuration.locales.get(0)
-            } else {
-                Resources.getSystem().configuration.locale
-            }
+            return Resources.getSystem().configuration.locales.get(0)
         }
 
     fun getCurrentDateString(): String {
@@ -30,7 +25,7 @@ object TimeUtil {
     }
 
     fun convertDateTime(dateTimeString: String): String {
-        if(dateTimeString.isEmpty()) return ""
+        if (dateTimeString.isEmpty()) return ""
         val date = dateTimeString.toDate(DATE_YEAR_MONTH_DAY_TIME_PATTERN)
         val converterPattern = if (date.isToday()) TIME_PATTERN else DATE_AND_TIME_PATTERN
         val dateFormat = SimpleDateFormat(converterPattern, currentLocale)

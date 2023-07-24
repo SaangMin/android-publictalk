@@ -149,8 +149,4 @@ class ChatRoomFragment : BaseFragment() {
             }
         }
     }
-
-    companion object {
-        private const val TAG = "ChatRoomFragment"
-    }
 }

@@ -95,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_chat_list_text"
             android:text="@{time}"
+            android:textColor="@color/gray"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tv_item_chat_list_unread_icon"
             app:layout_constraintEnd_toEndOf="parent"

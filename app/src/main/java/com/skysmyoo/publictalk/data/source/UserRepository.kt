@@ -22,10 +22,6 @@ class UserRepository @Inject constructor(
     private val chatRemoteDataSource: ChatRemoteDataSource,
 ) {
 
-    fun getMyLocale(): String {
-        return userLocalDataSource.getMyLocale()
-    }
-
     suspend fun createChatRoom(chatRoom: ChatRoom): ChatRoom? {
         val auth = FirebaseData.authToken ?: return null
         val createRoomResponse = chatRemoteDataSource.createChatRoom(auth, chatRoom)
@@ -229,9 +225,5 @@ class UserRepository @Inject constructor(
 
             else -> response
         }
-    }
-
-    companion object {
-        private const val TAG = "UserRepository"
     }
 }

@@ -26,20 +26,8 @@ class UserLocalDataSource @Inject constructor(
         return userModelDao.getMyInfo(myEmail)
     }
 
-    suspend fun clearUser() {
-        userModelDao.clearUser()
-    }
-
-    suspend fun getUser(): List<User>? {
-        return userModelDao.getUserList()
-    }
-
     fun getMyEmail(): String? {
         return preferencesManager.getMyEmail()
-    }
-
-    fun getMyLocale(): String {
-        return preferencesManager.getLocale()
     }
 
     fun clearMyData() {

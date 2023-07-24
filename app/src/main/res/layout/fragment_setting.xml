@@ -78,6 +78,7 @@
             android:layout_margin="@dimen/margin_setting"
             android:text="@{user.userName}"
             android:textAlignment="textEnd"
+            android:textColor="@color/color_text"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/tv_setting_email"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,6 +106,7 @@
             android:layout_margin="@dimen/margin_setting"
             android:text="@{user.userEmail}"
             android:textAlignment="textEnd"
+            android:textColor="@color/color_text"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/sp_setting_language"
             app:layout_constraintEnd_toEndOf="parent"
@@ -133,6 +135,7 @@
             android:layout_marginEnd="@dimen/margin_setting"
             android:padding="4dp"
             android:textAlignment="center"
+            android:textColor="@color/color_text"
             app:layout_constraintBottom_toTopOf="@id/sw_setting_notification"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_email" />

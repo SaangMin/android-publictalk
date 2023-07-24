@@ -35,7 +35,6 @@
     <string name="friend_name_sample">개똥이</string>
     <string name="mine">나</string>
     <string name="friend_label">친구</string>
-    <string name="load_my_info_error">알 수 없는 오류가 발생했습니다. 앱 종료 후 다시 실행해주세요.</string>
     <string name="exist_user_info_msg">기존 정보로 로그인합니다.</string>
     <string name="icon_logo_image">로고 이미지</string>
     <string name="navigation_splash_label">시작 로딩 화면</string>
