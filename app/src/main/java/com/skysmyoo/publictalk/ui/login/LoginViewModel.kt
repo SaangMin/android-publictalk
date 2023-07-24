@@ -112,6 +112,7 @@ class LoginViewModel @Inject constructor(
             val response = repository.getExistUser(email)
             if (response is ApiResultSuccess) {
                 val user = response.data.values.first()
+                FirebaseData.setUserInfo()
                 FirebaseData.getIdToken({
                     viewModelScope.launch {
                         val updatedUser = user.copy(userDeviceToken = token ?: "")
