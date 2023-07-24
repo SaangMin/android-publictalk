@@ -47,7 +47,6 @@ class LoginFragment : BaseFragment() {
     private lateinit var signInRequest: BeginSignInRequest
     private lateinit var oneTapLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var legacyLauncher: ActivityResultLauncher<Intent>
-    private var idToken: String? = null
     private val viewModel: LoginViewModel by viewModels()
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
@@ -65,6 +64,7 @@ class LoginFragment : BaseFragment() {
         binding.btnLogin.setOnClickListener {
             beginLogin(oneTapLauncher, legacyLauncher)
         }
+        binding.viewModel = viewModel
         setLoginUiState()
     }
 
@@ -85,8 +85,11 @@ class LoginFragment : BaseFragment() {
                     val data = result.data
                     try {
                         val signInCredential = signInClient.getSignInCredentialFromIntent(data)
-                        idToken = signInCredential.googleIdToken
-                        viewModel.validateExistUser(signInCredential.id)
+                        val idToken =
+                            signInCredential.googleIdToken ?: return@registerForActivityResult
+                        setFirebaseAuth(idToken) {
+                            viewModel.validateExistUser(signInCredential.id)
+                        }
                     } catch (e: ApiException) {
                         Log.e(TAG, "Couldn't get credential from result.(${e.localizedMessage}")
                     }
@@ -105,8 +108,10 @@ class LoginFragment : BaseFragment() {
                     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                     try {
                         val account = task.getResult(ApiException::class.java)
-                        idToken = account.idToken
-                        viewModel.validateExistUser(account.email)
+                        val idToken = account.idToken ?: return@registerForActivityResult
+                        setFirebaseAuth(idToken) {
+                            viewModel.validateExistUser(account.email)
+                        }
                     } catch (e: ApiException) {
                         Log.w(TAG, "Google sign in failed", e)
                     }
@@ -151,26 +156,11 @@ class LoginFragment : BaseFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.loginUiState.collect {
                     if (it.isGoogleLogin) {
-                        if (idToken != null) {
-                            val authCredential = GoogleAuthProvider.getCredential(idToken, null)
-                            firebaseAuth.signInWithCredential(authCredential)
-                                .addOnCompleteListener(requireActivity()) { task ->
-                                    if (task.isSuccessful) {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            getString(R.string.login_success_msg),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        FirebaseData.setUserInfo()
-                                        setNavigation()
-                                    } else {
-                                        Log.w(
-                                            TAG,
-                                            "signInWithCredential failed : ${task.exception}"
-                                        )
-                                    }
-                                }
-                        }
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.login_success_msg),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     if (it.isExist == true) {
                         Toast.makeText(
@@ -182,9 +172,25 @@ class LoginFragment : BaseFragment() {
                         findNavController().navigate(action)
                         requireActivity().finish()
                     }
+                    if (it.isFirstLogin) {
+                        setNavigation()
+                    }
                 }
             }
         }
+    }
+
+    private fun setFirebaseAuth(idToken: String, onSuccess: () -> Unit) {
+        val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+        firebaseAuth.signInWithCredential(authCredential)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    FirebaseData.setUserInfo()
+                    onSuccess()
+                } else {
+                    Log.w(TAG, "signInWithCredential failed : ${task.exception}")
+                }
+            }
     }
 
     private fun setNavigation() {
