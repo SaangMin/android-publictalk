@@ -135,7 +135,6 @@
             android:layout_marginEnd="@dimen/margin_setting"
             android:padding="4dp"
             android:textAlignment="center"
-            android:textColor="@color/color_text"
             app:layout_constraintBottom_toTopOf="@id/sw_setting_notification"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_email" />
