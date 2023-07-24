@@ -105,7 +105,6 @@ class ChatRoomViewModel @Inject constructor(
 
     fun onCancelClick() {
         _isCancelClick.value = true
-        _isCancelClick.value = false
     }
 
     fun findFriend(chatRoom: ChatRoom) {
