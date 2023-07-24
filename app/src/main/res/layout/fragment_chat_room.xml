@@ -28,6 +28,7 @@
             app:layout_constraintBottom_toTopOf="@id/rv_chat_room"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:titleTextColor="@color/color_text"
             app:layout_constraintTop_toTopOf="parent"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium"
