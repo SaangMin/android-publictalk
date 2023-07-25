@@ -48,8 +48,8 @@
             android:layout_margin="@dimen/margin_setting_info"
             android:text="@string/setting_profile_image_label"
             android:textAlignment="center"
-            android:textStyle="bold"
             android:textColor="@color/black"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_setting_info_profile" />
@@ -149,7 +149,6 @@
             android:layout_margin="@dimen/margin_setting_info"
             android:padding="8dp"
             android:textAlignment="center"
-            android:textColor="@color/color_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_setting_info_language_label"
             app:layout_constraintTop_toBottomOf="@id/et_setting_info_phone" />

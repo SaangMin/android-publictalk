@@ -31,6 +31,7 @@ data class ChatRoomUiState(
     val otherUser: User? = null,
     val isNetworkError: Boolean = false,
     val isNotFoundUser: Boolean = false,
+    val isSendBtnClicked: Boolean = false,
 )
 
 @HiltViewModel
@@ -65,6 +66,7 @@ class ChatRoomViewModel @Inject constructor(
     val chatRoomUiState: StateFlow<ChatRoomUiState> = _chatRoomUiState
 
     val messageBody = MutableLiveData<String>()
+    var inputBody = ""
     private var currentChatRoomKey = ""
     var translatedText = ""
 
@@ -162,36 +164,40 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     fun startTranslate(chatRoom: ChatRoom) {
+        _isLoading.value = true
+        inputBody = messageBody.value ?: ""
+        _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = true)
+        _chatRoomUiState.value = _chatRoomUiState.value.copy(isSendBtnClicked = false)
         if (_chatRoomUiState.value.otherUser == null) {
             _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = true)
             _chatRoomUiState.value = _chatRoomUiState.value.copy(isNotFoundUser = false)
+            _isLoading.value = false
             return
         }
         viewModelScope.launch {
             val myLocale = userRepository.getMyInfo()?.userLanguage
             val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
-            _isLoading.value = true
-            if (!messageBody.value.isNullOrEmpty()) {
-                if (messageBody.value!!.first() == '*') {
-                    sendMessage(chatRoom, messageBody.value ?: "", messageBody.value ?: "")
+            if (inputBody.isNotEmpty()) {
+                if (inputBody.first() == '*') {
+                    sendMessage(chatRoom, inputBody, inputBody)
                     _isLoading.value = false
                     return@launch
                 }
                 if (myLocale == targetLanguage) {
-                    sendMessage(chatRoom, messageBody.value ?: "", messageBody.value ?: "")
+                    sendMessage(chatRoom, inputBody, inputBody)
                     _isLoading.value = false
                     return@launch
                 }
                 val translatedBody =
-                    chatRepository.translateText(targetLanguage, messageBody.value ?: "")
+                    chatRepository.translateText(targetLanguage, inputBody)
                 translatedText = translatedBody
-                _isLoading.value = false
                 _isTranslated.value = true
                 _isTranslated.value = false
-            } else {
                 _isLoading.value = false
+            } else {
                 _isEmptyMessage.value = true
                 _isEmptyMessage.value = false
+                _isLoading.value = false
             }
         }
     }

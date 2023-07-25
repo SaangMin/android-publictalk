@@ -95,6 +95,9 @@ class ChatRoomFragment : BaseFragment() {
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
+                        if (it.isSendBtnClicked) {
+                            binding.etChatRoomMessage.setText("")
+                        }
                     }
                 }
                 launch {
@@ -120,18 +123,10 @@ class ChatRoomFragment : BaseFragment() {
                             val action =
                                 ChatRoomFragmentDirections.actionChatRoomToTranslate(
                                     chatRoomInfo,
-                                    viewModel.messageBody.value ?: "",
+                                    viewModel.inputBody,
                                     translatedBody,
                                 )
                             findNavController().navigate(action)
-                            binding.etChatRoomMessage.setText("")
-                        }
-                    }
-                }
-                launch {
-                    viewModel.isSent.collect {
-                        if (it) {
-                            binding.etChatRoomMessage.setText("")
                         }
                     }
                 }
