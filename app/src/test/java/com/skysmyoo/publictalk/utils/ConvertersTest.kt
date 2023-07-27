@@ -1,5 +1,6 @@
-package com.skysmyoo.publictalk.data.source.local
+package com.skysmyoo.publictalk.utils
 
+import com.skysmyoo.publictalk.data.source.local.Converters
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
