@@ -48,5 +48,8 @@ object FirebaseData {
                     failureResult()
                 }
         }
+        if(user == null) {
+            failureResult()
+        }
     }
 }

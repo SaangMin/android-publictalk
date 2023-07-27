@@ -125,6 +125,10 @@ class LoginViewModel @Inject constructor(
                             _loginUiState.value.copy(isExist = true, isLoading = false)
                     }
                 }, {
+                    if(FirebaseData.user == null) {
+                        repository.clearMyData()
+                        _splashUiState.value = _splashUiState.value.copy(isExist = false)
+                    }
                     viewModelScope.launch {
                         val originUser = repository.getMyInfo()
                         if (originUser != null) {
