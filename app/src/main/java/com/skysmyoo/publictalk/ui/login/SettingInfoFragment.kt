@@ -102,9 +102,11 @@ class SettingInfoFragment : BaseFragment() {
         val languageList = resources.getStringArray(R.array.user_language)
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
+            R.layout.item_spinner,
             languageList
-        )
+        ).also {
+            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
         with(binding.spSettingInfoLanguage) {
             this.adapter = adapter
             this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
