@@ -125,7 +125,7 @@ class LoginViewModel @Inject constructor(
                             _loginUiState.value.copy(isExist = true, isLoading = false)
                     }
                 }, {
-                    if(FirebaseData.user == null) {
+                    if (FirebaseData.user == null) {
                         repository.clearMyData()
                         _splashUiState.value = _splashUiState.value.copy(isExist = false)
                     }
@@ -146,20 +146,14 @@ class LoginViewModel @Inject constructor(
 
     fun localLogin() {
         viewModelScope.launch {
-            val user = repository.getMyInfo()
-            if (user != null) {
-                _splashUiState.value = _splashUiState.value.copy(isExist = true)
-                _loginUiState.value = _loginUiState.value.copy(isExist = true, isLoading = false)
-            } else {
-                _splashUiState.value = _splashUiState.value.copy(isExist = false)
-                _loginUiState.value =
-                    _loginUiState.value.copy(
-                        isGoogleLogin = true,
-                        isExist = false,
-                        isFirstLogin = true,
-                        isLoading = false
-                    )
-            }
+            _splashUiState.value = _splashUiState.value.copy(isExist = false)
+            _loginUiState.value =
+                _loginUiState.value.copy(
+                    isGoogleLogin = true,
+                    isExist = false,
+                    isFirstLogin = true,
+                    isLoading = false
+                )
         }
     }
 
