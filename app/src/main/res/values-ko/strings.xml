@@ -92,4 +92,5 @@
     <string name="notification_off_msg">앱 내 알림이 해제되었습니다.</string>
     <string name="edit_error_msg">잠시 후 다시 시도해주세요.</string>
     <string name="other_user_not_friend_msg">상대방을 친구 추가 해야 메세지를 보낼 수 있습니다.</string>
+    <string name="offline_mode_login">오프라인 모드로 로그인 됩니다. 네트워크를 확인해주세요.</string>
 </resources>

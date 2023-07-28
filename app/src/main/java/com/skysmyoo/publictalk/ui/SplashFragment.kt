@@ -49,6 +49,8 @@ class SplashFragment : BaseFragment() {
                 viewModel.validateExistUser(email)
             } else {
                 viewModel.localLogin()
+                Toast.makeText(requireContext(),
+                    getString(R.string.offline_mode_login), Toast.LENGTH_SHORT).show()
             }
         }
     }
