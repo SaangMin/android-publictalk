@@ -176,28 +176,56 @@ class ChatRoomViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val myLocale = userRepository.getMyInfo()?.userLanguage
-            val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
-            if (inputBody.isNotEmpty()) {
-                if (inputBody.first() == '*') {
-                    sendMessage(chatRoom, inputBody, inputBody)
+            val otherUser = _chatRoomUiState.value.otherUser
+            val otherUserResponse = userRepository.searchFriendFromRemote(otherUser?.userEmail ?: "")
+            if(otherUserResponse is ApiResultSuccess) {
+                val targetLanguage = otherUserResponse.data.userLanguage
+                if (inputBody.isNotEmpty()) {
+                    if (inputBody.first() == '*') {
+                        sendMessage(chatRoom, inputBody, inputBody)
+                        _isLoading.value = false
+                        return@launch
+                    }
+                    if (myLocale == targetLanguage) {
+                        sendMessage(chatRoom, inputBody, inputBody)
+                        _isLoading.value = false
+                        return@launch
+                    }
+                    val translatedBody =
+                        chatRepository.translateText(targetLanguage, inputBody)
+                    translatedText = translatedBody
+                    _isTranslated.value = true
+                    _isTranslated.value = false
                     _isLoading.value = false
-                    return@launch
-                }
-                if (myLocale == targetLanguage) {
-                    sendMessage(chatRoom, inputBody, inputBody)
+                } else {
+                    _isEmptyMessage.value = true
+                    _isEmptyMessage.value = false
                     _isLoading.value = false
-                    return@launch
                 }
-                val translatedBody =
-                    chatRepository.translateText(targetLanguage, inputBody)
-                translatedText = translatedBody
-                _isTranslated.value = true
-                _isTranslated.value = false
-                _isLoading.value = false
             } else {
-                _isEmptyMessage.value = true
-                _isEmptyMessage.value = false
-                _isLoading.value = false
+                val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
+                if (inputBody.isNotEmpty()) {
+                    if (inputBody.first() == '*') {
+                        sendMessage(chatRoom, inputBody, inputBody)
+                        _isLoading.value = false
+                        return@launch
+                    }
+                    if (myLocale == targetLanguage) {
+                        sendMessage(chatRoom, inputBody, inputBody)
+                        _isLoading.value = false
+                        return@launch
+                    }
+                    val translatedBody =
+                        chatRepository.translateText(targetLanguage, inputBody)
+                    translatedText = translatedBody
+                    _isTranslated.value = true
+                    _isTranslated.value = false
+                    _isLoading.value = false
+                } else {
+                    _isEmptyMessage.value = true
+                    _isEmptyMessage.value = false
+                    _isLoading.value = false
+                }
             }
         }
     }
