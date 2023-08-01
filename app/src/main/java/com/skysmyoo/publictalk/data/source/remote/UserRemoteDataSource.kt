@@ -150,6 +150,16 @@ class UserRemoteDataSource @Inject constructor(private val apiClient: ApiClient)
         }
     }
 
+    suspend fun deleteUser(auth: String, userEmail: String): ApiResponse<Unit> {
+        val userDataSnapshot = getExistUser(userEmail)
+        if (userDataSnapshot is ApiResultSuccess) {
+            val key = userDataSnapshot.data.key ?: return ApiResultError(400, "Doesn't have Key.")
+            return apiClient.deleteUser(key, auth)
+        } else {
+            return ApiResultError(400, "Not exist User")
+        }
+    }
+
     companion object {
         const val TAG = "UserRemoteDataSource"
     }

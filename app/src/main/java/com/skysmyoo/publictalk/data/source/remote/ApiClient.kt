@@ -42,4 +42,10 @@ interface ApiClient {
         @Path("chatRoomId") chatRoomId: String,
         @Query("auth") auth: String
     ): ApiResponse<Map<String, String>>
+
+    @DELETE("users/{uid}.json")
+    suspend fun deleteUser(
+        @Path("uid") uid: String,
+        @Query("auth") auth: String
+    ): ApiResponse<Unit>
 }

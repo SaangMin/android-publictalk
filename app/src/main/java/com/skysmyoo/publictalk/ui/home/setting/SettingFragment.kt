@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.PublicTalkApplication.Companion.preferencesManager
@@ -47,6 +48,9 @@ class SettingFragment : BaseFragment() {
 
         setUiState()
         setNotificationSwitch()
+        binding.btnSettingDeleteAccount.setOnClickListener {
+            showDeleteAccountDialog()
+        }
     }
 
     private fun setUiState() {
@@ -74,6 +78,14 @@ class SettingFragment : BaseFragment() {
                                 getString(R.string.edit_error_msg),
                                 Snackbar.LENGTH_SHORT
                             ).show()
+                        }
+                        if (it.isDeleteAccount) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.delete_account_accept_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                            restartApp()
                         }
                     }
                 }
@@ -167,6 +179,17 @@ class SettingFragment : BaseFragment() {
                 Log.d(TAG, "No media selected")
             }
         }
+    }
+
+    private fun showDeleteAccountDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_account))
+            .setMessage(getString(R.string.delete_accroun_msg))
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                viewModel.deleteAccount()
+            }
+            .setNegativeButton(getString(R.string.no), null)
+            .show()
     }
 
     companion object {
