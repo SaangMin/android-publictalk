@@ -254,7 +254,6 @@ class ChatRoomViewModel @Inject constructor(
     private fun sendFcm(message: Message) {
         _isLoading.value = true
         viewModelScope.launch {
-            val fcmServerKey = BuildConfig.FCM_SERVER_KEY
             val senderResponse = userRepository.searchFriendFromRemote(message.sender)
             val receiverResponse = userRepository.searchFriendFromRemote(message.receiver)
             if (senderResponse is ApiResultSuccess && receiverResponse is ApiResultSuccess) {
@@ -267,7 +266,7 @@ class ChatRoomViewModel @Inject constructor(
                         body = message.body
                     )
                 )
-                when (chatRepository.sendNotification("key=$fcmServerKey", notification)) {
+                when (chatRepository.sendNotification("key=${BuildConfig.FCM_SERVER_KEY}", notification)) {
                     is ApiResultSuccess -> {
                         _isSent.value = true
                         delay(1000)
