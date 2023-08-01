@@ -198,9 +198,10 @@ class ChatRoomViewModel @Inject constructor(
                     _isTranslated.value = false
                     _isLoading.value = false
                 } else {
-                    _isEmptyMessage.value = true
-                    _isEmptyMessage.value = false
                     _isLoading.value = false
+                    _isEmptyMessage.value = true
+                    delay(1000)
+                    _isEmptyMessage.value = false
                 }
             } else {
                 val targetLanguage = _chatRoomUiState.value.otherUser?.userLanguage ?: "ko"
