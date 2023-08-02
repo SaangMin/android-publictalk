@@ -128,6 +128,7 @@ class UserRepository @Inject constructor(
                     }
                     emit(chatRooms.values.toList())
                 }
+
                 else -> emit(chatLocalDataSource.getChatRoomList() ?: emptyList())
             }
         }
@@ -225,5 +226,23 @@ class UserRepository @Inject constructor(
 
             else -> response
         }
+    }
+
+    suspend fun deleteAccount(): ApiResponse<Unit> {
+        val email = userLocalDataSource.getMyEmail() ?: return ApiResultError(
+            400,
+            "Not found email"
+        )
+        val authToken = FirebaseData.authToken ?: return ApiResultError(
+            code = 400,
+            message = "Not found firebase token"
+        )
+        return userRemoteDataSource.deleteUser(authToken, email)
+    }
+
+    suspend fun clearRoomData() {
+        userLocalDataSource.clearMyData()
+        userLocalDataSource.clearFriendsData()
+        chatLocalDataSource.clearChatRooms()
     }
 }

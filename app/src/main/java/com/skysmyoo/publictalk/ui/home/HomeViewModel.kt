@@ -42,6 +42,7 @@ data class SettingUiState(
     val isEdit: Boolean = false,
     val isLoading: Boolean = false,
     val isFailed: Boolean = false,
+    val isDeleteAccount: Boolean = false,
 )
 
 data class FriendInfoUiState(
@@ -216,6 +217,22 @@ class HomeViewModel @Inject constructor(
             } else {
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = true)
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = false)
+            }
+        }
+    }
+
+    fun deleteAccount() {
+        viewModelScope.launch {
+            _settingUiState.value = _settingUiState.value.copy(isLoading = true)
+            val response = repository.deleteAccount()
+            if (response is ApiResultSuccess) {
+                repository.clearRoomData()
+                _settingUiState.value = _settingUiState.value.copy(isDeleteAccount = true)
+                _settingUiState.value = _settingUiState.value.copy(isLoading = false)
+            } else {
+                _settingUiState.value = _settingUiState.value.copy(isFailed = true)
+                _settingUiState.value = _settingUiState.value.copy(isFailed = false)
+                _settingUiState.value = _settingUiState.value.copy(isLoading = false)
             }
         }
     }

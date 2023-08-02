@@ -44,6 +44,7 @@ class TranslateDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
 
         binding.tvTranslateResult.text = translatedText
         setLayout()
@@ -59,6 +60,7 @@ class TranslateDialogFragment : DialogFragment() {
 
     private fun setLayout() {
         viewModel.getRoomKey(chatRoom)
+        binding.viewModel = viewModel
 
         binding.btnTranslateSend.setOnClickListener {
             viewModel.sendMessage(chatRoom, body, translatedText)
