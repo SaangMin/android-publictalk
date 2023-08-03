@@ -22,6 +22,7 @@ import com.skysmyoo.publictalk.data.model.local.Language
 import com.skysmyoo.publictalk.databinding.FragmentSettingBinding
 import com.skysmyoo.publictalk.ui.HomeActivity
 import com.skysmyoo.publictalk.ui.home.HomeViewModel
+import com.skysmyoo.publictalk.utils.isNetworkAvailable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -86,6 +87,13 @@ class SettingFragment : BaseFragment() {
                                 Snackbar.LENGTH_SHORT
                             ).show()
                             restartApp()
+                        }
+                        if (it.isNetworkError) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.network_error_msg),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -186,7 +194,15 @@ class SettingFragment : BaseFragment() {
             .setTitle(getString(R.string.delete_account))
             .setMessage(getString(R.string.delete_account_msg))
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                viewModel.deleteAccount()
+                if (isNetworkAvailable(requireContext())) {
+                    viewModel.deleteAccount()
+                } else {
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.network_error_msg),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
             }
             .setNegativeButton(getString(R.string.no), null)
             .show()

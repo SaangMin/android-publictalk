@@ -46,8 +46,10 @@ class SplashFragment : BaseFragment() {
                 viewModel.validateExistUser(email)
             } else {
                 viewModel.localLogin()
-                Toast.makeText(requireContext(),
-                    getString(R.string.offline_mode_login), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.offline_mode_login), Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -57,11 +59,6 @@ class SplashFragment : BaseFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.splashUiState.collect {
                     if (it.isExist == true) {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.exist_user_info_msg),
-                            Toast.LENGTH_SHORT
-                        ).show()
                         val action = SplashFragmentDirections.actionSplashToHome()
                         findNavController().navigate(action)
                         requireActivity().finish()

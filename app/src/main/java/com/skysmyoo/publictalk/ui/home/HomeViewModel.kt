@@ -43,6 +43,7 @@ data class SettingUiState(
     val isLoading: Boolean = false,
     val isFailed: Boolean = false,
     val isDeleteAccount: Boolean = false,
+    val isNetworkError: Boolean = false,
 )
 
 data class FriendInfoUiState(
@@ -116,8 +117,10 @@ class HomeViewModel @Inject constructor(
             }, {
                 Log.e(TAG, "Get token failed!")
                 _settingUiState.value = _settingUiState.value.copy(isFailed = true)
+                _settingUiState.value = _settingUiState.value.copy(isNetworkError = true)
                 _settingUiState.value = _settingUiState.value.copy(isLoading = false)
                 _settingUiState.value = _settingUiState.value.copy(isFailed = false)
+                _settingUiState.value = _settingUiState.value.copy(isNetworkError = false)
             })
         }
     }

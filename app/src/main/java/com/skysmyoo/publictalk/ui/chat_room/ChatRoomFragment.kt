@@ -14,6 +14,7 @@ import com.skysmyoo.publictalk.BaseFragment
 import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.databinding.FragmentChatRoomBinding
+import com.skysmyoo.publictalk.utils.isNetworkAvailable
 import kotlinx.coroutines.launch
 
 class ChatRoomFragment : BaseFragment() {
@@ -51,9 +52,29 @@ class ChatRoomFragment : BaseFragment() {
                 findNavController().navigateUp()
             }
             abChatRoom.setOnMenuItemClickListener {
-                val action = ChatRoomFragmentDirections.actionChatRoomToRemoveChat(chatRoomInfo)
-                findNavController().navigate(action)
-                true
+                if (isNetworkAvailable(requireContext())) {
+                    val action = ChatRoomFragmentDirections.actionChatRoomToRemoveChat(chatRoomInfo)
+                    findNavController().navigate(action)
+                    true
+                } else {
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.network_error_msg),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    true
+                }
+            }
+        }
+        binding.btnChatRoomSend.setOnClickListener {
+            if (isNetworkAvailable(requireContext())) {
+                viewModel.startTranslate(chatRoomInfo)
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    getString(R.string.network_error_msg),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
         binding.viewModel = viewModel
