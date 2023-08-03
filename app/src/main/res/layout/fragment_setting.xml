@@ -95,7 +95,7 @@
             app:layout_constraintBottom_toTopOf="@id/tv_setting_email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/gl_top"
-            tools:text="@string/me_sample" />
+            tools:text="김철수" />
 
         <TextView
             android:id="@+id/tv_setting_email_label"
@@ -123,7 +123,7 @@
             app:layout_constraintBottom_toTopOf="@id/sp_setting_language"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_name"
-            tools:text="@string/email_sample" />
+            tools:text="abcd@gmail.com" />
 
         <TextView
             android:id="@+id/tv_setting_language_label"

@@ -15,7 +15,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/me_sample" />
+            tools:text="나" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

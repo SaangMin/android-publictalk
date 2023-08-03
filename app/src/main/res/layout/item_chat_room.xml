@@ -65,7 +65,7 @@
             app:layout_constraintBottom_toTopOf="@id/tv_item_chat_list_body"
             app:layout_constraintStart_toEndOf="@id/iv_item_chat_list_profile"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/friend_name_sample" />
+            tools:text="개똥이" />
 
         <TextView
             android:id="@+id/tv_item_chat_list_body"

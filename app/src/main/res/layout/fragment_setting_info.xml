@@ -85,7 +85,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_setting_info_email_label"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_info_profile_label"
-            tools:text="@string/email_sample" />
+            tools:text="abcd@gmail.com" />
 
         <TextView
             android:id="@+id/tv_setting_info_name_label"
