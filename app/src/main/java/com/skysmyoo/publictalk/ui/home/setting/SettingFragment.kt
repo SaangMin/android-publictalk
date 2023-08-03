@@ -184,7 +184,7 @@ class SettingFragment : BaseFragment() {
     private fun showDeleteAccountDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.delete_account))
-            .setMessage(getString(R.string.delete_accroun_msg))
+            .setMessage(getString(R.string.delete_account_msg))
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 viewModel.deleteAccount()
             }
