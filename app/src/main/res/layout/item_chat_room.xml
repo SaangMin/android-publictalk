@@ -32,6 +32,10 @@
         <variable
             name="userName"
             type="String" />
+
+        <variable
+            name="showingText"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,7 +78,7 @@
             android:layout_margin="@dimen/margin_chat_list_text"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="@{lastMessage.translatedText}"
+            android:text="@{showingText}"
             android:textColor="@color/gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@id/gl_end"

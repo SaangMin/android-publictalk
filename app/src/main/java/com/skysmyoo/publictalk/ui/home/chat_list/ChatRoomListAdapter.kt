@@ -47,6 +47,12 @@ class ChatRoomListAdapter(private val viewModel: HomeViewModel) :
                         !it.reading && it.receiver == myEmail
                     }.size
                 time = TimeUtil.convertDateTime(messageList.lastOrNull()?.createdAt ?: "")
+                val lastMessage = messageList.lastOrNull()
+                showingText = if (lastMessage != null && lastMessage.sender == myEmail) {
+                    lastMessage.body
+                } else {
+                    lastMessage?.translatedText ?: ""
+                }
             }
             binding.viewModel = viewModel
         }
