@@ -35,7 +35,7 @@
     <string name="icon_logo_image">logo image</string>
     <string name="navigation_splash_label">start loading Screen</string>
     <string name="navigation_start_activity_label">Start Screen</string>
-    <string name="logout">logout</string>
+    <string name="logout">Logout</string>
     <string name="chat_room_image">Chat Room Image</string>
     <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
     <string name="send">SEND</string>
@@ -89,7 +89,7 @@
     <string name="edit_error_msg">Please try again in a few minutes.</string>
     <string name="other_user_not_friend_msg">You must add the person as a friend before you can send them a message.</string>
     <string name="offline_mode_login">You will be logged in in offline mode. Please check your network.</string>
-    <string name="delete_account">withdrawal</string>
+    <string name="delete_account">Withdrawal</string>
     <string name="delete_account_msg">Are you sure you want to delete your account?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

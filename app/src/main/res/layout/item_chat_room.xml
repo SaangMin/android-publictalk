@@ -74,7 +74,7 @@
             android:layout_margin="@dimen/margin_chat_list_text"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="@{lastMessage.body}"
+            android:text="@{lastMessage.translatedText}"
             android:textColor="@color/gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@id/gl_end"
