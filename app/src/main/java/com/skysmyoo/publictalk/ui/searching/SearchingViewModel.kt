@@ -87,8 +87,10 @@ class SearchingViewModel @Inject constructor(
                     _searchingUiState.value = _searchingUiState.value.copy(isAddedFriend = false)
                 } else {
                     _searchingUiState.value = _searchingUiState.value.copy(isFailedAddFriend = true)
+                    _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = true)
                     _searchingUiState.value =
                         _searchingUiState.value.copy(isFailedAddFriend = false)
+                    _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = false)
                 }
             }
         }

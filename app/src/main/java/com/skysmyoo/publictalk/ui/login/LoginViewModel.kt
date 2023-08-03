@@ -24,6 +24,7 @@ data class SetInfoUiState(
     val isImageClicked: Boolean = false,
     val isSubmit: Boolean = false,
     val isNotRequired: Boolean = false,
+    val isNetworkError: Boolean = false,
 )
 
 data class LoginUiState(
@@ -94,11 +95,15 @@ class LoginViewModel @Inject constructor(
                     startHomeActivity()
                 } else {
                     _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isNetworkError = true)
                     _setInfoUiState.value = _setInfoUiState.value.copy(isLoading = false)
+                    _setInfoUiState.value = _setInfoUiState.value.copy(isNetworkError = false)
                 }
             }
         }, {
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNetworkError = true)
             _setInfoUiState.value = _setInfoUiState.value.copy(isFailed = true)
+            _setInfoUiState.value = _setInfoUiState.value.copy(isNetworkError = false)
         })
     }
 
