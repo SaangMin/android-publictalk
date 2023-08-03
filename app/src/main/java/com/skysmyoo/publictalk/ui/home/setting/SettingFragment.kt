@@ -52,6 +52,10 @@ class SettingFragment : BaseFragment() {
         binding.btnSettingDeleteAccount.setOnClickListener {
             showDeleteAccountDialog()
         }
+        binding.btnSettingHowToUse.setOnClickListener {
+            val action = SettingFragmentDirections.actionSettingToUsing()
+            findNavController().navigate(action)
+        }
     }
 
     private fun setUiState() {

@@ -95,4 +95,7 @@
     <string name="no">No</string>
     <string name="delete_account_accept_msg">Account has been deleted.</string>
     <string name="empty_email_msg">Please enter Email.</string>
+    <string name="how_to_use_label">HOW TO USE</string>
+    <string name="how_to_use">1. The language inside the app is currently only supported in Korean / English.\n(Translation function separate)\n\n2. In the translation function, the language you set is translated into the language set by the other party.\n\n3. To send a message without translation, put \'*\' in front of the message.\n\n4. If you don\'t add the person as a friend, you can only send and receive chat messages.\n(The names of friends who have not been added as friends are displayed in the email.)\n\n5. Notifications set in the settings screen are notifications while the app is running, and if you want to turn off notifications outside the app, turn off the notification permission in the system settings.</string>
+    <string name="close">Close</string>
 </resources>

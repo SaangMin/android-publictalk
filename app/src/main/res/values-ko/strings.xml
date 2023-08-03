@@ -95,4 +95,7 @@
     <string name="no">아니요</string>
     <string name="delete_account_accept_msg">계정이 삭제되었습니다.</string>
     <string name="empty_email_msg">이메일을 입력해주세요.</string>
+    <string name="how_to_use_label">사용법</string>
+    <string name="how_to_use">1. 앱 내부의 언어는 현재 한글 / 영어만 지원됩니다.\n(번역 기능 별도)\n\n2. 번역 기능은 내가 설정한 언어가 상대방이 설정한 언어로 번역됩니다.\n\n3. 번역을 하지 않고 보내실 메세지는 \'*\'를 메세지 앞에 붙여주세요.\n\n4. 상대방을 친구 추가 하지 않으면 채팅을 보낼 수 없고 받기만 할 수 있습니다.\n(친구 추가 되지 않은 친구의 이름은 이메일로 표시됩니다.)\n\n5. 설정 화면에서 설정되는 알림은 앱 실행 도중 알림이며 앱 밖에서의 알림을 끄길 원한다면 시스템 설정에서 알림 권한을 꺼주세요.</string>
+    <string name="close">닫기</string>
 </resources>

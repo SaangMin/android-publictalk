@@ -82,6 +82,11 @@ class HomeActivity : AppCompatActivity() {
                     setToolbar(getString(R.string.searching_friend))
                     bottomNavigation.isVisible = false
                 }
+
+                R.id.navigation_using -> {
+                    setToolbar(getString(R.string.how_to_use_label))
+                    bottomNavigation.isVisible = false
+                }
             }
         }
     }
