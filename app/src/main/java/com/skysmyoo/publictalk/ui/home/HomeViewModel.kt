@@ -24,9 +24,9 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 data class FriendListUiState(
-    val adapterItemList: List<FriendListScreenData> = emptyList(),
     val isFriendClicked: Boolean = false,
     val isMyInfoClicked: Boolean = false,
+    val isUpdatedFriend: Boolean = false,
 )
 
 data class ChatListUiState(
@@ -71,6 +71,9 @@ class HomeViewModel @Inject constructor(
 
     private val _chatRoomList = MutableStateFlow<List<ChatRoom>>(emptyList())
     var chatRoomList: StateFlow<List<ChatRoom>> = _chatRoomList
+
+    private val _friendList = MutableStateFlow<List<FriendListScreenData>>(emptyList())
+    var friendList: StateFlow<List<FriendListScreenData>> = _friendList
 
     var clickedChatRoom: ChatRoom? = null
     var clickedFriend: User? = null
@@ -126,21 +129,12 @@ class HomeViewModel @Inject constructor(
 
     fun setAdapterItemList(textOfMe: String, textOfFriend: String) {
         viewModelScope.launch {
-            val myInfo = repository.getMyInfo() ?: return@launch
-            val friendList = repository.getFriends().sortedBy { it.userName }
-            val itemList = mutableListOf(
-                FriendListScreenData.Header(textOfMe),
-                FriendListScreenData.Friend(myInfo),
-                FriendListScreenData.Header(textOfFriend)
-            )
-
-            if (friendList.isNotEmpty()) {
-                val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
-                itemList.addAll(friendListScreenData)
-                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
-            } else {
-                _friendListUiState.value = _friendListUiState.value.copy(adapterItemList = itemList)
-            }
+            val itemList =
+                repository.updateFriendList(textOfMe, textOfFriend).stateIn(viewModelScope)
+            _friendList.value = itemList.value
+            _friendListUiState.value = _friendListUiState.value.copy(isUpdatedFriend = true)
+            delay(1000)
+            _friendListUiState.value = _friendListUiState.value.copy(isUpdatedFriend = false)
         }
     }
 
@@ -213,7 +207,9 @@ class HomeViewModel @Inject constructor(
             val response = repository.removeFriend(myInfo, friend)
             if (response is ApiResultSuccess) {
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = true)
+                _friendListUiState.value = _friendListUiState.value.copy(isUpdatedFriend = true)
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isRemovedFriend = false)
+                _friendListUiState.value = _friendListUiState.value.copy(isUpdatedFriend = false)
             } else {
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = true)
                 _friendInfoUiState.value = _friendInfoUiState.value.copy(isNetworkError = false)
