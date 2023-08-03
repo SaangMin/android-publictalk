@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,7 +25,7 @@ class FriendInfoDialogFragment : DialogFragment() {
     private var _binding: DialogFriendInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
     private val args: FriendInfoDialogFragmentArgs by navArgs()
     private lateinit var friendInfo: User
 
@@ -41,6 +41,7 @@ class FriendInfoDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
 
         with(binding) {
             friend = friendInfo
@@ -84,6 +85,7 @@ class FriendInfoDialogFragment : DialogFragment() {
                         navigateChatRoom()
                     }
                     if (it.isRemovedFriend) {
+                        viewModel.setAdapterItemList(getString(R.string.mine), getString(R.string.friend_label))
                         Snackbar.make(
                             binding.root,
                             getString(R.string.delete_friend_msg),

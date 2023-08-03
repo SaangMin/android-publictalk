@@ -2,7 +2,7 @@ package com.skysmyoo.publictalk.ui.home.friend
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,7 +21,7 @@ class FriendListFragment : BaseFragment() {
     override val binding get() = _binding!! as FragmentFriendListBinding
     override val layoutId: Int get() = R.layout.fragment_friend_list
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
     private lateinit var friendListAdapter: FriendListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,8 +46,8 @@ class FriendListFragment : BaseFragment() {
                     if (it.isMyInfoClicked) {
                         showSettingFragment()
                     }
-                    if (it.adapterItemList.isNotEmpty()) {
-                        friendListAdapter.submitList(it.adapterItemList)
+                    if (it.isUpdatedFriend) {
+                        friendListAdapter.submitList(viewModel.friendList.value)
                     }
                 }
             }
@@ -66,5 +66,9 @@ class FriendListFragment : BaseFragment() {
             val action = FriendListFragmentDirections.actionFriendListToSetting()
             findNavController().navigate(action)
         }
+    }
+
+    companion object {
+        private const val TAG = "FriendListFragment"
     }
 }

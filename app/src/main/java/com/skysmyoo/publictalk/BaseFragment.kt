@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import com.skysmyoo.publictalk.utils.isNetworkAvailable
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,6 +30,13 @@ open class BaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        if(!isNetworkAvailable(requireContext())) {
+            Snackbar.make(
+                binding.root,
+                getString(R.string.network_error_msg),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onDestroyView() {

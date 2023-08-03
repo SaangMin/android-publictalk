@@ -8,7 +8,6 @@
     <string name="edit_profile_image">이미지 설정</string>
     <string name="setting_profile_image_label">프로필 이미지 설정</string>
     <string name="email_label">이메일\n(Email)</string>
-    <string name="email_sample">abcde@gmail.com</string>
     <string name="name_label">이름\n(Name)</string>
     <string name="input_name">이름(name)</string>
     <string name="language_label">언어\n(Language)</string>
@@ -29,10 +28,7 @@
     <string name="navigation_chat_list_label">채팅 목록 화면</string>
     <string name="navigation_setting_label">설정 화면</string>
     <string name="navigation_home_activity_label">메인 화면</string>
-    <string name="friends_sample">친구</string>
-    <string name="me_sample">나</string>
     <string name="friend_profile_image">프로필 이미지</string>
-    <string name="friend_name_sample">개똥이</string>
     <string name="mine">나</string>
     <string name="friend_label">친구</string>
     <string name="exist_user_info_msg">기존 정보로 로그인합니다.</string>
@@ -94,8 +90,12 @@
     <string name="other_user_not_friend_msg">상대방을 친구 추가 해야 메세지를 보낼 수 있습니다.</string>
     <string name="offline_mode_login">오프라인 모드로 로그인 됩니다. 네트워크를 확인해주세요.</string>
     <string name="delete_account">회원탈퇴</string>
-    <string name="delete_accroun_msg">정말로 계정을 삭제하시겠습니까?</string>
+    <string name="delete_account_msg">정말로 계정을 삭제하시겠습니까?</string>
     <string name="yes">예</string>
     <string name="no">아니요</string>
     <string name="delete_account_accept_msg">계정이 삭제되었습니다.</string>
+    <string name="empty_email_msg">이메일을 입력해주세요.</string>
+    <string name="how_to_use_label">사용법</string>
+    <string name="how_to_use">1. 앱 내부의 언어는 현재 한글 / 영어만 지원됩니다.\n(번역 기능 별도)\n\n2. 번역 기능은 내가 설정한 언어가 상대방이 설정한 언어로 번역됩니다.\n\n3. 번역을 하지 않고 보내실 메세지는 \'*\'를 메세지 앞에 붙여주세요.\n\n4. 상대방을 친구 추가 하지 않으면 채팅을 보낼 수 없고 받기만 할 수 있습니다.\n(친구 추가 되지 않은 친구의 이름은 이메일로 표시됩니다.)\n\n5. 설정 화면에서 설정되는 알림은 앱 실행 도중 알림이며 앱 밖에서의 알림을 끄길 원한다면 시스템 설정에서 알림 권한을 꺼주세요.</string>
+    <string name="close">닫기</string>
 </resources>

@@ -21,7 +21,7 @@
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:titleTextColor="@color/black"
             tools:menu="@menu/home_ab_menu"
-            tools:title="@string/friends_sample" />
+            tools:title="친구" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fcv_home"

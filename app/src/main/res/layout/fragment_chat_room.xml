@@ -28,10 +28,10 @@
             app:layout_constraintBottom_toTopOf="@id/rv_chat_room"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:titleTextColor="@color/color_text"
             app:layout_constraintTop_toTopOf="parent"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium"
+            app:titleTextColor="@color/color_text"
             tools:title="@string/chat_room_title_sample" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -76,7 +76,6 @@
                 style="@style/MyChatRoomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->viewModel.startTranslate(chatRoom)}"
                 android:text="@string/send"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

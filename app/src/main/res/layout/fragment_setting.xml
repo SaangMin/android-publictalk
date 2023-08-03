@@ -28,6 +28,18 @@
         tools:context=".ui.home.setting.SettingFragment">
 
         <Button
+            android:id="@+id/btn_setting_how_to_use"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/color_submit"
+            android:text="@string/how_to_use_label"
+            android:textColorHint="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
             android:id="@+id/btn_setting_delete_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -50,7 +62,7 @@
             app:layout_constraintBottom_toBottomOf="@id/gl_top"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_setting_delete_account"
             app:shapeAppearanceOverlay="@style/MyShapeImageStyle"
             app:strokeWidth="4dp"
             tools:src="@drawable/icon_profile_image" />
@@ -95,7 +107,7 @@
             app:layout_constraintBottom_toTopOf="@id/tv_setting_email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/gl_top"
-            tools:text="@string/me_sample" />
+            tools:text="김철수" />
 
         <TextView
             android:id="@+id/tv_setting_email_label"
@@ -123,7 +135,7 @@
             app:layout_constraintBottom_toTopOf="@id/sp_setting_language"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_setting_name"
-            tools:text="@string/email_sample" />
+            tools:text="abcd@gmail.com" />
 
         <TextView
             android:id="@+id/tv_setting_language_label"

@@ -44,6 +44,9 @@
         <action
             android:id="@+id/action_setting_to_home"
             app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_setting_to_using"
+            app:destination="@id/navigation_using" />
     </fragment>
 
     <activity
@@ -120,6 +123,10 @@
         android:id="@+id/navigation_home"
         android:name="com.skysmyoo.publictalk.ui.HomeActivity"
         android:label="@string/navigation_home_label"
-        tools:layout="@layout/activity_home"/>
+        tools:layout="@layout/activity_home" />
+    <fragment
+        android:id="@+id/navigation_using"
+        android:name="com.skysmyoo.publictalk.ui.information.UsingInformationFragment"
+        android:label="@string/how_to_use_label" />
 
 </navigation>

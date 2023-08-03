@@ -1,9 +1,5 @@
 package com.skysmyoo.publictalk.ui
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -17,6 +13,7 @@ import com.skysmyoo.publictalk.R
 import com.skysmyoo.publictalk.data.source.remote.FirebaseData
 import com.skysmyoo.publictalk.databinding.FragmentSplashBinding
 import com.skysmyoo.publictalk.ui.login.LoginViewModel
+import com.skysmyoo.publictalk.utils.isNetworkAvailable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -45,12 +42,14 @@ class SplashFragment : BaseFragment() {
         if (email.isNullOrEmpty()) {
             navigateToLogin()
         } else {
-            if (isNetworkAvailable()) {
+            if (isNetworkAvailable(requireContext())) {
                 viewModel.validateExistUser(email)
             } else {
                 viewModel.localLogin()
-                Toast.makeText(requireContext(),
-                    getString(R.string.offline_mode_login), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.offline_mode_login), Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -60,11 +59,6 @@ class SplashFragment : BaseFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.splashUiState.collect {
                     if (it.isExist == true) {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.exist_user_info_msg),
-                            Toast.LENGTH_SHORT
-                        ).show()
                         val action = SplashFragmentDirections.actionSplashToHome()
                         findNavController().navigate(action)
                         requireActivity().finish()
@@ -73,26 +67,6 @@ class SplashFragment : BaseFragment() {
                     }
                 }
             }
-        }
-    }
-
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-                    ?: return false
-            return when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
-            val activeNetworkInfo = connectivityManager.activeNetworkInfo
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected
         }
     }
 

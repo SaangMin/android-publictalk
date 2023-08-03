@@ -73,6 +73,9 @@ class SettingInfoFragment : BaseFragment() {
                             startHomeActivity()
                         }
                     }
+                    if(it.isNetworkError) {
+                        Snackbar.make(binding.root,getString(R.string.network_error_msg), Snackbar.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

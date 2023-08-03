@@ -1,6 +1,7 @@
 package com.skysmyoo.publictalk.data.source
 
 import android.net.Uri
+import com.skysmyoo.publictalk.data.model.local.FriendListScreenData
 import com.skysmyoo.publictalk.data.model.remote.ChatRoom
 import com.skysmyoo.publictalk.data.model.remote.User
 import com.skysmyoo.publictalk.data.source.local.ChatLocalDataSource
@@ -244,5 +245,28 @@ class UserRepository @Inject constructor(
         userLocalDataSource.clearMyData()
         userLocalDataSource.clearFriendsData()
         chatLocalDataSource.clearChatRooms()
+    }
+
+    fun updateFriendList(
+        textOfMe: String,
+        textOfFriend: String
+    ): Flow<List<FriendListScreenData>> {
+        return flow {
+            val myInfo = getMyInfo() ?: return@flow
+            val friendList = getFriends().sortedBy { it.userName }
+            val itemList = mutableListOf(
+                FriendListScreenData.Header(textOfMe),
+                FriendListScreenData.Friend(myInfo),
+                FriendListScreenData.Header(textOfFriend)
+            )
+
+            if (friendList.isNotEmpty()) {
+                val friendListScreenData = friendList.map { FriendListScreenData.Friend(it) }
+                itemList.addAll(friendListScreenData)
+                emit(itemList)
+            } else {
+                emit(itemList)
+            }
+        }
     }
 }

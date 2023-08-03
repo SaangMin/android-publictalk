@@ -73,10 +73,17 @@ class SearchingFragment : BaseFragment() {
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
-                    if(it.isFailedAddFriend) {
+                    if (it.isFailedAddFriend) {
                         Snackbar.make(
                             binding.root,
                             getString(R.string.add_friend_error_msg),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (it.isEmptyTarget) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.empty_email_msg),
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }

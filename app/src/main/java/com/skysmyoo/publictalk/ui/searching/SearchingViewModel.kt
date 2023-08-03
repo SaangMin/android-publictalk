@@ -21,6 +21,7 @@ data class SearchingUiState(
     val isAddedFriend: Boolean = false,
     val isNetworkError: Boolean = false,
     val isFailedAddFriend: Boolean = false,
+    val isEmptyTarget: Boolean = false,
 )
 
 @HiltViewModel
@@ -47,17 +48,25 @@ class SearchingViewModel @Inject constructor(
                     }
 
                     is ApiResultError -> {
-                        _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = true)
+                        _searchingUiState.value =
+                            _searchingUiState.value.copy(isNetworkError = true)
                         delay(1000)
-                        _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = false)
+                        _searchingUiState.value =
+                            _searchingUiState.value.copy(isNetworkError = false)
                     }
 
                     else -> {
-                        _searchingUiState.value = _searchingUiState.value.copy(isNotExistUser = true)
+                        _searchingUiState.value =
+                            _searchingUiState.value.copy(isNotExistUser = true)
                         delay(1000)
-                        _searchingUiState.value = _searchingUiState.value.copy(isNotExistUser = false)
+                        _searchingUiState.value =
+                            _searchingUiState.value.copy(isNotExistUser = false)
                     }
                 }
+            } else {
+                _searchingUiState.value = _searchingUiState.value.copy(isEmptyTarget = true)
+                delay(1000)
+                _searchingUiState.value = _searchingUiState.value.copy(isEmptyTarget = false)
             }
         }
     }
@@ -78,7 +87,10 @@ class SearchingViewModel @Inject constructor(
                     _searchingUiState.value = _searchingUiState.value.copy(isAddedFriend = false)
                 } else {
                     _searchingUiState.value = _searchingUiState.value.copy(isFailedAddFriend = true)
-                    _searchingUiState.value = _searchingUiState.value.copy(isFailedAddFriend = false)
+                    _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = true)
+                    _searchingUiState.value =
+                        _searchingUiState.value.copy(isFailedAddFriend = false)
+                    _searchingUiState.value = _searchingUiState.value.copy(isNetworkError = false)
                 }
             }
         }

@@ -8,7 +8,6 @@
     <string name="edit_profile_image">image setting</string>
     <string name="setting_profile_image_label">프로필 이미지 설정\nProfile Image Setting</string>
     <string name="email_label">이메일\n(Email)</string>
-    <string name="email_sample">abcde@gmail.com</string>
     <string name="name_label">이름\n(Name)</string>
     <string name="input_name">이름(name)</string>
     <string name="language_label">언어\n(Language)</string>
@@ -29,17 +28,14 @@
     <string name="navigation_chat_list_label">Chat List Screen</string>
     <string name="navigation_setting_label">Setting Screen</string>
     <string name="navigation_home_activity_label">Main Screen</string>
-    <string name="friends_sample">Friends</string>
-    <string name="me_sample">me</string>
     <string name="friend_profile_image">Profile Image</string>
-    <string name="friend_name_sample">Steve</string>
     <string name="mine">Me</string>
     <string name="friend_label">Friends</string>
     <string name="exist_user_info_msg">Log in with your existing information.</string>
     <string name="icon_logo_image">logo image</string>
     <string name="navigation_splash_label">start loading Screen</string>
     <string name="navigation_start_activity_label">Start Screen</string>
-    <string name="logout">logout</string>
+    <string name="logout">Logout</string>
     <string name="chat_room_image">Chat Room Image</string>
     <string name="chat_list_item_body_sample">dsjnfajksldnfjalskdfjklashdfjlasndfuansdkfnasjdklfjsadkfljsadkfsjaldkfjksadlfjsadiofjkoaenwjrnwatasjtokkk</string>
     <string name="send">SEND</string>
@@ -93,9 +89,13 @@
     <string name="edit_error_msg">Please try again in a few minutes.</string>
     <string name="other_user_not_friend_msg">You must add the person as a friend before you can send them a message.</string>
     <string name="offline_mode_login">You will be logged in in offline mode. Please check your network.</string>
-    <string name="delete_account">withdrawal</string>
-    <string name="delete_accroun_msg">Are you sure you want to delete your account?</string>
+    <string name="delete_account">Withdrawal</string>
+    <string name="delete_account_msg">Are you sure you want to delete your account?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="delete_account_accept_msg">Account has been deleted.</string>
+    <string name="empty_email_msg">Please enter Email.</string>
+    <string name="how_to_use_label">HOW TO USE</string>
+    <string name="how_to_use">1. The language inside the app is currently only supported in Korean / English.\n(Translation function separate)\n\n2. In the translation function, the language you set is translated into the language set by the other party.\n\n3. To send a message without translation, put \'*\' in front of the message.\n\n4. If you don\'t add the person as a friend, you can only send and receive chat messages.\n(The names of friends who have not been added as friends are displayed in the email.)\n\n5. Notifications set in the settings screen are notifications while the app is running, and if you want to turn off notifications outside the app, turn off the notification permission in the system settings.</string>
+    <string name="close">Close</string>
 </resources>

@@ -67,7 +67,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_searching_profile"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/friend_name_sample" />
+                tools:text="개똥이" />
 
             <Button
                 android:id="@+id/btn_searching_add_friend"
