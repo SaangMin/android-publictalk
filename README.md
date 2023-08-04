@@ -39,4 +39,4 @@ Store : https://play.google.com/store/apps/details?id=com.skysmyoo.publictalk
 
 **개발 기록 문서**
 -
-https://github.com/SaangMin/android-publictalk.wiki.git
+https://github.com/SaangMin/android-publictalk.wiki
